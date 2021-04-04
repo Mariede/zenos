@@ -1,0 +1,5 @@
+# dependencies
+node_modules
+
+# other files
+/docs

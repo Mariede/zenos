@@ -1,0 +1,86 @@
+@import url(https://fonts.googleapis.com/css?family=B612);
+@import url(https://fonts.googleapis.com/css?family=Orbitron);
+
+html, body {
+	font: 16px B612, 'Segoe UI', Helvetica, Arial, sans-serif;
+	color: #000;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	background-color: #fff;
+	text-align: center;
+	outline: 0;
+	margin: 0;
+	padding: 0;
+}
+
+/* image */
+img {
+	border: 0;
+}
+
+#screen {
+	position: relative;
+	max-width: 1920px;
+	width: 100%;
+	height: 100%;
+	margin: auto;
+}
+
+#screen > div#action {
+	width: 100%;
+	height: calc(100% - 125px);
+	overflow: hidden;
+}
+
+/* Keep it fixed in pixels, based on map size */
+#screen > div#action > canvas {
+	width: 100%;
+	height: 100%;
+}
+
+#screen > div#general {
+	margin-top: 10px;
+	height: 115px;
+}
+
+#screen > div#general > div#menu {
+	width: 100%;
+	background-color: darkred;
+	color: white;
+}
+
+#screen > div#general > div#menu > div#top {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	align-items: center;
+}
+
+#screen > div#general > div#menu > div#bottom {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+}
+
+#screen > div#general > div#menu > div#top > span#player-name {
+	font-family: Orbitron, 'Segoe UI', Helvetica, Arial, sans-serif;
+	font-size: 32px;
+	letter-spacing: 1px;
+}
+
+#screen > div#general > div#menu > div#bottom > span#timer {
+	font-size: 24px;
+}
+
+#screen > div#general > div#info {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 14px;
+	font-style: italic;
+}
