@@ -5,27 +5,27 @@
 	// Helpers
 	// -----------------------------------------------------------------------------------------------
 
-	// Generic helpers
+	// Generic game helpers
 
 	// Get random integer number (min and max included)
-	const _randomIntFromInterval = (min, max) => (
-		Math.floor((Math.random() * (max - min + 1)) + min)
+	const _randomIntFromInterval = (_min, _max) => (
+		Math.floor((Math.random() * (_max - _min + 1)) + _min)
 	);
 
 	// Format number
-	const _numberFormatted = (number, decimalsAfter = 0) => {
-		const fatorDecimalsAfter = 10 ** decimalsAfter;
+	const _numberFormatted = (_number, _decimalsAfter = 0) => {
+		const fatorDecimalsAfter = 10 ** _decimalsAfter;
 
 		return (
-			String((Math.round(number * fatorDecimalsAfter) / fatorDecimalsAfter).toFixed(decimalsAfter)).replace('.', ',')
+			String((Math.round(_number * fatorDecimalsAfter) / fatorDecimalsAfter).toFixed(_decimalsAfter)).replace('.', ',')
 		);
 	};
 
 	// Format timer
-	const _timerFormatted = time => {
+	const _timerFormatted = _number => {
 		const date = new Date(0);
 
-		date.setSeconds(time);
+		date.setSeconds(_number);
 
 		return (
 			date.toISOString().substr(12, 7)
@@ -53,16 +53,62 @@
 		);
 	};
 
-	// Especific helpers
+	// Especific game helpers
 
-	// Check if map border is close enough
-	const _checkScreenBorders = side => (
-		Math.round(side / 2)
-	);
+	// Get element direction
+	/*
+		Return
+			-11 -> NW
+			-10 -> N
+			-9 -> NE
+			-1 -> W
+			1 -> E
+			9 -> SW
+			10 -> S
+			11 -> SE
+	*/
+	const _getElementDirection = _element => {
+		let currentElementDirection = 0;
+
+		if (_element.style.currentDirection) { // Only makes sense if element has a side directrion
+			if (_element.step.x === 0 && _element.step.y === 0) {
+				currentElementDirection = _element.style.currentDirection;
+			} else {
+				let saveThis = false;
+
+				if (_element.step.x > 0) {
+					currentElementDirection += 1;
+					saveThis = true;
+				} else if (_element.step.x < 0) {
+					currentElementDirection -= 1;
+					saveThis = true;
+				}
+
+				if (_element.step.y > 0) {
+					currentElementDirection += 10;
+					saveThis = true;
+				} else if (_element.step.y < 0) {
+					currentElementDirection -= 10;
+					saveThis = true;
+				}
+
+				if (saveThis) {
+					_element.style.currentDirection = currentElementDirection;
+				}
+			}
+		}
+
+		return currentElementDirection;
+	};
 
 	// Get element speed (if speed not defined, base 1)
-	const _getElementSpeed = (step, stepSpeed = 1) => (
-		Math.floor((step || 0) * (stepSpeed || 1))
+	const _getElementSpeed = (_step, _stepSpeed = 1) => (
+		Math.floor((_step || 0) * (_stepSpeed || 1))
+	);
+
+	// Check if map border is close enough
+	const _checkScreenBorders = _side => (
+		Math.round(_side / 2)
 	);
 
 	// -----------------------------------------------------------------------------------------------
@@ -216,6 +262,13 @@
 			// Colisions
 			checkElementColisions(mapElement, _map);
 
+			/*
+			*** Only when using sprites for objects - future code ***
+
+			// Element direction (if applicable)
+			const currentElementDirection = _getElementDirection(mapElement);
+			*/
+
 			// Drawn element body
 			if (mapElement.rotate) {
 				_cx.translate(mapElement.x, mapElement.y);
@@ -306,50 +359,6 @@
 		}
 	};
 
-	// Get player direction
-	/*
-		Return
-			-11 -> NW
-			-10 -> N
-			-9 -> NE
-			-1 -> W
-			1 -> E
-			9 -> SW
-			10 -> S
-			11 -> SE
-	*/
-	const getPlayerDirection = (_player, savePlayerDirection = false) => {
-		let currentPlayerDirection = 0;
-
-		if (_player.step.x === 0 && _player.step.y === 0) {
-			currentPlayerDirection = _player.style.currentDirection;
-		} else {
-			let saveThis = false;
-
-			if (_player.step.x > 0) {
-				currentPlayerDirection += 1;
-				saveThis = true;
-			} else if (_player.step.x < 0) {
-				currentPlayerDirection -= 1;
-				saveThis = true;
-			}
-
-			if (_player.step.y > 0) {
-				currentPlayerDirection += 10;
-				saveThis = true;
-			} else if (_player.step.y < 0) {
-				currentPlayerDirection -= 10;
-				saveThis = true;
-			}
-
-			if (saveThis && savePlayerDirection) {
-				_player.style.currentDirection = currentPlayerDirection;
-			}
-		}
-
-		return currentPlayerDirection;
-	};
-
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDirection = (_cx, _player, _x, _y) => {
 			_cx.moveTo(_player.x, _player.y);
@@ -358,14 +367,14 @@
 
 		const baseAngle = Math.PI / 180;
 
-		// Player direction
-		const currentPlayerDirection = getPlayerDirection(_player, true);
-
 		// Movement
 		movePlayer(_action, _player);
 
 		// Colisions
 		checkPlayerColisions(_player, _map);
+
+		// Player direction
+		const currentPlayerDirection = _getElementDirection(_player);
 
 		// Drawn player body
 		_cx.beginPath();
