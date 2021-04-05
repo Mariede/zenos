@@ -114,82 +114,160 @@
 	// Drawn element extra forms indicating the current direction
 	const _drawnElementDirection = (_cx, _element, _currentPlayerDirection) => {
 		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
-			const _drawnExtraForm = (_cx, _player, _x, _y) => {
-				// If circle
-				_cx.moveTo(_player.x, _player.y);
-				_cx.lineTo(_x, _y);
-			};
-
 			const baseAngle = Math.PI / 180;
 
-			// If circle
-			_cx.lineWidth = _element.radius / 5;
+			const elementIsACircle = _element.radius || false; // Circle or rectangle
+
+			_cx.save();
+
+			_cx.lineWidth = 5;
+
+			const midInnerRectWidth = _element.x + (_element.width / 2); // Only for rectangle element
+			const midInnerRectHeight = _element.y + (_element.height / 2); // Only for rectangle element
+			const baseInnerRectStart = _cx.lineWidth / 2; // Circle or rectangle
 
 			_cx.beginPath();
-			_cx.rect(_element.x - (_cx.lineWidth / 2), _element.y - (_cx.lineWidth / 2), _cx.lineWidth, _cx.lineWidth);
+
+			if (elementIsACircle) {
+				_cx.rect(_element.x - baseInnerRectStart, _element.y - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
+			} else {
+				_cx.rect(midInnerRectWidth - baseInnerRectStart, midInnerRectHeight - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
+			}
 
 			switch (_currentPlayerDirection) {
 				case -11: { // NW
-					const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
-					const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
+					if (elementIsACircle) {
+						const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
+						const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x;
+						const getY = _element.y;
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case -10: { // N
-					const getX = _element.x;
-					const getY = _element.y - _element.radius;
+					if (elementIsACircle) {
+						const getX = _element.x;
+						const getY = _element.y - _element.radius;
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x + (_element.width / 2);
+						const getY = _element.y;
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case -9: { // NE
-					const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
-					const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
+					if (elementIsACircle) {
+						const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
+						const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x + _element.width;
+						const getY = _element.y;
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case -1: { // W
-					const getX = _element.x - _element.radius;
-					const getY = _element.y;
+					if (elementIsACircle) {
+						const getX = _element.x - _element.radius;
+						const getY = _element.y;
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x;
+						const getY = _element.y + (_element.height / 2);
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case 1: { // E
-					const getX = _element.x + _element.radius;
-					const getY = _element.y;
+					if (elementIsACircle) {
+						const getX = _element.x + _element.radius;
+						const getY = _element.y;
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x + _element.width;
+						const getY = _element.y + (_element.height / 2);
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case 9: { // SW
-					const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
-					const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
+					if (elementIsACircle) {
+						const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
+						const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x;
+						const getY = _element.y + _element.height;
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case 10: { // S
-					const getX = _element.x;
-					const getY = _element.y + _element.radius;
+					if (elementIsACircle) {
+						const getX = _element.x;
+						const getY = _element.y + _element.radius;
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x + (_element.width / 2);
+						const getY = _element.y + _element.height;
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
 				case 11: { // SE
-					const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
-					const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
+					if (elementIsACircle) {
+						const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
+						const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
 
-					_drawnExtraForm(_cx, _element, getX, getY);
+						_cx.moveTo(_element.x, _element.y);
+						_cx.lineTo(getX, getY);
+					} else {
+						const getX = _element.x + _element.width;
+						const getY = _element.y + _element.height;
+
+						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+						_cx.lineTo(getX, getY);
+					}
 
 					break;
 				}
@@ -198,6 +276,8 @@
 			_cx.strokeStyle = _element.style.color.details;
 			_cx.stroke();
 			_cx.closePath();
+
+			_cx.restore();
 		}
 	};
 
@@ -365,14 +445,16 @@
 			_cx.fillStyle = mapElement.style.fillStyle;
 			_cx.fillRect(mapElement.x, mapElement.y, mapElement.width, mapElement.height);
 
+			_cx.restore();
+
 			// Drawn element direction (if applicable)
 			_drawnElementDirection(_cx, mapElement, currentElementDirection);
-
-			_cx.restore();
 		}
 	};
 
 	const renderMap = (_cx, _map) => {
+		_cx.save();
+
 		// Drawn base screen Filling
 		_cx.fillStyle = _map.style.fillStyle;
 		_cx.fillRect(0, 0, $boxWidth, $boxHeight);
@@ -385,6 +467,8 @@
 		_cx.strokeStyle = _map.style.outline;
 		_cx.stroke();
 		_cx.closePath();
+
+		_cx.restore();
 
 		// Elements inside base screen
 		drawMapElements(_cx, _map);
@@ -449,6 +533,8 @@
 	};
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
+		_cx.save();
+
 		// Movement
 		movePlayer(_action, _player);
 
@@ -465,11 +551,15 @@
 		_cx.fill();
 		_cx.closePath();
 
+		_cx.restore();
+
 		// Drawn player direction
 		_drawnElementDirection(_cx, _player, currentPlayerDirection);
 
 		// Drawn player details (shield)
 		if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
+			_cx.save();
+
 			_cx.lineWidth = 1;
 
 			_cx.beginPath();
@@ -477,6 +567,8 @@
 			_cx.strokeStyle = _player.skills.shield.color;
 			_cx.stroke();
 			_cx.closePath();
+
+			_cx.restore();
 		}
 	};
 
@@ -1040,6 +1132,10 @@
 						x: 500,
 						y: 500,
 						style: {
+							color: {
+								details: 'aquamarine'
+							},
+							currentDirection: 11,
 							fillStyle: 'green'
 						},
 						step: {
@@ -1059,6 +1155,10 @@
 						x: 490,
 						y: 170,
 						style: {
+							color: {
+								details: 'darkorange'
+							},
+							currentDirection: 11,
 							fillStyle: 'gold'
 						},
 						step: {
