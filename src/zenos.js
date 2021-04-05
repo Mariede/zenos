@@ -1022,7 +1022,7 @@
 		/*
 			Maps images and elements colors
 				-> each item in the outer array (first) defines a image map set (same order as maps)
-				-> uses ids to replace properties in maps
+				-> uses ids to replace properties in maps (style.fillStyle or style.color.body)
 
 			type:
 				1 - solid color
@@ -1030,6 +1030,7 @@
 				3 - background image - pattern (no repeat)
 				4 - background image - pattern (repeat-x)
 				5 - background image - pattern (repeat-y)
+				6 - callback related (linear or radial gradient)
 		*/
 		const mapsFillSpecial = [
 			{
@@ -1043,6 +1044,28 @@
 						id: '%elements.2.style.color.body%',
 						content: './images/brick1.png',
 						type: 2
+					},
+					{
+						id: '%elements.5.style.color.body',
+						content: _cx => {
+							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
+							gradient.addColorStop(0.5, 'green');
+							gradient.addColorStop(1, 'purple');
+
+							return gradient;
+						},
+						type: 6
+					},
+					{
+						id: '%elements.6.style.color.body',
+						content: _cx => {
+							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
+							gradient.addColorStop(0.5, 'gold');
+							gradient.addColorStop(1, 'cyan');
+
+							return gradient;
+						},
+						type: 6
 					}
 				]
 			}
@@ -1137,7 +1160,7 @@
 						y: 500,
 						style: {
 							color: {
-								body: 'green',
+								body: '%elements.5.style.color.body',
 								details: 'aquamarine'
 							},
 							currentDirection: 11
@@ -1160,7 +1183,7 @@
 						y: 170,
 						style: {
 							color: {
-								body: 'gold',
+								body: '%elements.6.style.color.body',
 								details: 'darkorange'
 							},
 							currentDirection: 11
@@ -1210,34 +1233,54 @@
 	const loadMapFillData = mapFillItem => (
 		new Promise(
 			(resolve, reject) => {
-				if (mapFillItem.type === 1) {
-					resolve(
-						{
-							id: mapFillItem.id,
-							fill: mapFillItem.content,
-							type: mapFillItem.type
-						}
-					);
-				} else {
-					const mapImage = new Image();
+				switch (mapFillItem.type) {
+					case 1:
+					case 6: {
+						resolve(
+							{
+								id: mapFillItem.id,
+								fill: mapFillItem.content,
+								type: mapFillItem.type
+							}
+						);
 
-					mapImage.src = mapFillItem.content;
+						break;
+					}
+					case 2:
+					case 3:
+					case 4:
+					case 5: {
+						const mapImage = new Image();
 
-					mapImage.onload = () => resolve(
-						{
-							id: mapFillItem.id,
-							fill: mapImage,
-							type: mapFillItem.type
-						}
-					);
+						mapImage.src = mapFillItem.content;
 
-					mapImage.onabort = () => reject(
-						new Error(`Error loading map image ${mapFillItem.content} - aborting...`)
-					);
+						mapImage.onload = () => resolve(
+							{
+								id: mapFillItem.id,
+								fill: mapImage,
+								type: mapFillItem.type
+							}
+						);
 
-					mapImage.onerror = () => reject(
-						new Error(`Error loading map image ${mapFillItem.content}...'`)
-					);
+						mapImage.onabort = () => reject(
+							new Error(`Error loading map image ${mapFillItem.content} - aborting...`)
+						);
+
+						mapImage.onerror = () => reject(
+							new Error(`Error loading map image ${mapFillItem.content}...'`)
+						);
+
+						break;
+					}
+					default: {
+						resolve(
+							{
+								id: mapFillItem.id,
+								fill: '',
+								type: mapFillItem.type
+							}
+						);
+					}
 				}
 			}
 		)
@@ -1294,27 +1337,31 @@
 									mapType === 1 ? (
 										mapFill
 									) : (
-										(mapType === 2 || mapType === 3 || mapType === 4 || mapType === 5) ? (
-											_cx.createPattern(
-												mapFill,
-												(
-													mapType === 2 ? (
-														'repeat'
-													) : (
-														mapType === 3 ? (
-															'no-repeat'
+										mapType === 6 ? (
+											typeof mapFill === 'function' && mapFill(_cx)
+										) : (
+											(mapType === 2 || mapType === 3 || mapType === 4 || mapType === 5) ? (
+												_cx.createPattern(
+													mapFill,
+													(
+														mapType === 2 ? (
+															'repeat'
 														) : (
-															mapType === 4 ? (
-																'repeat-x'
+															mapType === 3 ? (
+																'no-repeat'
 															) : (
-																'repeat-y'
+																mapType === 4 ? (
+																	'repeat-x'
+																) : (
+																	'repeat-y'
+																)
 															)
 														)
 													)
 												)
+											) : (
+												mapFill
 											)
-										) : (
-											_cx.createPattern(mapFill, '')
 										)
 									)
 								);
