@@ -114,25 +114,36 @@
 	// Drawn element extra forms indicating the current direction
 	const _drawnElementDirection = (_cx, _element, _currentPlayerDirection) => {
 		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
+			const _executeDrawnDirection = (_cx, _element, _elementIsACircle, _getX, _getY) => {
+				_cx.save();
+
+				_cx.lineWidth = 5;
+
+				const baseInnerRectStart = _cx.lineWidth / 2;
+
+				_cx.beginPath();
+
+				if (_elementIsACircle) {
+					_cx.rect(_element.x - baseInnerRectStart, _element.y - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
+					_cx.moveTo(_element.x, _element.y);
+				} else {
+					const midInnerRectWidth = _element.x + (_element.width / 2);
+					const midInnerRectHeight = _element.y + (_element.height / 2);
+
+					_cx.rect(midInnerRectWidth - baseInnerRectStart, midInnerRectHeight - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
+					_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+				}
+
+				_cx.lineTo(_getX, _getY);
+				_cx.strokeStyle = _element.style.color.details;
+				_cx.stroke();
+				_cx.closePath();
+
+				_cx.restore();
+			};
+
 			const baseAngle = Math.PI / 180;
-
-			const elementIsACircle = _element.radius || false; // Circle or rectangle
-
-			_cx.save();
-
-			_cx.lineWidth = 5;
-
-			const midInnerRectWidth = _element.x + (_element.width / 2); // Only for rectangle element
-			const midInnerRectHeight = _element.y + (_element.height / 2); // Only for rectangle element
-			const baseInnerRectStart = _cx.lineWidth / 2; // Circle or rectangle
-
-			_cx.beginPath();
-
-			if (elementIsACircle) {
-				_cx.rect(_element.x - baseInnerRectStart, _element.y - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
-			} else {
-				_cx.rect(midInnerRectWidth - baseInnerRectStart, midInnerRectHeight - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
-			}
+			const elementIsACircle = _element.radius || false;
 
 			switch (_currentPlayerDirection) {
 				case -11: { // NW
@@ -140,14 +151,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x;
 						const getY = _element.y;
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -157,14 +166,12 @@
 						const getX = _element.x;
 						const getY = _element.y - _element.radius;
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + (_element.width / 2);
 						const getY = _element.y;
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -174,14 +181,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + _element.width;
 						const getY = _element.y;
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -191,14 +196,12 @@
 						const getX = _element.x - _element.radius;
 						const getY = _element.y;
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x;
 						const getY = _element.y + (_element.height / 2);
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -208,14 +211,12 @@
 						const getX = _element.x + _element.radius;
 						const getY = _element.y;
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + _element.width;
 						const getY = _element.y + (_element.height / 2);
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -225,14 +226,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x;
 						const getY = _element.y + _element.height;
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -242,14 +241,12 @@
 						const getX = _element.x;
 						const getY = _element.y + _element.radius;
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + (_element.width / 2);
 						const getY = _element.y + _element.height;
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -259,25 +256,17 @@
 						const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
 
-						_cx.moveTo(_element.x, _element.y);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + _element.width;
 						const getY = _element.y + _element.height;
 
-						_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-						_cx.lineTo(getX, getY);
+						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
 				}
 			}
-
-			_cx.strokeStyle = _element.style.color.details;
-			_cx.stroke();
-			_cx.closePath();
-
-			_cx.restore();
 		}
 	};
 
@@ -533,6 +522,22 @@
 	};
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
+		const _executeDrawnPlayerDetails = (_cx, _player) => {
+			if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
+				_cx.save();
+
+				_cx.lineWidth = 1;
+
+				_cx.beginPath();
+				_cx.arc(_player.x, _player.y, _player.radius * 1.5, 0, 2 * Math.PI);
+				_cx.strokeStyle = _player.skills.shield.color;
+				_cx.stroke();
+				_cx.closePath();
+
+				_cx.restore();
+			}
+		};
+
 		_cx.save();
 
 		// Movement
@@ -557,19 +562,7 @@
 		_drawnElementDirection(_cx, _player, currentPlayerDirection);
 
 		// Drawn player details (shield)
-		if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
-			_cx.save();
-
-			_cx.lineWidth = 1;
-
-			_cx.beginPath();
-			_cx.arc(_player.x, _player.y, _player.radius * 1.5, 0, 2 * Math.PI);
-			_cx.strokeStyle = _player.skills.shield.color;
-			_cx.stroke();
-			_cx.closePath();
-
-			_cx.restore();
-		}
+		_executeDrawnPlayerDetails(_cx, _player);
 	};
 
 	// -----------------------------------------------------------------------------------------------
