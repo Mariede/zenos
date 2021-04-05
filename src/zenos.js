@@ -111,10 +111,39 @@
 		return currentElementDirection;
 	};
 
-	// Drawn element extra forms indicating the current direction
-	const _drawnElementDirection = (_cx, _element, _currentPlayerDirection) => {
+	// Drawn element body and direction (if applicable)
+	const _drawnElement = (_cx, _element, _currentPlayerDirection) => {
+		const elementIsACircle = _element.radius || false;
+
+		// Drawn element body
+		if (elementIsACircle) {
+			_cx.save();
+
+			_cx.beginPath();
+			_cx.arc(_element.x, _element.y, _element.radius, 0, 2 * Math.PI);
+			_cx.fillStyle = _element.style.color.body;
+			_cx.fill();
+			_cx.closePath();
+
+			_cx.restore();
+		} else {
+			_cx.save();
+
+			if (_element.rotate) {
+				_cx.translate(_element.x, _element.y);
+				_cx.rotate(_element.rotate * Math.PI / 180);
+				_cx.translate(-_element.x, -_element.y);
+			}
+
+			_cx.fillStyle = _element.style.fillStyle;
+			_cx.fillRect(_element.x, _element.y, _element.width, _element.height);
+
+			_cx.restore();
+		}
+
+		// Drawn element direction
 		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
-			const _executeDrawnDirection = (_cx, _element, _elementIsACircle, _getX, _getY) => {
+			const _drawnElementDirection = (_cx, _element, _elementIsACircle, _getX, _getY) => {
 				_cx.save();
 
 				_cx.lineWidth = 5;
@@ -143,7 +172,6 @@
 			};
 
 			const baseAngle = Math.PI / 180;
-			const elementIsACircle = _element.radius || false;
 
 			switch (_currentPlayerDirection) {
 				case -11: { // NW
@@ -151,12 +179,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x;
 						const getY = _element.y;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -166,12 +194,12 @@
 						const getX = _element.x;
 						const getY = _element.y - _element.radius;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + (_element.width / 2);
 						const getY = _element.y;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -181,12 +209,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + _element.width;
 						const getY = _element.y;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -196,12 +224,12 @@
 						const getX = _element.x - _element.radius;
 						const getY = _element.y;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x;
 						const getY = _element.y + (_element.height / 2);
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -211,12 +239,12 @@
 						const getX = _element.x + _element.radius;
 						const getY = _element.y;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + _element.width;
 						const getY = _element.y + (_element.height / 2);
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -226,12 +254,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x;
 						const getY = _element.y + _element.height;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -241,12 +269,12 @@
 						const getX = _element.x;
 						const getY = _element.y + _element.radius;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + (_element.width / 2);
 						const getY = _element.y + _element.height;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -256,12 +284,12 @@
 						const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					} else {
 						const getX = _element.x + _element.width;
 						const getY = _element.y + _element.height;
 
-						_executeDrawnDirection(_cx, _element, elementIsACircle, getX, getY);
+						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
 					}
 
 					break;
@@ -413,8 +441,6 @@
 		// Elements for base screen
 
 		for (const mapElement of _map.elements) {
-			_cx.save();
-
 			// Movement (if applicable)
 			moveMapElement(mapElement);
 
@@ -424,20 +450,8 @@
 			// Element direction (if applicable)
 			const currentElementDirection = _getElementDirection(mapElement);
 
-			// Drawn element body
-			if (mapElement.rotate) {
-				_cx.translate(mapElement.x, mapElement.y);
-				_cx.rotate(mapElement.rotate * Math.PI / 180);
-				_cx.translate(-mapElement.x, -mapElement.y);
-			}
-
-			_cx.fillStyle = mapElement.style.fillStyle;
-			_cx.fillRect(mapElement.x, mapElement.y, mapElement.width, mapElement.height);
-
-			_cx.restore();
-
-			// Drawn element direction (if applicable)
-			_drawnElementDirection(_cx, mapElement, currentElementDirection);
+			// Drawn element body (direction if applicable)
+			_drawnElement(_cx, mapElement, currentElementDirection);
 		}
 	};
 
@@ -522,7 +536,7 @@
 	};
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
-		const _executeDrawnPlayerDetails = (_cx, _player) => {
+		const _drawnPlayerDetails = (_cx, _player) => {
 			if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
 				_cx.save();
 
@@ -538,8 +552,6 @@
 			}
 		};
 
-		_cx.save();
-
 		// Movement
 		movePlayer(_action, _player);
 
@@ -549,20 +561,11 @@
 		// Player direction
 		const currentPlayerDirection = _getElementDirection(_player);
 
-		// Drawn player body
-		_cx.beginPath();
-		_cx.arc(_player.x, _player.y, _player.radius, 0, 2 * Math.PI);
-		_cx.fillStyle = _player.style.color.body;
-		_cx.fill();
-		_cx.closePath();
-
-		_cx.restore();
-
-		// Drawn player direction
-		_drawnElementDirection(_cx, _player, currentPlayerDirection);
+		// Drawn player body and direction
+		_drawnElement(_cx, _player, currentPlayerDirection);
 
 		// Drawn player details (shield)
-		_executeDrawnPlayerDetails(_cx, _player);
+		_drawnPlayerDetails(_cx, _player);
 	};
 
 	// -----------------------------------------------------------------------------------------------
