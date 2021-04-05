@@ -55,7 +55,17 @@
 
 	// Especific game helpers
 
-	// Get element direction
+	// Get element speed (if speed not defined, base 1)
+	const _getElementSpeed = (_step, _stepSpeed = 1) => (
+		Math.floor((_step || 0) * (_stepSpeed || 1))
+	);
+
+	// Check if map border is close enough
+	const _checkScreenBorders = _side => (
+		Math.round(_side / 2)
+	);
+
+	// Get element current direction
 	/*
 		Return
 			-11 -> NW
@@ -70,7 +80,7 @@
 	const _getElementDirection = _element => {
 		let currentElementDirection = 0;
 
-		if (_element.style.currentDirection) { // Only makes sense if element has a side directrion
+		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
 			if (_element.step.x === 0 && _element.step.y === 0) {
 				currentElementDirection = _element.style.currentDirection;
 			} else {
@@ -101,15 +111,95 @@
 		return currentElementDirection;
 	};
 
-	// Get element speed (if speed not defined, base 1)
-	const _getElementSpeed = (_step, _stepSpeed = 1) => (
-		Math.floor((_step || 0) * (_stepSpeed || 1))
-	);
+	// Drawn element extra forms indicating the current direction
+	const _drawnElementDirection = (_cx, _element, _currentPlayerDirection) => {
+		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
+			const _drawnExtraForm = (_cx, _player, _x, _y) => {
+				// If circle
+				_cx.moveTo(_player.x, _player.y);
+				_cx.lineTo(_x, _y);
+			};
 
-	// Check if map border is close enough
-	const _checkScreenBorders = _side => (
-		Math.round(_side / 2)
-	);
+			const baseAngle = Math.PI / 180;
+
+			// If circle
+			_cx.lineWidth = _element.radius / 5;
+
+			_cx.beginPath();
+			_cx.rect(_element.x - (_cx.lineWidth / 2), _element.y - (_cx.lineWidth / 2), _cx.lineWidth, _cx.lineWidth);
+
+			switch (_currentPlayerDirection) {
+				case -11: { // NW
+					const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case -10: { // N
+					const getX = _element.x;
+					const getY = _element.y - _element.radius;
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case -9: { // NE
+					const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case -1: { // W
+					const getX = _element.x - _element.radius;
+					const getY = _element.y;
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case 1: { // E
+					const getX = _element.x + _element.radius;
+					const getY = _element.y;
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case 9: { // SW
+					const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case 10: { // S
+					const getX = _element.x;
+					const getY = _element.y + _element.radius;
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+				case 11: { // SE
+					const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
+
+					_drawnExtraForm(_cx, _element, getX, getY);
+
+					break;
+				}
+			}
+
+			_cx.strokeStyle = _element.style.color.details;
+			_cx.stroke();
+			_cx.closePath();
+		}
+	};
 
 	// -----------------------------------------------------------------------------------------------
 	// Listeners (load / start)
@@ -262,12 +352,8 @@
 			// Colisions
 			checkElementColisions(mapElement, _map);
 
-			/*
-			*** Only when using sprites for objects - future code ***
-
 			// Element direction (if applicable)
 			const currentElementDirection = _getElementDirection(mapElement);
-			*/
 
 			// Drawn element body
 			if (mapElement.rotate) {
@@ -278,6 +364,9 @@
 
 			_cx.fillStyle = mapElement.style.fillStyle;
 			_cx.fillRect(mapElement.x, mapElement.y, mapElement.width, mapElement.height);
+
+			// Drawn element direction (if applicable)
+			_drawnElementDirection(_cx, mapElement, currentElementDirection);
 
 			_cx.restore();
 		}
@@ -360,13 +449,6 @@
 	};
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
-		const _drawnPlayerDirection = (_cx, _player, _x, _y) => {
-			_cx.moveTo(_player.x, _player.y);
-			_cx.lineTo(_x, _y);
-		};
-
-		const baseAngle = Math.PI / 180;
-
 		// Movement
 		movePlayer(_action, _player);
 
@@ -384,81 +466,7 @@
 		_cx.closePath();
 
 		// Drawn player direction
-		_cx.lineWidth = _player.radius / 5;
-
-		_cx.beginPath();
-		_cx.rect(_player.x - (_cx.lineWidth / 2), _player.y - (_cx.lineWidth / 2), _cx.lineWidth, _cx.lineWidth);
-
-		switch (currentPlayerDirection) {
-			case -11: { // NW
-				const getX = _player.x + (_player.radius * Math.sin(-45 * baseAngle));
-				const getY = _player.y - (_player.radius * Math.cos(-45 * baseAngle));
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case -10: { // N
-				const getX = _player.x;
-				const getY = _player.y - _player.radius;
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case -9: { // NE
-				const getX = _player.x + (_player.radius * Math.sin(45 * baseAngle));
-				const getY = _player.y - (_player.radius * Math.cos(45 * baseAngle));
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case -1: { // W
-				const getX = _player.x - _player.radius;
-				const getY = _player.y;
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case 1: { // E
-				const getX = _player.x + _player.radius;
-				const getY = _player.y;
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case 9: { // SW
-				const getX = _player.x + (_player.radius * Math.sin(225 * baseAngle));
-				const getY = _player.y - (_player.radius * Math.cos(225 * baseAngle));
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case 10: { // S
-				const getX = _player.x;
-				const getY = _player.y + _player.radius;
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-			case 11: { // SE
-				const getX = _player.x + (_player.radius * Math.sin(-225 * baseAngle));
-				const getY = _player.y - (_player.radius * Math.cos(-225 * baseAngle));
-
-				_drawnPlayerDirection(_cx, _player, getX, getY);
-
-				break;
-			}
-		}
-
-		_cx.strokeStyle = _player.style.color.details;
-		_cx.stroke();
-		_cx.closePath();
+		_drawnElementDirection(_cx, _player, currentPlayerDirection);
 
 		// Drawn player details (shield)
 		if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
