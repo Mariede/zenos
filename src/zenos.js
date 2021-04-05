@@ -135,7 +135,7 @@
 				_cx.translate(-_element.x, -_element.y);
 			}
 
-			_cx.fillStyle = _element.style.fillStyle;
+			_cx.fillStyle = _element.style.color.body;
 			_cx.fillRect(_element.x, _element.y, _element.width, _element.height);
 
 			_cx.restore();
@@ -1040,7 +1040,7 @@
 						type: 2
 					},
 					{
-						id: '%elements.1.style.fillStyle%',
+						id: '%elements.2.style.color.body%',
 						content: './images/brick1.png',
 						type: 2
 					}
@@ -1077,62 +1077,70 @@
 				elements: [
 					{
 						id: 1,
+						type: 1,
 						width: 80,
 						height: 310,
-						type: 1,
 						x: 158,
 						y: 198,
 						style: {
-							fillStyle: 'black'
+							color: {
+								body: 'black'
+							}
 						}
 					},
 					{
 						id: 2,
+						type: 1,
 						width: 80,
 						height: 305,
 						// Em análise - rotate: 10,
-						type: 1,
 						x: 150,
 						y: 200,
 						style: {
-							fillStyle: '%elements.1.style.fillStyle%'
+							color: {
+								body: '%elements.2.style.color.body%'
+							}
 						}
 					},
 					{
 						id: 3,
+						type: 1,
 						width: 200,
 						height: 50,
-						type: 1,
 						x: 290,
 						y: 110,
 						style: {
-							fillStyle: 'orangered'
+							color: {
+								body: 'orangered'
+							}
 						}
 					},
 					{
 						id: 4,
+						type: 1,
 						width: 200,
 						height: 50,
-						type: 1,
 						x: 290,
 						y: 550,
 						style: {
-							fillStyle: 'red'
+							color: {
+								body: 'red'
+							}
 						}
 					},
 					{
 						id: 5,
+						type: 3,
 						width: 150,
 						height: 50,
-						type: 3,
 						x: 500,
 						y: 500,
 						style: {
 							color: {
+								body: 'green',
 								details: 'aquamarine'
 							},
-							currentDirection: 11,
-							fillStyle: 'green'
+							currentDirection: 11
 						},
 						step: {
 							x: 2,
@@ -1145,17 +1153,17 @@
 					},
 					{
 						id: 6,
+						type: 3,
 						width: 10,
 						height: 60,
-						type: 3,
 						x: 490,
 						y: 170,
 						style: {
 							color: {
+								body: 'gold',
 								details: 'darkorange'
 							},
-							currentDirection: 11,
-							fillStyle: 'gold'
+							currentDirection: 11
 						},
 						step: {
 							x: 1,
@@ -1164,13 +1172,27 @@
 					},
 					{
 						id: 7,
+						type: 1,
 						width: 20,
 						height: 100,
-						type: 1,
 						x: 700,
 						y: 200,
 						style: {
-							fillStyle: 'tomato'
+							color: {
+								body: 'tomato'
+							}
+						}
+					},
+					{
+						id: 8,
+						type: 1,
+						radius: 40,
+						x: 650,
+						y: 150,
+						style: {
+							color: {
+								body: 'pink'
+							}
 						}
 					}
 				]
@@ -1358,12 +1380,19 @@
 		const playersRepo = [
 			{
 				name: 'Mike',
-				radius: 20,
 				life: 500,
 				damageTakenFactor: 25,
 				timer: 0,
+				radius: 20,
 				x: 200,
 				y: 200,
+				style: {
+					color: {
+						body: 'black',
+						details: 'red'
+					},
+					currentDirection: 1
+				},
 				step: {
 					x: 0,
 					y: 0,
@@ -1371,13 +1400,6 @@
 					xMax: 3,
 					yMax: 3,
 					speed: 1
-				},
-				style: {
-					color: {
-						body: 'black',
-						details: 'red'
-					},
-					currentDirection: 1
 				},
 				skills: {
 					shield: {
