@@ -573,7 +573,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const colisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, _aidValues, phase) => {
-		let willReturn = false;
+		let willModifyPlayerLife = false;
 
 		if (_checkElement.type && _checkElement.type === 2) { // Remove active item
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
@@ -612,7 +612,7 @@
 					}
 				}
 
-				willReturn = true;
+				willModifyPlayerLife = true;
 
 				break;
 			}
@@ -628,13 +628,13 @@
 					}
 				}
 
-				willReturn = true;
+				willModifyPlayerLife = true;
 
 				break;
 			}
 		}
 
-		return willReturn;
+		return willModifyPlayerLife;
 	};
 
 	const checkMapBorderXColision = (checkElement, _map) => {
@@ -711,28 +711,34 @@
 			);
 
 			if (goCheck) {
+				const bonusLifeModifier = (
+					_mapElement.skills && typeof _mapElement.skills.bonusLifeModifier === 'number' && !isNaN(_mapElement.skills.bonusLifeModifier) && _mapElement.skills.bonusLifeModifier
+				) || (
+					0
+				);
+
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
 					if (_checkElement.x <= aidValuesAtX.groupedXPlus + _mapElement.width && _checkElement.x > aidValuesAtX.groupedXPlus) {
 						// Colided
-						const willReturn = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 1);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 1);
 
-						if (willReturn) {
-							return -1;
+						if (willModifyPlayerLife) {
+							return bonusLifeModifier;
 						}
 					}
 				} else {
 					if (_checkElement.x >= aidValuesAtX.groupedXLess && _checkElement.x + secureBorder <= aidValuesAtX.groupedXLess + _mapElement.width) {
 						// Colided
-						const willReturn = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 2);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 2);
 
-						if (willReturn) {
-							return 1;
+						if (willModifyPlayerLife) {
+							return bonusLifeModifier;
 						}
 					}
 				}
 			}
 
-			return 0;
+			return NaN;
 		};
 
 		const _checkAtY = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
@@ -760,28 +766,34 @@
 			);
 
 			if (goCheck) {
+				const bonusLifeModifier = (
+					_mapElement.skills && typeof _mapElement.skills.bonusLifeModifier === 'number' && !isNaN(_mapElement.skills.bonusLifeModifier) && _mapElement.skills.bonusLifeModifier
+				) || (
+					0
+				);
+
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
 					if (_checkElement.y <= aidValuesAtY.groupedYPlus + _mapElement.height && _checkElement.y > aidValuesAtY.groupedYPlus) {
 						// Colided
-						const willReturn = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 3);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 3);
 
-						if (willReturn) {
-							return -1;
+						if (willModifyPlayerLife) {
+							return bonusLifeModifier;
 						}
 					}
 				} else {
 					if (_checkElement.y >= aidValuesAtY.groupedYLess && _checkElement.y + secureBorder <= aidValuesAtY.groupedYLess + _mapElement.height) {
 						// Colided
-						const willReturn = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 4);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 4);
 
-						if (willReturn) {
-							return 1;
+						if (willModifyPlayerLife) {
+							return bonusLifeModifier;
 						}
 					}
 				}
 			}
 
-			return 0;
+			return NaN;
 		};
 
 		for (const mapElement of _map.elements) {
@@ -789,13 +801,17 @@
 				const resultAtX = _checkAtX(checkElement, mapElement, _map.elements, _idActiveElement);
 				const resultAtY = _checkAtY(checkElement, mapElement, _map.elements, _idActiveElement);
 
-				if (resultAtX !== 0 || resultAtY !== 0) {
-					return (resultAtX || resultAtY);
+				if (!isNaN(resultAtX)) {
+					return resultAtX;
+				}
+
+				if (!isNaN(resultAtY)) {
+					return resultAtY;
 				}
 			}
 		}
 
-		return 0;
+		return NaN;
 	};
 
 	const checkElementColisions = (_mapElement, _map) => {
@@ -817,9 +833,9 @@
 		}
 	};
 
-	// Calculate damage to player
-	const getPlayerDamage = (_player, bonusDamage = 0) => {
-		const damageTakenCurrent = (_player.damageTakenFactor - _randomIntFromInterval(1, _player.damageTakenFactor - 1)) + bonusDamage;
+	// Calculate players new modified life
+	const getPlayerLifeModifier = (_player, bonusLifeModifier) => {
+		const damageTakenCurrent = (_player.damageTakenFactor - _randomIntFromInterval(1, _player.damageTakenFactor - 1)) + bonusLifeModifier;
 
 		if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
 			_player.skills.shield.charges -= 1;
@@ -836,9 +852,10 @@
 		const playerColidedMapBorderY = checkMapBorderYColision(_player, _map);
 		const playerColidedMapElement = checkMapElementColision(_player, _map);
 
-		if (playerColidedMapBorderX || playerColidedMapBorderY || (playerColidedMapElement !== 0 && [-1, 1].includes(playerColidedMapElement))) {
+		if (playerColidedMapBorderX || playerColidedMapBorderY || !isNaN(playerColidedMapElement)) {
 			// Decrease life
-			const resultLife = _player.life - getPlayerDamage(_player);
+			const bonusLifeModifier = (typeof playerColidedMapElement === 'number' && !isNaN(playerColidedMapElement)) ? playerColidedMapElement : 0;
+			const resultLife = _player.life - getPlayerLifeModifier(_player, bonusLifeModifier);
 
 			_player.life = (resultLife >= 0 ? resultLife : 0);
 
@@ -1191,6 +1208,9 @@
 						step: {
 							x: 1,
 							y: 3
+						},
+						skills: {
+							bonusLifeModifier: 250
 						}
 					},
 					{
@@ -1390,7 +1410,7 @@
 					map.players.startPointX === 'mid' ? (
 						_canvas.width < _action.offsetWidth ? _canvas.width / 2 : _action.offsetWidth / 2
 					) : (
-						typeof map.players.startPointX === 'number' ? (
+						typeof map.players.startPointX === 'number' && !isNaN(map.players.startPointX) ? (
 							map.players.startPointX
 						) : (
 							200
@@ -1402,7 +1422,7 @@
 					map.players.startPointY === 'mid' ? (
 						_canvas.height < _action.offsetHeight ? _canvas.height / 2 : _action.offsetHeight / 2
 					) : (
-						typeof map.players.startPointY === 'number' ? (
+						typeof map.players.startPointY === 'number' && !isNaN(map.players.startPointY) ? (
 							map.players.startPointY
 						) : (
 							200
