@@ -303,7 +303,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const listeners = {
-		debounceKeyDownHandler: (_event, _player, _debounceKeyDownWait) => {
+		debounceKeyDownHandler: (_event, _player, _map, _debounceKeyDownWait) => {
 			_event.preventDefault();
 
 			// Movements / actions -> shield (q) / space / arrow up / arrow down/ arrow left / arrow right (debounced)
@@ -315,6 +315,86 @@
 							_player.skills.shield.up = true;
 						} else {
 							_player.skills.shield.up = false;
+						}
+
+						break;
+					}
+					case 'w':
+					case 'W': {
+						const newShootData = (_player.skills && _player.skills.weapon && _player.skills.weapon.shoot && typeof _player.skills.weapon.shoot === 'object') ? (
+							{ ..._player.skills.weapon.shoot }
+						) : (
+							undefined
+						);
+
+						if (newShootData) {
+							const currentPlayerDirection = _getElementDirection(_player);
+
+							const checkDirectionXpositive = [-9, 1, 11].includes(currentPlayerDirection);
+							const checkDirectionXnegative = [-11, -1, 9].includes(currentPlayerDirection);
+							const checkDirectionYpositive = [9, 10, 11].includes(currentPlayerDirection);
+							const checkDirectionYnegative = [-11, -10, -9].includes(currentPlayerDirection);
+
+							const secureColisionValue = Math.round(_player.radius * 1.5);
+
+							const shootDataX = checkDirectionXpositive ? (
+								_player.x + secureColisionValue
+							) : (
+								checkDirectionXnegative ? (
+									_player.x - secureColisionValue
+								) : (
+									_player.x
+								)
+							);
+
+							const shootDataY = checkDirectionYpositive ? (
+								_player.y + secureColisionValue
+							) : (
+								checkDirectionYnegative ? (
+									_player.y - secureColisionValue
+								) : (
+									_player.y
+								)
+							);
+
+							const shootStepX = (_player.step.x > 0 || checkDirectionXpositive) ? (
+								newShootData.personal.shootSpeed
+							) : (
+								(_player.step.x < 0 || checkDirectionXnegative) ? (
+									newShootData.personal.shootSpeed * -1
+								) : (
+									0
+								)
+							);
+
+							const shootStepY = (_player.step.y > 0 || checkDirectionYpositive) ? (
+								newShootData.personal.shootSpeed
+							) : (
+								(_player.step.y < 0 || checkDirectionYnegative) ? (
+									newShootData.personal.shootSpeed * -1
+								) : (
+									0
+								)
+							);
+
+							delete newShootData.personal; // Temporary data in json
+
+							const shootDataId = _map.elements.reduce(
+								(maxId, element) => (element.id > maxId ? element.id : maxId),
+								0
+							);
+
+							const newShootDataAttach = {
+								id: shootDataId + 1,
+								x: shootDataX,
+								y: shootDataY,
+								step: {
+									x: shootStepX,
+									y: shootStepY
+								}
+							};
+
+							_map.elements.push({ ...newShootData, ...newShootDataAttach });
 						}
 
 						break;
@@ -697,8 +777,8 @@
 			aidValuesAtX.groupedYPlus = _mapElement.y + baseCheckElementDistanceY;
 			aidValuesAtX.groupedYLess = _mapElement.y - baseCheckElementDistanceY;
 
-			const secureValue = Math.abs(_getElementSpeed(_checkElement.step.y, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
-			const secureBorder = secureValue < _mapElement.height ? secureValue : _mapElement.height;
+			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.y, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
+			const secureBorder = secureColisionValue < _mapElement.height ? secureColisionValue : _mapElement.height;
 
 			const goCheck = (
 				_checkElement.radius ? (
@@ -752,8 +832,8 @@
 			aidValuesAtY.groupedYPlus = _mapElement.y + baseCheckElementDistanceY;
 			aidValuesAtY.groupedYLess = _mapElement.y - baseCheckElementDistanceY;
 
-			const secureValue = Math.abs(_getElementSpeed(_checkElement.step.x, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
-			const secureBorder = secureValue < _mapElement.width ? secureValue : _mapElement.width;
+			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.x, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
+			const secureBorder = secureColisionValue < _mapElement.width ? secureColisionValue : _mapElement.width;
 
 			const goCheck = (
 				_checkElement.radius ? (
@@ -1015,7 +1095,7 @@
 
 		const debounceKeyDownWait = 50;
 
-		$debounceKeyDownHandler = event => listeners.debounceKeyDownHandler(event, _player, debounceKeyDownWait);
+		$debounceKeyDownHandler = event => listeners.debounceKeyDownHandler(event, _player, _map, debounceKeyDownWait);
 
 		// Action screen
 		setActionScreen(_action, _cx, _player, _map);
@@ -1480,6 +1560,24 @@
 						up: false,
 						charges: 10,
 						reduceFactor: 2
+					},
+					weapon: {
+						shoot: {
+							type: 2,
+							width: 20,
+							height: 20,
+							style: {
+								color: {
+									body: 'red'
+								}
+							},
+							hit: {
+								bonusLifeModifier: 50
+							},
+							personal: { // Temporary data for calculation
+								shootSpeed: 15
+							}
+						}
 					}
 				}
 			}
