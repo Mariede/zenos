@@ -712,7 +712,7 @@
 
 			if (goCheck) {
 				const bonusLifeModifier = (
-					_mapElement.skills && typeof _mapElement.skills.bonusLifeModifier === 'number' && !isNaN(_mapElement.skills.bonusLifeModifier) && _mapElement.skills.bonusLifeModifier
+					_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
 				) || (
 					0
 				);
@@ -767,7 +767,7 @@
 
 			if (goCheck) {
 				const bonusLifeModifier = (
-					_mapElement.skills && typeof _mapElement.skills.bonusLifeModifier === 'number' && !isNaN(_mapElement.skills.bonusLifeModifier) && _mapElement.skills.bonusLifeModifier
+					_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
 				) || (
 					0
 				);
@@ -1215,7 +1215,7 @@
 							x: 1,
 							y: 3
 						},
-						skills: {
+						hit: {
 							bonusLifeModifier: 250
 						}
 					},
