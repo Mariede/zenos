@@ -327,7 +327,7 @@
 							undefined
 						);
 
-						if (newShootData) {
+						if (newShootData && _player.skills.weapon.shoot.personal.charges > 0) {
 							const currentPlayerDirection = _getElementDirection(_player);
 
 							const checkDirectionXpositive = [-9, 1, 11].includes(currentPlayerDirection);
@@ -377,7 +377,7 @@
 								)
 							);
 
-							delete newShootData.personal; // Temporary data in json
+							delete newShootData.personal; // Not needed for the map element
 
 							const shootDataId = _map.elements.reduce(
 								(maxId, element) => (element.id > maxId ? element.id : maxId),
@@ -395,6 +395,8 @@
 							};
 
 							_map.elements.push({ ...newShootData, ...newShootDataAttach });
+
+							_player.skills.weapon.shoot.personal.charges -= 1;
 						}
 
 						break;
@@ -667,8 +669,10 @@
 			case 1: { // Revert movement
 				switch (phase) {
 					case 1: {
+						const baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : _mapElement.width;
+
 						_checkElement.step.x = -_checkElement.step.x;
-						_checkElement.x = _aidValues.groupedXPlus + _mapElement.width;
+						_checkElement.x = _aidValues.groupedXPlus + baseMapElementDistanceX;
 
 						break;
 					}
@@ -679,8 +683,10 @@
 						break;
 					}
 					case 3: {
+						const baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : _mapElement.height;
+
 						_checkElement.step.y = -_checkElement.step.y;
-						_checkElement.y = _aidValues.groupedYPlus + _mapElement.height;
+						_checkElement.y = _aidValues.groupedYPlus + baseMapElementDistanceY;
 
 						break;
 					}
@@ -985,6 +991,7 @@
 		// Top
 		const elMenuPlayerName = document.querySelector('#screen > div#general > div#menu > div#top span#player-name');
 		const elMenuPlayerLife = document.querySelector('#screen > div#general > div#menu > div#top span#life');
+		const elMenuPlayerShoot = document.querySelector('#screen > div#general > div#menu > div#top span#shoot');
 		const elMenuPlayerShield = document.querySelector('#screen > div#general > div#menu > div#top span#shield');
 		const elMenuPlayerSpeed = document.querySelector('#screen > div#general > div#menu > div#top span#speed');
 
@@ -1003,6 +1010,9 @@
 
 		// Life
 		elMenuPlayerLife.textContent = `❤️ ${_player.life}`;
+
+		// Shoot
+		elMenuPlayerShoot.textContent = `🔫 ${_player.skills.weapon.shoot.personal.charges}`;
 
 		// Shield
 		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges}`;
@@ -1106,6 +1116,11 @@
 		$intervalTimer = setInterval(
 			() => {
 				_player.timer++;
+
+				if (_player.timer % 5 === 0) { // Decrease life over time
+					_player.life--;
+				}
+
 				setMenuScreen(_player);
 			},
 			1000
@@ -1564,8 +1579,7 @@
 					weapon: {
 						shoot: {
 							type: 2,
-							width: 20,
-							height: 20,
+							radius: 15,
 							style: {
 								color: {
 									body: 'red'
@@ -1574,8 +1588,9 @@
 							hit: {
 								bonusLifeModifier: 50
 							},
-							personal: { // Temporary data for calculation
-								shootSpeed: 15
+							personal: {
+								shootSpeed: 10,
+								charges: 100
 							}
 						}
 					}
