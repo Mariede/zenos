@@ -835,16 +835,22 @@
 
 	// Calculate players new modified life
 	const getPlayerLifeModifier = (_player, bonusLifeModifier) => {
-		const damageTakenCurrent = (_player.damageTakenFactor - _randomIntFromInterval(1, _player.damageTakenFactor - 1)) + bonusLifeModifier;
+		const lifeModifierCurrent = (
+			bonusLifeModifier < 0 ? ( // Player gain life
+				bonusLifeModifier
+			) : ( // Player lose life
+				(_player.damageTakenFactor - _randomIntFromInterval(1, _player.damageTakenFactor - 1)) + bonusLifeModifier
+			)
+		);
 
-		if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
+		if (lifeModifierCurrent >= 0 && _player.skills.shield.up && _player.skills.shield.charges > 0) {
 			_player.skills.shield.charges -= 1;
 			_player.skills.shield.up = false;
 
-			return Math.round(damageTakenCurrent / 2); // Player shield may reduce half damage
+			return Math.round(lifeModifierCurrent / _player.skills.shield.reduceFactor); // Player damage reduced by reduceFactor shield
 		}
 
-		return damageTakenCurrent;
+		return lifeModifierCurrent;
 	};
 
 	const checkPlayerColisions = (_player, _map) => {
@@ -1472,7 +1478,8 @@
 					shield: {
 						color: 'lightcyan',
 						up: false,
-						charges: 10
+						charges: 10,
+						reduceFactor: 2
 					}
 				}
 			}
