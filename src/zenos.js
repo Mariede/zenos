@@ -327,76 +327,85 @@
 							undefined
 						);
 
-						if (newShootData && _player.skills.weapon.shoot.personal.charges > 0) {
-							const currentPlayerDirection = _getElementDirection(_player);
+						if (newShootData && _player.skills.weapon.shoot.personal) {
+							const chekInfiniteAmmo = _player.skills.weapon.shoot.personal.charges === -1;
+							const chargesLeft = !chekInfiniteAmmo && _player.skills.weapon.shoot.personal.charges;
 
-							const checkDirectionXpositive = [-9, 1, 11].includes(currentPlayerDirection);
-							const checkDirectionXnegative = [-11, -1, 9].includes(currentPlayerDirection);
-							const checkDirectionYpositive = [9, 10, 11].includes(currentPlayerDirection);
-							const checkDirectionYnegative = [-11, -10, -9].includes(currentPlayerDirection);
+							if (chekInfiniteAmmo || chargesLeft > 0) {
+								const currentPlayerDirection = _getElementDirection(_player);
 
-							const secureColisionValue = Math.round(_player.radius * 1.5);
+								const checkDirectionXpositive = [-9, 1, 11].includes(currentPlayerDirection);
+								const checkDirectionXnegative = [-11, -1, 9].includes(currentPlayerDirection);
+								const checkDirectionYpositive = [9, 10, 11].includes(currentPlayerDirection);
+								const checkDirectionYnegative = [-11, -10, -9].includes(currentPlayerDirection);
 
-							const shootDataX = checkDirectionXpositive ? (
-								_player.x + secureColisionValue
-							) : (
-								checkDirectionXnegative ? (
-									_player.x - secureColisionValue
+								const secureColisionValue = Math.round(_player.radius * 1.5);
+
+								const shootDataX = checkDirectionXpositive ? (
+									_player.x + secureColisionValue
 								) : (
-									_player.x
-								)
-							);
+									checkDirectionXnegative ? (
+										_player.x - secureColisionValue
+									) : (
+										_player.x
+									)
+								);
 
-							const shootDataY = checkDirectionYpositive ? (
-								_player.y + secureColisionValue
-							) : (
-								checkDirectionYnegative ? (
-									_player.y - secureColisionValue
+								const shootDataY = checkDirectionYpositive ? (
+									_player.y + secureColisionValue
 								) : (
-									_player.y
-								)
-							);
+									checkDirectionYnegative ? (
+										_player.y - secureColisionValue
+									) : (
+										_player.y
+									)
+								);
 
-							const shootStepX = (_player.step.x > 0 || checkDirectionXpositive) ? (
-								newShootData.personal.shootSpeed
-							) : (
-								(_player.step.x < 0 || checkDirectionXnegative) ? (
-									newShootData.personal.shootSpeed * -1
+								const shootStepX = (_player.step.x > 0 || checkDirectionXpositive) ? (
+									newShootData.personal.shootSpeed
 								) : (
+									(_player.step.x < 0 || checkDirectionXnegative) ? (
+										newShootData.personal.shootSpeed * -1
+									) : (
+										0
+									)
+								);
+
+								const shootStepY = (_player.step.y > 0 || checkDirectionYpositive) ? (
+									newShootData.personal.shootSpeed
+								) : (
+									(_player.step.y < 0 || checkDirectionYnegative) ? (
+										newShootData.personal.shootSpeed * -1
+									) : (
+										0
+									)
+								);
+
+								delete newShootData.personal; // Not needed for the map element
+
+								const shootDataId = _map.elements.reduce(
+									(maxId, element) => (element.id > maxId ? element.id : maxId),
 									0
-								)
-							);
+								);
 
-							const shootStepY = (_player.step.y > 0 || checkDirectionYpositive) ? (
-								newShootData.personal.shootSpeed
-							) : (
-								(_player.step.y < 0 || checkDirectionYnegative) ? (
-									newShootData.personal.shootSpeed * -1
-								) : (
-									0
-								)
-							);
+								const newShootDataAttach = {
+									id: shootDataId + 1,
+									x: shootDataX,
+									y: shootDataY,
+									step: {
+										x: shootStepX,
+										y: shootStepY
+									}
+								};
 
-							delete newShootData.personal; // Not needed for the map element
+								_map.elements.push({ ...newShootData, ...newShootDataAttach });
 
-							const shootDataId = _map.elements.reduce(
-								(maxId, element) => (element.id > maxId ? element.id : maxId),
-								0
-							);
+								_player.skills.weapon.shoot.personal.isShooting = true;
 
-							const newShootDataAttach = {
-								id: shootDataId + 1,
-								x: shootDataX,
-								y: shootDataY,
-								step: {
-									x: shootStepX,
-									y: shootStepY
+								if (!chekInfiniteAmmo) {
+									_player.skills.weapon.shoot.personal.charges -= 1;
 								}
-							};
-
-							_map.elements.push({ ...newShootData, ...newShootDataAttach });
-
-							_player.skills.weapon.shoot.personal.charges -= 1;
+							}
 						}
 
 						break;
@@ -619,6 +628,20 @@
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDetails = (_cx, _player) => {
+			// Weapon shoot
+			if (_player.skills.weapon.shoot.personal.isShooting) {
+				_player.style.color.saved = _player.style.color.details; // Temporary
+				_player.style.color.details = _player.skills.weapon.shoot.personal.colorWhenShooting;
+
+				_player.skills.weapon.shoot.personal.isShooting = false;
+			} else {
+				if (_player.style.color.saved) {
+					_player.style.color.details = _player.style.color.saved;
+					delete _player.style.color.saved;
+				}
+			}
+
+			// Shield
 			if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
 				_cx.save();
 
@@ -998,6 +1021,9 @@
 		// Bottom
 		const elPlayerMenuCounter = document.querySelector('#screen > div#general > div#menu > div#bottom span#timer');
 
+		// Check finite ammo
+		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.personal && _player.skills.weapon.shoot.personal.charges === -1;
+
 		// Speed calc
 		const playerSpeedStepX = Math.abs(_getElementSpeed(_player.step.x, _player.step.speed));
 		const playerSpeedStepY = Math.abs(_getElementSpeed(_player.step.y, _player.step.speed));
@@ -1012,7 +1038,7 @@
 		elMenuPlayerLife.textContent = `❤️ ${_player.life}`;
 
 		// Shoot
-		elMenuPlayerShoot.textContent = `🔫 ${_player.skills.weapon.shoot.personal.charges}`;
+		elMenuPlayerShoot.textContent = `🔫 ${!chekInfiniteAmmo ? _player.skills.weapon.shoot.personal.charges : '♾️'}`;
 
 		// Shield
 		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges}`;
@@ -1589,8 +1615,10 @@
 								bonusLifeModifier: 50
 							},
 							personal: {
+								isShooting: false,
+								colorWhenShooting: 'yellow',
 								shootSpeed: 10,
-								charges: 100
+								charges: 100 // -1 for infinite ammo
 							}
 						}
 					}
