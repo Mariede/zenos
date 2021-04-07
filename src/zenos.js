@@ -795,21 +795,27 @@
 	};
 
 	const checkMapElementColision = (checkElement, _map, _idActiveElement = null) => {
-		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
+		const _getAidValues = (_checkElement, _mapElement) => {
+			const aidValues = {};
+
 			const baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
-			const baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.height : 0);
+			const baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
 
-			const aidValuesAtX = {};
+			aidValues.groupedXPlus = _mapElement.x + baseCheckElementDistanceX;
+			aidValues.groupedXLess = _mapElement.x - baseCheckElementDistanceX;
+			aidValues.groupedYPlus = _mapElement.y + baseCheckElementDistanceY;
+			aidValues.groupedYLess = _mapElement.y - baseCheckElementDistanceY;
 
-			aidValuesAtX.groupedXPlus = _mapElement.x + baseCheckElementDistanceX;
-			aidValuesAtX.groupedXLess = _mapElement.x - baseCheckElementDistanceX;
-			aidValuesAtX.groupedYPlus = _mapElement.y + baseCheckElementDistanceY;
-			aidValuesAtX.groupedYLess = _mapElement.y - baseCheckElementDistanceY;
+			return aidValues;
+		};
+
+		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
+			const aidValuesAtX = _getAidValues(_checkElement, _mapElement);
 
 			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.y, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
 			const secureBorder = secureColisionValue < _mapElement.height ? secureColisionValue : _mapElement.height;
 
-			const goCheck = (
+			const goCheckRangeY = (
 				_checkElement.radius ? (
 					_checkElement.y > aidValuesAtX.groupedYLess + secureBorder && _checkElement.y < aidValuesAtX.groupedYPlus + _mapElement.height - secureBorder
 				) : (
@@ -819,7 +825,7 @@
 				)
 			);
 
-			if (goCheck) {
+			if (goCheckRangeY) {
 				const bonusLifeModifier = (
 					_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
 				) || (
@@ -851,20 +857,12 @@
 		};
 
 		const _checkAtY = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
-			const baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.width : 0);
-			const baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
-
-			const aidValuesAtY = {};
-
-			aidValuesAtY.groupedXPlus = _mapElement.x + baseCheckElementDistanceX;
-			aidValuesAtY.groupedXLess = _mapElement.x - baseCheckElementDistanceX;
-			aidValuesAtY.groupedYPlus = _mapElement.y + baseCheckElementDistanceY;
-			aidValuesAtY.groupedYLess = _mapElement.y - baseCheckElementDistanceY;
+			const aidValuesAtY = _getAidValues(_checkElement, _mapElement);
 
 			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.x, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
 			const secureBorder = secureColisionValue < _mapElement.width ? secureColisionValue : _mapElement.width;
 
-			const goCheck = (
+			const goCheckRangeX = (
 				_checkElement.radius ? (
 					_checkElement.x > aidValuesAtY.groupedXLess + secureBorder && _checkElement.x < aidValuesAtY.groupedXPlus + _mapElement.width - secureBorder
 				) : (
@@ -874,7 +872,7 @@
 				)
 			);
 
-			if (goCheck) {
+			if (goCheckRangeX) {
 				const bonusLifeModifier = (
 					_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
 				) || (
