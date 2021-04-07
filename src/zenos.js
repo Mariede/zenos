@@ -695,13 +695,13 @@
 						const baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : _mapElement.width;
 
 						_checkElement.step.x = -_checkElement.step.x;
-						_checkElement.x = _aidValues.groupedXPlus + baseMapElementDistanceX;
+						_checkElement.x = _aidValues.groupedXBackward + baseMapElementDistanceX;
 
 						break;
 					}
 					case 2: {
 						_checkElement.step.x = -_checkElement.step.x;
-						_checkElement.x = _aidValues.groupedXLess;
+						_checkElement.x = _aidValues.groupedXFoward;
 
 						break;
 					}
@@ -709,13 +709,13 @@
 						const baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : _mapElement.height;
 
 						_checkElement.step.y = -_checkElement.step.y;
-						_checkElement.y = _aidValues.groupedYPlus + baseMapElementDistanceY;
+						_checkElement.y = _aidValues.groupedYBackward + baseMapElementDistanceY;
 
 						break;
 					}
 					case 4: {
 						_checkElement.step.y = -_checkElement.step.y;
-						_checkElement.y = _aidValues.groupedYLess;
+						_checkElement.y = _aidValues.groupedYFoward;
 
 						break;
 					}
@@ -801,10 +801,17 @@
 			const baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
 			const baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
 
-			aidValues.groupedXPlus = _mapElement.x + baseCheckElementDistanceX;
-			aidValues.groupedXLess = _mapElement.x - baseCheckElementDistanceX;
-			aidValues.groupedYPlus = _mapElement.y + baseCheckElementDistanceY;
-			aidValues.groupedYLess = _mapElement.y - baseCheckElementDistanceY;
+			aidValues.groupedXBackward = _mapElement.x + baseCheckElementDistanceX;
+			aidValues.groupedXBackwardComplement = aidValues.groupedXBackward + _mapElement.width;
+
+			aidValues.groupedXFoward = _mapElement.x - baseCheckElementDistanceX;
+			aidValues.groupedXFowardComplement = aidValues.groupedXFoward + _mapElement.width;
+
+			aidValues.groupedYBackward = _mapElement.y + baseCheckElementDistanceY;
+			aidValues.groupedYBackwardComplement = aidValues.groupedYBackward + _mapElement.height;
+
+			aidValues.groupedYFoward = _mapElement.y - baseCheckElementDistanceY;
+			aidValues.groupedYFowardComplement = aidValues.groupedYFoward + _mapElement.height;
 
 			return aidValues;
 		};
@@ -817,7 +824,7 @@
 
 			const goCheckRangeY = (
 				_checkElement.radius ? (
-					_checkElement.y > aidValuesAtX.groupedYLess + secureBorder && _checkElement.y < aidValuesAtX.groupedYPlus + _mapElement.height - secureBorder
+					_checkElement.y > aidValuesAtX.groupedYFoward + secureBorder && _checkElement.y < aidValuesAtX.groupedYBackwardComplement - secureBorder
 				) : (
 					(
 						!(_checkElement.y > _mapElement.y + _mapElement.height - secureBorder || _checkElement.y < _mapElement.y - _checkElement.height + secureBorder)
@@ -833,7 +840,7 @@
 				);
 
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
-					if (_checkElement.x <= aidValuesAtX.groupedXPlus + _mapElement.width && _checkElement.x > aidValuesAtX.groupedXPlus) {
+					if (_checkElement.x <= aidValuesAtX.groupedXBackwardComplement && _checkElement.x > aidValuesAtX.groupedXBackward) {
 						// Colided
 						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 1);
 
@@ -842,7 +849,7 @@
 						}
 					}
 				} else {
-					if (_checkElement.x >= aidValuesAtX.groupedXLess && _checkElement.x + secureBorder <= aidValuesAtX.groupedXLess + _mapElement.width) {
+					if (_checkElement.x >= aidValuesAtX.groupedXFoward && _checkElement.x + secureBorder <= aidValuesAtX.groupedXFowardComplement) {
 						// Colided
 						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 2);
 
@@ -864,7 +871,7 @@
 
 			const goCheckRangeX = (
 				_checkElement.radius ? (
-					_checkElement.x > aidValuesAtY.groupedXLess + secureBorder && _checkElement.x < aidValuesAtY.groupedXPlus + _mapElement.width - secureBorder
+					_checkElement.x > aidValuesAtY.groupedXFoward + secureBorder && _checkElement.x < aidValuesAtY.groupedXBackwardComplement - secureBorder
 				) : (
 					(
 						!(_checkElement.x > _mapElement.x + _mapElement.width - secureBorder || _checkElement.x < _mapElement.x - _checkElement.width + secureBorder)
@@ -880,7 +887,7 @@
 				);
 
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
-					if (_checkElement.y <= aidValuesAtY.groupedYPlus + _mapElement.height && _checkElement.y > aidValuesAtY.groupedYPlus) {
+					if (_checkElement.y <= aidValuesAtY.groupedYBackwardComplement && _checkElement.y > aidValuesAtY.groupedYBackward) {
 						// Colided
 						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 3);
 
@@ -889,7 +896,7 @@
 						}
 					}
 				} else {
-					if (_checkElement.y >= aidValuesAtY.groupedYLess && _checkElement.y + secureBorder <= aidValuesAtY.groupedYLess + _mapElement.height) {
+					if (_checkElement.y >= aidValuesAtY.groupedYFoward && _checkElement.y + secureBorder <= aidValuesAtY.groupedYFowardComplement) {
 						// Colided
 						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 4);
 
