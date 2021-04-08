@@ -879,7 +879,19 @@
 
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
 					const goCheckColisionXBackward = (
-						_checkElement.x <= aidValuesAtX.groupedXBackwardComplement && _checkElement.x > aidValuesAtX.groupedXBackward
+						_checkElement.radius ? (
+							_mapElement.radius ? (
+								_checkElement.x <= aidValuesAtX.groupedXBackwardComplement && _checkElement.x > aidValuesAtX.groupedXBackward
+							) : (
+								_checkElement.x <= aidValuesAtX.groupedXBackwardComplement && _checkElement.x > aidValuesAtX.groupedXBackward
+							)
+						) : (
+							_mapElement.radius ? (
+								_checkElement.x <= aidValuesAtX.groupedXBackwardComplement && _checkElement.x > aidValuesAtX.groupedXBackward
+							) : (
+								_checkElement.x <= aidValuesAtX.groupedXBackwardComplement && _checkElement.x > aidValuesAtX.groupedXBackward
+							)
+						)
 					);
 
 					if (goCheckColisionXBackward) {
@@ -892,7 +904,19 @@
 					}
 				} else {
 					const goCheckColisionXFoward = (
-						_checkElement.x >= aidValuesAtX.groupedXFoward && _checkElement.x + secureBorder <= aidValuesAtX.groupedXFowardComplement
+						_checkElement.radius ? (
+							_mapElement.radius ? (
+								_checkElement.x >= aidValuesAtX.groupedXFoward && _checkElement.x + secureBorder <= aidValuesAtX.groupedXFowardComplement
+							) : (
+								_checkElement.x >= aidValuesAtX.groupedXFoward && _checkElement.x + secureBorder <= aidValuesAtX.groupedXFowardComplement
+							)
+						) : (
+							_mapElement.radius ? (
+								_checkElement.x >= aidValuesAtX.groupedXFoward && _checkElement.x + secureBorder <= aidValuesAtX.groupedXFowardComplement
+							) : (
+								_checkElement.x >= aidValuesAtX.groupedXFoward && _checkElement.x + secureBorder <= aidValuesAtX.groupedXFowardComplement
+							)
+						)
 					);
 
 					if (goCheckColisionXFoward) {
@@ -940,7 +964,19 @@
 
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
 					const goCheckColisionYBackward = (
-						_checkElement.y <= aidValuesAtY.groupedYBackwardComplement && _checkElement.y > aidValuesAtY.groupedYBackward
+						_checkElement.radius ? (
+							_mapElement.radius ? (
+								_checkElement.y <= aidValuesAtY.groupedYBackwardComplement && _checkElement.y > aidValuesAtY.groupedYBackward
+							) : (
+								_checkElement.y <= aidValuesAtY.groupedYBackwardComplement && _checkElement.y > aidValuesAtY.groupedYBackward
+							)
+						) : (
+							_mapElement.radius ? (
+								_checkElement.y <= aidValuesAtY.groupedYBackwardComplement && _checkElement.y > aidValuesAtY.groupedYBackward
+							) : (
+								_checkElement.y <= aidValuesAtY.groupedYBackwardComplement && _checkElement.y > aidValuesAtY.groupedYBackward
+							)
+						)
 					);
 
 					if (goCheckColisionYBackward) {
@@ -953,7 +989,19 @@
 					}
 				} else {
 					const goCheckColisionYFoward = (
-						_checkElement.y >= aidValuesAtY.groupedYFoward && _checkElement.y + secureBorder <= aidValuesAtY.groupedYFowardComplement
+						_checkElement.radius ? (
+							_mapElement.radius ? (
+								_checkElement.y >= aidValuesAtY.groupedYFoward && _checkElement.y + secureBorder <= aidValuesAtY.groupedYFowardComplement
+							) : (
+								_checkElement.y >= aidValuesAtY.groupedYFoward && _checkElement.y + secureBorder <= aidValuesAtY.groupedYFowardComplement
+							)
+						) : (
+							_mapElement.radius ? (
+								_checkElement.y >= aidValuesAtY.groupedYFoward && _checkElement.y + secureBorder <= aidValuesAtY.groupedYFowardComplement
+							) : (
+								_checkElement.y >= aidValuesAtY.groupedYFoward && _checkElement.y + secureBorder <= aidValuesAtY.groupedYFowardComplement
+							)
+						)
 					);
 
 					if (goCheckColisionYFoward) {
