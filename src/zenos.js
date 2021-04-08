@@ -801,17 +801,49 @@
 			const baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
 			const baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
 
+			// -X
 			aidValues.groupedXBackward = _mapElement.x + baseCheckElementDistanceX;
-			aidValues.groupedXBackwardComplement = aidValues.groupedXBackward + _mapElement.width;
 
-			aidValues.groupedXFoward = _mapElement.x - baseCheckElementDistanceX;
-			aidValues.groupedXFowardComplement = aidValues.groupedXFoward + _mapElement.width;
+			aidValues.groupedXBackwardComplement = _mapElement.radius ? (
+				aidValues.groupedXBackward + _mapElement.radius
+			) : (
+				aidValues.groupedXBackward + _mapElement.width
+			);
 
+			// +X
+			aidValues.groupedXFoward = _mapElement.radius ? (
+				_mapElement.x - baseCheckElementDistanceX - _mapElement.radius
+			) : (
+				_mapElement.x - baseCheckElementDistanceX
+			);
+
+			aidValues.groupedXFowardComplement = _mapElement.radius ? (
+				aidValues.groupedXFoward + _mapElement.radius
+			) : (
+				aidValues.groupedXFoward + _mapElement.width
+			);
+
+			// -Y
 			aidValues.groupedYBackward = _mapElement.y + baseCheckElementDistanceY;
-			aidValues.groupedYBackwardComplement = aidValues.groupedYBackward + _mapElement.height;
 
-			aidValues.groupedYFoward = _mapElement.y - baseCheckElementDistanceY;
-			aidValues.groupedYFowardComplement = aidValues.groupedYFoward + _mapElement.height;
+			aidValues.groupedYBackwardComplement = _mapElement.radius ? (
+				aidValues.groupedYBackward + _mapElement.radius
+			) : (
+				aidValues.groupedYBackward + _mapElement.height
+			);
+
+			// +Y
+			aidValues.groupedYFoward = _mapElement.radius ? (
+				_mapElement.y - baseCheckElementDistanceY - _mapElement.radius
+			) : (
+				_mapElement.y - baseCheckElementDistanceY
+			);
+
+			aidValues.groupedYFowardComplement = _mapElement.radius ? (
+				aidValues.groupedYFoward + _mapElement.radius
+			) : (
+				aidValues.groupedYFoward + _mapElement.height
+			);
 
 			return aidValues;
 		};
@@ -820,13 +852,15 @@
 			const aidValuesAtX = _getAidValues(_checkElement, _mapElement);
 
 			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.y, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
-			const secureBorder = secureColisionValue < _mapElement.height ? secureColisionValue : _mapElement.height;
+			const secureBorder = secureColisionValue < (_mapElement.height || _mapElement.radius) ? secureColisionValue : (_mapElement.height || _mapElement.radius);
 
 			const goCheckRangeY = (
 				_checkElement.radius ? (
 					_checkElement.y > aidValuesAtX.groupedYFoward + secureBorder && _checkElement.y < aidValuesAtX.groupedYBackwardComplement - secureBorder
 				) : (
-					(
+					_mapElement.radius ? (
+						!(_checkElement.y > _mapElement.y + _mapElement.radius - secureBorder || _checkElement.y < _mapElement.y - _mapElement.radius - _checkElement.height + secureBorder)
+					) : (
 						!(_checkElement.y > _mapElement.y + _mapElement.height - secureBorder || _checkElement.y < _mapElement.y - _checkElement.height + secureBorder)
 					)
 				)
@@ -867,13 +901,15 @@
 			const aidValuesAtY = _getAidValues(_checkElement, _mapElement);
 
 			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.x, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
-			const secureBorder = secureColisionValue < _mapElement.width ? secureColisionValue : _mapElement.width;
+			const secureBorder = secureColisionValue < (_mapElement.width || _mapElement.radius) ? secureColisionValue : (_mapElement.width || _mapElement.radius);
 
 			const goCheckRangeX = (
 				_checkElement.radius ? (
 					_checkElement.x > aidValuesAtY.groupedXFoward + secureBorder && _checkElement.x < aidValuesAtY.groupedXBackwardComplement - secureBorder
 				) : (
-					(
+					_mapElement.radius ? (
+						!(_checkElement.x > _mapElement.x + _mapElement.radius - secureBorder || _checkElement.x < _mapElement.x - _mapElement.radius - _checkElement.width + secureBorder)
+					) : (
 						!(_checkElement.x > _mapElement.x + _mapElement.width - secureBorder || _checkElement.x < _mapElement.x - _checkElement.width + secureBorder)
 					)
 				)
