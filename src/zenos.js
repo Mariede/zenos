@@ -1366,7 +1366,7 @@
 					{
 						id: 5,
 						type: 3,
-						width: 150,
+						width: 50,
 						height: 50,
 						x: 500,
 						y: 500,
@@ -1389,8 +1389,8 @@
 					{
 						id: 6,
 						type: 3,
-						width: 10,
-						height: 60,
+						width: 50,
+						height: 50,
 						x: 490,
 						y: 170,
 						style: {
@@ -1402,7 +1402,7 @@
 						},
 						step: {
 							x: 1,
-							y: 3
+							y: -3
 						},
 						hit: {
 							bonusLifeModifier: 250
@@ -1412,9 +1412,9 @@
 						id: 7,
 						type: 1,
 						width: 150,
-						height: 100,
-						x: 700,
-						y: 200,
+						height: 150,
+						x: 800,
+						y: 150,
 						style: {
 							color: {
 								body: 'tomato'
@@ -1425,11 +1425,23 @@
 						id: 8,
 						type: 1,
 						radius: 40,
-						x: 650,
-						y: 150,
+						x: 600,
+						y: 280,
 						style: {
 							color: {
 								body: 'pink'
+							}
+						}
+					},
+					{
+						id: 8,
+						type: 1,
+						radius: 80,
+						x: 800,
+						y: 500,
+						style: {
+							color: {
+								body: 'deepskyblue'
 							}
 						}
 					}
@@ -1685,7 +1697,7 @@
 							personal: {
 								isShooting: false,
 								colorWhenShooting: 'yellow',
-								shootSpeed: 10,
+								shootSpeed: 15,
 								charges: 100 // -1 for infinite ammo
 							}
 						}
