@@ -690,35 +690,28 @@
 
 		switch (_mapElement.type) {
 			case 1: { // Revert movement
-				switch (phase) {
-					case 1: {
-						const baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : _mapElement.width;
+				if (phase === 1 && _checkElement.step.x < 0) {
+					const baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : _mapElement.width;
 
-						_checkElement.step.x = -_checkElement.step.x;
-						_checkElement.x = _aidValues.groupedXBackward + baseMapElementDistanceX;
+					_checkElement.step.x = -_checkElement.step.x;
+					_checkElement.x = _aidValues.groupedXBackward + baseMapElementDistanceX;
+				}
 
-						break;
-					}
-					case 2: {
-						_checkElement.step.x = -_checkElement.step.x;
-						_checkElement.x = _aidValues.groupedXFoward;
+				if (phase === 2 && _checkElement.step.x > 0) {
+					_checkElement.step.x = -_checkElement.step.x;
+					_checkElement.x = _aidValues.groupedXFoward;
+				}
 
-						break;
-					}
-					case 3: {
-						const baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : _mapElement.height;
+				if (phase === 3 && _checkElement.step.y < 0) {
+					const baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : _mapElement.height;
 
-						_checkElement.step.y = -_checkElement.step.y;
-						_checkElement.y = _aidValues.groupedYBackward + baseMapElementDistanceY;
+					_checkElement.step.y = -_checkElement.step.y;
+					_checkElement.y = _aidValues.groupedYBackward + baseMapElementDistanceY;
+				}
 
-						break;
-					}
-					case 4: {
-						_checkElement.step.y = -_checkElement.step.y;
-						_checkElement.y = _aidValues.groupedYFoward;
-
-						break;
-					}
+				if (phase === 4 && _checkElement.step.y > 0) {
+					_checkElement.step.y = -_checkElement.step.y;
+					_checkElement.y = _aidValues.groupedYFoward;
 				}
 
 				willModifyPlayerLife = true;
@@ -881,7 +874,7 @@
 					const goCheckColisionXBackward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_checkElement.x <= _mapElement.x + _mapElement.radius + _checkElement.radius && _checkElement.x > _mapElement.x - _mapElement.radius + _checkElement.radius
+								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
 							) : (
 								_checkElement.x <= _mapElement.x + _mapElement.width + _checkElement.radius && _checkElement.x > _mapElement.x + _checkElement.radius
 							)
@@ -906,15 +899,15 @@
 					const goCheckColisionXFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.radius && _checkElement.x + secureBorder < _mapElement.x + _mapElement.radius - _checkElement.radius
+								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
 							) : (
-								_checkElement.x >= _mapElement.x - _checkElement.radius && _checkElement.x + secureBorder < _mapElement.x + _mapElement.width - _checkElement.radius
+								_checkElement.x >= _mapElement.x - _checkElement.radius && _checkElement.x < _mapElement.x + _mapElement.width - _checkElement.radius
 							)
 						) : (
 							_mapElement.radius ? (
-								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.width && _checkElement.x + secureBorder < _mapElement.x + _mapElement.radius - _checkElement.width
+								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.width && _checkElement.x < _mapElement.x + _mapElement.radius - _checkElement.width
 							) : (
-								_checkElement.x >= _mapElement.x - _checkElement.width && _checkElement.x + secureBorder < _mapElement.x + _mapElement.width - _checkElement.width
+								_checkElement.x >= _mapElement.x - _checkElement.width && _checkElement.x < _mapElement.x + _mapElement.width - _checkElement.width
 							)
 						)
 					);
@@ -966,7 +959,7 @@
 					const goCheckColisionYBackward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_checkElement.y <= _mapElement.y + _mapElement.radius + _checkElement.radius && _checkElement.y > _mapElement.y - _mapElement.radius + _checkElement.radius
+								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
 							) : (
 								_checkElement.y <= _mapElement.y + _mapElement.height + _checkElement.radius && _checkElement.y > _mapElement.y + _checkElement.radius
 							)
@@ -991,15 +984,15 @@
 					const goCheckColisionYFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.radius && _checkElement.y + secureBorder < _mapElement.y + _mapElement.radius - _checkElement.radius
+								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
 							) : (
-								_checkElement.y >= _mapElement.y - _checkElement.radius && _checkElement.y + secureBorder < _mapElement.y + _mapElement.height - _checkElement.radius
+								_checkElement.y >= _mapElement.y - _checkElement.radius && _checkElement.y < _mapElement.y + _mapElement.height - _checkElement.radius
 							)
 						) : (
 							_mapElement.radius ? (
-								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.height && _checkElement.y + secureBorder < _mapElement.y + _mapElement.radius - _checkElement.height
+								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.height && _checkElement.y < _mapElement.y + _mapElement.radius - _checkElement.height
 							) : (
-								_checkElement.y >= _mapElement.y - _checkElement.height && _checkElement.y + secureBorder < _mapElement.y + _mapElement.height - _checkElement.height
+								_checkElement.y >= _mapElement.y - _checkElement.height && _checkElement.y < _mapElement.y + _mapElement.height - _checkElement.height
 							)
 						)
 					);
@@ -1456,7 +1449,7 @@
 					{
 						id: 7,
 						type: 1,
-						width: 20,
+						width: 150,
 						height: 100,
 						x: 700,
 						y: 200,
