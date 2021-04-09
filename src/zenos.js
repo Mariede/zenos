@@ -906,15 +906,15 @@
 					const goCheckColisionXFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.radius && _checkElement.x + secureBorder <= _mapElement.x + _mapElement.radius - _checkElement.radius
+								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.radius && _checkElement.x + secureBorder < _mapElement.x + _mapElement.radius - _checkElement.radius
 							) : (
-								_checkElement.x >= _mapElement.x - _checkElement.radius && _checkElement.x + secureBorder <= _mapElement.x + _mapElement.width - _checkElement.radius
+								_checkElement.x >= _mapElement.x - _checkElement.radius && _checkElement.x + secureBorder < _mapElement.x + _mapElement.width - _checkElement.radius
 							)
 						) : (
 							_mapElement.radius ? (
-								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.width && _checkElement.x + secureBorder <= _mapElement.x + _mapElement.radius - _checkElement.width
+								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.width && _checkElement.x + secureBorder < _mapElement.x + _mapElement.radius - _checkElement.width
 							) : (
-								_checkElement.x >= _mapElement.x - _checkElement.width && _checkElement.x + secureBorder <= _mapElement.x + _mapElement.width - _checkElement.width
+								_checkElement.x >= _mapElement.x - _checkElement.width && _checkElement.x + secureBorder < _mapElement.x + _mapElement.width - _checkElement.width
 							)
 						)
 					);
@@ -991,15 +991,15 @@
 					const goCheckColisionYFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.radius && _checkElement.y + secureBorder <= _mapElement.y + _mapElement.radius - _checkElement.radius
+								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.radius && _checkElement.y + secureBorder < _mapElement.y + _mapElement.radius - _checkElement.radius
 							) : (
-								_checkElement.y >= _mapElement.y - _checkElement.radius && _checkElement.y + secureBorder <= _mapElement.y + _mapElement.height - _checkElement.radius
+								_checkElement.y >= _mapElement.y - _checkElement.radius && _checkElement.y + secureBorder < _mapElement.y + _mapElement.height - _checkElement.radius
 							)
 						) : (
 							_mapElement.radius ? (
-								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.height && _checkElement.y + secureBorder <= _mapElement.y + _mapElement.radius - _checkElement.height
+								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.height && _checkElement.y + secureBorder < _mapElement.y + _mapElement.radius - _checkElement.height
 							) : (
-								_checkElement.y >= _mapElement.y - _checkElement.height && _checkElement.y + secureBorder <= _mapElement.y + _mapElement.height - _checkElement.height
+								_checkElement.y >= _mapElement.y - _checkElement.height && _checkElement.y + secureBorder < _mapElement.y + _mapElement.height - _checkElement.height
 							)
 						)
 					);
