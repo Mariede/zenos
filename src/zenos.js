@@ -691,27 +691,23 @@
 		switch (_mapElement.type) {
 			case 1: { // Revert movement
 				if (phase === 1 && _checkElement.step.x < 0) {
-					const baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : _mapElement.width;
-
 					_checkElement.step.x = -_checkElement.step.x;
-					_checkElement.x = _aidValues.groupedXBackward + baseMapElementDistanceX;
+					_checkElement.x = _mapElement.x + _aidValues.baseMapElementDistanceX + _aidValues.baseCheckElementDistanceX;
 				}
 
 				if (phase === 2 && _checkElement.step.x > 0) {
 					_checkElement.step.x = -_checkElement.step.x;
-					_checkElement.x = _aidValues.groupedXFoward;
+					_checkElement.x = _mapElement.x - _aidValues.baseMapElementDistanceX - _aidValues.baseCheckElementDistanceX;
 				}
 
 				if (phase === 3 && _checkElement.step.y < 0) {
-					const baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : _mapElement.height;
-
 					_checkElement.step.y = -_checkElement.step.y;
-					_checkElement.y = _aidValues.groupedYBackward + baseMapElementDistanceY;
+					_checkElement.y = _mapElement.y + _aidValues.baseMapElementDistanceY + _aidValues.baseCheckElementDistanceY;
 				}
 
 				if (phase === 4 && _checkElement.step.y > 0) {
 					_checkElement.step.y = -_checkElement.step.y;
-					_checkElement.y = _aidValues.groupedYFoward;
+					_checkElement.y = _mapElement.y - _aidValues.baseMapElementDistanceY - _aidValues.baseCheckElementDistanceY;
 				}
 
 				willModifyPlayerLife = true;
@@ -791,55 +787,21 @@
 		const _getAidValues = (_checkElement, _mapElement) => {
 			const aidValues = {};
 
-			const baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
-			const baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
+			aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
 
-			// -X
-			aidValues.groupedXBackward = _mapElement.x + baseCheckElementDistanceX;
+			aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
 
-			aidValues.groupedXBackwardComplement = _mapElement.radius ? (
-				aidValues.groupedXBackward + _mapElement.radius
-			) : (
-				aidValues.groupedXBackward + _mapElement.width
-			);
+			aidValues.baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
 
-			// +X
-			aidValues.groupedXFoward = _mapElement.radius ? (
-				_mapElement.x - baseCheckElementDistanceX - _mapElement.radius
-			) : (
-				_mapElement.x - baseCheckElementDistanceX
-			);
-
-			aidValues.groupedXFowardComplement = _mapElement.radius ? (
-				aidValues.groupedXFoward + _mapElement.radius
-			) : (
-				aidValues.groupedXFoward + _mapElement.width
-			);
-
-			// -Y
-			aidValues.groupedYBackward = _mapElement.y + baseCheckElementDistanceY;
-
-			aidValues.groupedYBackwardComplement = _mapElement.radius ? (
-				aidValues.groupedYBackward + _mapElement.radius
-			) : (
-				aidValues.groupedYBackward + _mapElement.height
-			);
-
-			// +Y
-			aidValues.groupedYFoward = _mapElement.radius ? (
-				_mapElement.y - baseCheckElementDistanceY - _mapElement.radius
-			) : (
-				_mapElement.y - baseCheckElementDistanceY
-			);
-
-			aidValues.groupedYFowardComplement = _mapElement.radius ? (
-				aidValues.groupedYFoward + _mapElement.radius
-			) : (
-				aidValues.groupedYFoward + _mapElement.height
-			);
+			aidValues.baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
 
 			return aidValues;
 		};
+
+		// Two circles colision formula
+		const _circlesColision = (_circleA, _circleB) => (
+			((_circleA.x - _circleB.x) ** 2) + ((_circleA.y - _circleB.y) ** 2) <= ((_circleA.radius + _circleB.radius) ** 2)
+		);
 
 		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
 			const aidValuesAtX = _getAidValues(_checkElement, _mapElement);
@@ -850,15 +812,15 @@
 			const goCheckRangeY = (
 				_checkElement.radius ? (
 					_mapElement.radius ? (
-						!(_checkElement.y > _mapElement.y + _checkElement.radius + _mapElement.radius - secureBorder || _checkElement.y < _mapElement.y - _checkElement.radius - _mapElement.radius + secureBorder)
+						!(_checkElement.y - _checkElement.radius > _mapElement.y + _mapElement.radius - secureBorder || _checkElement.y + _checkElement.radius < _mapElement.y - _mapElement.radius + secureBorder)
 					) : (
-						!(_checkElement.y > _mapElement.y + _checkElement.radius + _mapElement.height - secureBorder || _checkElement.y < _mapElement.y - _checkElement.radius + secureBorder)
+						!(_checkElement.y - _checkElement.radius > _mapElement.y + _mapElement.height - secureBorder || _checkElement.y + _checkElement.radius < _mapElement.y + secureBorder)
 					)
 				) : (
 					_mapElement.radius ? (
-						!(_checkElement.y > _mapElement.y + _mapElement.radius - secureBorder || _checkElement.y < _mapElement.y - _mapElement.radius - _checkElement.height + secureBorder)
+						!(_checkElement.y > _mapElement.y + _mapElement.radius - secureBorder || _checkElement.y + _checkElement.height < _mapElement.y - _mapElement.radius + secureBorder)
 					) : (
-						!(_checkElement.y > _mapElement.y + _mapElement.height - secureBorder || _checkElement.y < _mapElement.y - _checkElement.height + secureBorder)
+						!(_checkElement.y > _mapElement.y + _mapElement.height - secureBorder || _checkElement.y + _checkElement.height < _mapElement.y + secureBorder)
 					)
 				)
 			);
@@ -874,9 +836,9 @@
 					const goCheckColisionXBackward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
+								_circlesColision(_checkElement, _mapElement)
 							) : (
-								_checkElement.x <= _mapElement.x + _mapElement.width + _checkElement.radius && _checkElement.x > _mapElement.x + _checkElement.radius
+								_checkElement.x - _checkElement.radius <= _mapElement.x + _mapElement.width && _checkElement.x - _checkElement.radius > _mapElement.x
 							)
 						) : (
 							_mapElement.radius ? (
@@ -899,15 +861,15 @@
 					const goCheckColisionXFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
+								_circlesColision(_checkElement, _mapElement)
 							) : (
-								_checkElement.x >= _mapElement.x - _checkElement.radius && _checkElement.x < _mapElement.x + _mapElement.width - _checkElement.radius
+								_checkElement.x + _checkElement.radius >= _mapElement.x && _checkElement.x + _checkElement.radius < _mapElement.x + _mapElement.width
 							)
 						) : (
 							_mapElement.radius ? (
-								_checkElement.x >= _mapElement.x - _mapElement.radius - _checkElement.width && _checkElement.x < _mapElement.x + _mapElement.radius - _checkElement.width
+								_checkElement.x + _checkElement.width >= _mapElement.x - _mapElement.radius && _checkElement.x + _checkElement.width < _mapElement.x + _mapElement.radius
 							) : (
-								_checkElement.x >= _mapElement.x - _checkElement.width && _checkElement.x < _mapElement.x + _mapElement.width - _checkElement.width
+								_checkElement.x + _checkElement.width >= _mapElement.x && _checkElement.x + _checkElement.width < _mapElement.x + _mapElement.width
 							)
 						)
 					);
@@ -935,15 +897,15 @@
 			const goCheckRangeX = (
 				_checkElement.radius ? (
 					_mapElement.radius ? (
-						!(_checkElement.x > _mapElement.x + _checkElement.radius + _mapElement.radius - secureBorder || _checkElement.x < _mapElement.x - _checkElement.radius - _mapElement.radius + secureBorder)
+						!(_checkElement.x - _checkElement.radius > _mapElement.x + _mapElement.radius - secureBorder || _checkElement.x + _checkElement.radius < _mapElement.x - _mapElement.radius + secureBorder)
 					) : (
-						!(_checkElement.x > _mapElement.x + _checkElement.radius + _mapElement.width - secureBorder || _checkElement.x < _mapElement.x - _checkElement.radius + secureBorder)
+						!(_checkElement.x - _checkElement.radius > _mapElement.x + _mapElement.width - secureBorder || _checkElement.x + _checkElement.radius < _mapElement.x + secureBorder)
 					)
 				) : (
 					_mapElement.radius ? (
-						!(_checkElement.x > _mapElement.x + _mapElement.radius - secureBorder || _checkElement.x < _mapElement.x - _mapElement.radius - _checkElement.width + secureBorder)
+						!(_checkElement.x > _mapElement.x + _mapElement.radius - secureBorder || _checkElement.x + _checkElement.width < _mapElement.x - _mapElement.radius + secureBorder)
 					) : (
-						!(_checkElement.x > _mapElement.x + _mapElement.width - secureBorder || _checkElement.x < _mapElement.x - _checkElement.width + secureBorder)
+						!(_checkElement.x > _mapElement.x + _mapElement.width - secureBorder || _checkElement.x + _checkElement.width < _mapElement.x + secureBorder)
 					)
 				)
 			);
@@ -959,9 +921,9 @@
 					const goCheckColisionYBackward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
+								_circlesColision(_checkElement, _mapElement)
 							) : (
-								_checkElement.y <= _mapElement.y + _mapElement.height + _checkElement.radius && _checkElement.y > _mapElement.y + _checkElement.radius
+								_checkElement.y - _checkElement.radius <= _mapElement.y + _mapElement.height && _checkElement.y - _checkElement.radius > _mapElement.y
 							)
 						) : (
 							_mapElement.radius ? (
@@ -984,15 +946,15 @@
 					const goCheckColisionYFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								((_mapElement.x - _checkElement.x) ** 2) + ((_mapElement.y - _checkElement.y) ** 2) <= ((_mapElement.radius + _checkElement.radius) ** 2)
+								_circlesColision(_checkElement, _mapElement)
 							) : (
-								_checkElement.y >= _mapElement.y - _checkElement.radius && _checkElement.y < _mapElement.y + _mapElement.height - _checkElement.radius
+								_checkElement.y + _checkElement.radius >= _mapElement.y && _checkElement.y + _checkElement.radius < _mapElement.y + _mapElement.height
 							)
 						) : (
 							_mapElement.radius ? (
-								_checkElement.y >= _mapElement.y - _mapElement.radius - _checkElement.height && _checkElement.y < _mapElement.y + _mapElement.radius - _checkElement.height
+								_checkElement.y + _checkElement.height >= _mapElement.y - _mapElement.radius && _checkElement.y + _checkElement.height < _mapElement.y + _mapElement.radius
 							) : (
-								_checkElement.y >= _mapElement.y - _checkElement.height && _checkElement.y < _mapElement.y + _mapElement.height - _checkElement.height
+								_checkElement.y + _checkElement.height >= _mapElement.y && _checkElement.y + _checkElement.height < _mapElement.y + _mapElement.height
 							)
 						)
 					);
