@@ -677,7 +677,7 @@
 	// Colisions
 	// -----------------------------------------------------------------------------------------------
 
-	const colisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, _aidValues, phase) => {
+	const colisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
 		let willModifyPlayerLife = false;
 
 		if (_checkElement.type && _checkElement.type === 2) { // Remove active item
@@ -690,24 +690,40 @@
 
 		switch (_mapElement.type) {
 			case 1: { // Revert movement
+				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the map element
+					const aidValues = {};
+
+					aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
+
+					aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
+
+					aidValues.baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
+
+					aidValues.baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
+
+					return aidValues;
+				};
+
+				const aidValues = _getAidValues(_checkElement, _mapElement);
+
 				if (phase === 1 && _checkElement.step.x < 0) {
 					_checkElement.step.x = -_checkElement.step.x;
-					_checkElement.x = _mapElement.x + _aidValues.baseMapElementDistanceX + _aidValues.baseCheckElementDistanceX;
+					_checkElement.x = _mapElement.x + aidValues.baseMapElementDistanceX + aidValues.baseCheckElementDistanceX;
 				}
 
 				if (phase === 2 && _checkElement.step.x > 0) {
 					_checkElement.step.x = -_checkElement.step.x;
-					_checkElement.x = _mapElement.x - _aidValues.baseMapElementDistanceX - _aidValues.baseCheckElementDistanceX;
+					_checkElement.x = _mapElement.x - aidValues.baseMapElementDistanceX - aidValues.baseCheckElementDistanceX;
 				}
 
 				if (phase === 3 && _checkElement.step.y < 0) {
 					_checkElement.step.y = -_checkElement.step.y;
-					_checkElement.y = _mapElement.y + _aidValues.baseMapElementDistanceY + _aidValues.baseCheckElementDistanceY;
+					_checkElement.y = _mapElement.y + aidValues.baseMapElementDistanceY + aidValues.baseCheckElementDistanceY;
 				}
 
 				if (phase === 4 && _checkElement.step.y > 0) {
 					_checkElement.step.y = -_checkElement.step.y;
-					_checkElement.y = _mapElement.y - _aidValues.baseMapElementDistanceY - _aidValues.baseCheckElementDistanceY;
+					_checkElement.y = _mapElement.y - aidValues.baseMapElementDistanceY - aidValues.baseCheckElementDistanceY;
 				}
 
 				willModifyPlayerLife = true;
@@ -784,28 +800,12 @@
 	};
 
 	const checkMapElementColision = (checkElement, _map, _idActiveElement = null) => {
-		const _getAidValues = (_checkElement, _mapElement) => {
-			const aidValues = {};
-
-			aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
-
-			aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
-
-			aidValues.baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
-
-			aidValues.baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
-
-			return aidValues;
-		};
-
 		// Two circles colision formula
-		const _circlesColision = (_circleA, _circleB) => (
-			((_circleA.x - _circleB.x) ** 2) + ((_circleA.y - _circleB.y) ** 2) <= ((_circleA.radius + _circleB.radius) ** 2)
-		);
+		// const _circlesColision = (_circleA, _circleB) => (
+		// 	((_circleA.x - _circleB.x) ** 2) + ((_circleA.y - _circleB.y) ** 2) <= ((_circleA.radius + _circleB.radius) ** 2)
+		// );
 
 		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
-			const aidValuesAtX = _getAidValues(_checkElement, _mapElement);
-
 			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.y, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
 			const secureBorder = secureColisionValue < (_mapElement.height || _mapElement.radius) ? secureColisionValue : (_mapElement.height || _mapElement.radius);
 
@@ -836,7 +836,8 @@
 					const goCheckColisionXBackward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_circlesColision(_checkElement, _mapElement)
+//								_circlesColision(_checkElement, _mapElement)
+								_checkElement.x - _checkElement.radius <= _mapElement.x + _mapElement.radius && _checkElement.x - _checkElement.radius > _mapElement.x - _mapElement.radius
 							) : (
 								_checkElement.x - _checkElement.radius <= _mapElement.x + _mapElement.width && _checkElement.x - _checkElement.radius > _mapElement.x
 							)
@@ -851,7 +852,7 @@
 
 					if (goCheckColisionXBackward) {
 						// Colided
-						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 1);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
 
 						if (willModifyPlayerLife) {
 							return bonusLifeModifier;
@@ -861,7 +862,8 @@
 					const goCheckColisionXFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_circlesColision(_checkElement, _mapElement)
+//								_circlesColision(_checkElement, _mapElement)
+								_checkElement.x + _checkElement.radius >= _mapElement.x - _mapElement.radius && _checkElement.x + _checkElement.radius < _mapElement.x + _mapElement.radius
 							) : (
 								_checkElement.x + _checkElement.radius >= _mapElement.x && _checkElement.x + _checkElement.radius < _mapElement.x + _mapElement.width
 							)
@@ -876,7 +878,7 @@
 
 					if (goCheckColisionXFoward) {
 						// Colided
-						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtX, 2);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
 
 						if (willModifyPlayerLife) {
 							return bonusLifeModifier;
@@ -889,8 +891,6 @@
 		};
 
 		const _checkAtY = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
-			const aidValuesAtY = _getAidValues(_checkElement, _mapElement);
-
 			const secureColisionValue = Math.abs(_getElementSpeed(_checkElement.step.x, _checkElement.step.speed)) + (_checkElement.step.speed || 1);
 			const secureBorder = secureColisionValue < (_mapElement.width || _mapElement.radius) ? secureColisionValue : (_mapElement.width || _mapElement.radius);
 
@@ -921,7 +921,8 @@
 					const goCheckColisionYBackward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_circlesColision(_checkElement, _mapElement)
+//								_circlesColision(_checkElement, _mapElement)
+								_checkElement.y - _checkElement.radius <= _mapElement.y + _mapElement.radius && _checkElement.y - _checkElement.radius > _mapElement.y - _mapElement.radius
 							) : (
 								_checkElement.y - _checkElement.radius <= _mapElement.y + _mapElement.height && _checkElement.y - _checkElement.radius > _mapElement.y
 							)
@@ -936,7 +937,7 @@
 
 					if (goCheckColisionYBackward) {
 						// Colided
-						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 3);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
 
 						if (willModifyPlayerLife) {
 							return bonusLifeModifier;
@@ -946,7 +947,8 @@
 					const goCheckColisionYFoward = (
 						_checkElement.radius ? (
 							_mapElement.radius ? (
-								_circlesColision(_checkElement, _mapElement)
+//								_circlesColision(_checkElement, _mapElement)
+								_checkElement.y + _checkElement.radius >= _mapElement.y - _mapElement.radius && _checkElement.y + _checkElement.radius < _mapElement.y + _mapElement.radius
 							) : (
 								_checkElement.y + _checkElement.radius >= _mapElement.y && _checkElement.y + _checkElement.radius < _mapElement.y + _mapElement.height
 							)
@@ -961,7 +963,7 @@
 
 					if (goCheckColisionYFoward) {
 						// Colided
-						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, aidValuesAtY, 4);
+						const willModifyPlayerLife = colisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
 
 						if (willModifyPlayerLife) {
 							return bonusLifeModifier;
