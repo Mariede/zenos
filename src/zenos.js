@@ -1613,32 +1613,35 @@
 		.then(
 			map => {
 				// Initial map player coordinates
-				const startPointX = (
+				const mapStartPointX = (
 					map.players.startPointX === 'mid' ? (
 						_canvas.width < _action.offsetWidth ? _canvas.width / 2 : _action.offsetWidth / 2
 					) : (
 						typeof map.players.startPointX === 'number' && !isNaN(map.players.startPointX) ? (
 							map.players.startPointX
 						) : (
-							200
+							0
 						)
 					)
 				);
 
-				const startPointY = (
+				const mapStartPointY = (
 					map.players.startPointY === 'mid' ? (
 						_canvas.height < _action.offsetHeight ? _canvas.height / 2 : _action.offsetHeight / 2
 					) : (
 						typeof map.players.startPointY === 'number' && !isNaN(map.players.startPointY) ? (
 							map.players.startPointY
 						) : (
-							200
+							0
 						)
 					)
 				);
 
-				_player.x = startPointX;
-				_player.y = startPointY;
+				const playerStartPointX = _player.x; // Initially added to mapStartPointX
+				const playerStartPointY = _player.y; // Initially added to mapStartPointY
+
+				_player.x = mapStartPointX + playerStartPointX;
+				_player.y = mapStartPointY + playerStartPointY;
 
 				beginGame(_action, _canvas, _cx, _player, map);
 			}
@@ -1658,8 +1661,8 @@
 				damageTakenFactor: 25,
 				timer: 0,
 				radius: 20,
-				x: 200,
-				y: 200,
+				x: 0, // Initially added to mapStartPointX
+				y: 0, // Initially added to mapStartPointY
 				style: {
 					color: {
 						body: 'black',
