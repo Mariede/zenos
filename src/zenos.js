@@ -1136,7 +1136,7 @@
 		const screenCheckW = _checkScreenBorders(_action.offsetWidth);
 		const screenCheckY = _checkScreenBorders(_action.offsetHeight);
 
-		const startPointX = (
+		const mapStartPointX = (
 			$boxWidth < _action.offsetWidth ? (
 				$boxWidth / 2
 			) : (
@@ -1152,7 +1152,7 @@
 			)
 		);
 
-		const startPointY = (
+		const mapStartPointY = (
 			$boxHeight < _action.offsetHeight ? (
 				$boxHeight / 2
 			) : (
@@ -1172,7 +1172,7 @@
 		_cx.textAlign = 'center';
 
 		_cx.font = '900 48px Arial';
-		_cx.fillText('Game Over', startPointX, startPointY);
+		_cx.fillText('Game Over', mapStartPointX, mapStartPointY);
 	};
 
 	// Actually ends
