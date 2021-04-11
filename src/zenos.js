@@ -694,11 +694,8 @@
 					const aidValues = {};
 
 					aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
-
 					aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
-
 					aidValues.baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
-
 					aidValues.baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
 
 					return aidValues;
@@ -860,19 +857,20 @@
 					_checkCoord + _checkComplement >= _mapCoord && _checkCoord + _checkComplement < _mapCoord + _mapComplement
 				)
 			)
+		);
 
+		const checkCollisionBonusLifeModifier = _mapElement => (
+			(
+				_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
+			) || (
+				0
+			)
 		);
 
 		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
 			const goCheckBroadRangeY = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y, _checkElement.step.speed);
 
 			if (goCheckBroadRangeY) {
-				const bonusLifeModifier = (
-					_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
-				) || (
-					0
-				);
-
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
 					const goCheckCollisionBackwardX = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width);
 
@@ -881,7 +879,7 @@
 						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
 
 						if (willModifyPlayerLife) {
-							return bonusLifeModifier;
+							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
 				} else {
@@ -892,7 +890,7 @@
 						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
 
 						if (willModifyPlayerLife) {
-							return bonusLifeModifier;
+							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
 				}
@@ -905,12 +903,6 @@
 			const goCheckBroadRangeX = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.step.x, _checkElement.step.speed);
 
 			if (goCheckBroadRangeX) {
-				const bonusLifeModifier = (
-					_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
-				) || (
-					0
-				);
-
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
 					const goCheckCollisionBackwardY = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height);
 
@@ -919,7 +911,7 @@
 						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
 
 						if (willModifyPlayerLife) {
-							return bonusLifeModifier;
+							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
 				} else {
@@ -930,7 +922,7 @@
 						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
 
 						if (willModifyPlayerLife) {
-							return bonusLifeModifier;
+							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
 				}
