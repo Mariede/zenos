@@ -7,11 +7,11 @@ It will be converted to a React application soon enough!
 ```
 
  * Player render
- 	- Config options diversity (json data)
- 	- Player direction
- 	- Life, Shoot, Shield and Speed
+	- Config options diversity (json data)
+	- Player direction
+	- Life, Shoot, Shield and Speed
  * Map and map's elements render
- 	- Config options diversity (json data)
+	- Config options diversity (json data)
 	- Element filling options diversity (json data)
 	- Element types with differents collision actions
 	- Elements direction (when applicable)
