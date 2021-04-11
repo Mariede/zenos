@@ -678,7 +678,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
-		let willModifyPlayerLife = false;
+		let mayModifyCheckElementLife = false;
 
 		if (_checkElement.type && _checkElement.type === 2) { // Remove active item
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
@@ -723,7 +723,7 @@
 					_checkElement.y = _mapElement.y - aidValues.baseMapElementDistanceY - aidValues.baseCheckElementDistanceY;
 				}
 
-				willModifyPlayerLife = true;
+				mayModifyCheckElementLife = true;
 
 				break;
 			}
@@ -739,13 +739,13 @@
 					}
 				}
 
-				willModifyPlayerLife = true;
+				mayModifyCheckElementLife = true;
 
 				break;
 			}
 		}
 
-		return willModifyPlayerLife;
+		return mayModifyCheckElementLife;
 	};
 
 	const checkMapBorderXCollision = (checkElement, _map) => {
@@ -819,15 +819,15 @@
 		};
 
 		// Two circles collision formula
-		// const _circlesCollision = (_circleA, _circleB) => (
-		// 	((_circleA.x - _circleB.x) ** 2) + ((_circleA.y - _circleB.y) ** 2) <= ((_circleA.radius + _circleB.radius) ** 2)
+		// const _circlesCollision = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther) => (
+		// 	((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
 		// );
 
 		// Two rectangles Collision axis backward (-X / -Y)
 		const goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement) => (
 			_checkRadius ? (
 				_mapRadius ? (
-//					_circlesCollision(_checkElement, _mapElement)
+//					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
 					_checkCoord - _checkRadius <= _mapCoord + _mapRadius && _checkCoord - _checkRadius > _mapCoord - _mapRadius
 				) : (
 					_checkCoord - _checkRadius <= _mapCoord + _mapComplement && _checkCoord - _checkRadius > _mapCoord
@@ -845,7 +845,7 @@
 		const goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement) => (
 			_checkRadius ? (
 				_mapRadius ? (
-//					_circlesCollision(_checkElement, _mapElement)
+//					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
 					_checkCoord + _checkRadius >= _mapCoord - _mapRadius && _checkCoord + _checkRadius < _mapCoord + _mapRadius
 				) : (
 					_checkCoord + _checkRadius >= _mapCoord && _checkCoord + _checkRadius < _mapCoord + _mapComplement
@@ -876,9 +876,9 @@
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
-						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
+						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
 
-						if (willModifyPlayerLife) {
+						if (mayModifyCheckElementLife) {
 							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
@@ -887,9 +887,9 @@
 
 					if (goCheckCollisionFowardX) {
 						// Collided
-						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
+						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
 
-						if (willModifyPlayerLife) {
+						if (mayModifyCheckElementLife) {
 							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
@@ -908,9 +908,9 @@
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
-						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
+						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
 
-						if (willModifyPlayerLife) {
+						if (mayModifyCheckElementLife) {
 							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
@@ -919,9 +919,9 @@
 
 					if (goCheckCollisionFowardY) {
 						// Collided
-						const willModifyPlayerLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
+						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
 
-						if (willModifyPlayerLife) {
+						if (mayModifyCheckElementLife) {
 							return checkCollisionBonusLifeModifier(_mapElement);
 						}
 					}
@@ -994,7 +994,7 @@
 		const playerCollidedMapElement = checkMapElementCollision(_player, _map);
 
 		if (playerCollidedMapBorderX || playerCollidedMapBorderY || !isNaN(playerCollidedMapElement)) {
-			// Decrease life
+			// Decrease player life (the current checkElement)
 			const bonusLifeModifier = (typeof playerCollidedMapElement === 'number' && !isNaN(playerCollidedMapElement)) ? playerCollidedMapElement : 0;
 			const resultLife = _player.life - getPlayerLifeModifier(_player, bonusLifeModifier);
 
