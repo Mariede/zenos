@@ -17,8 +17,9 @@ It will be converted to a React application soon enough!
 	- Elements direction (when applicable)
 	- Map scrolling or fixed
  * Elements collisions
-	- Rectangle x Rectangle
-	- Circle x Circle (in development)
+	- "Rectangle x Rectangle"
+	- "Circle x Circle"
+	- Right now, "Circle x Rectangle" or "Rectangle x Circle" acts as "Rectangle x Rectangle" collision
 	- Configurable collisions actions
  * Elements iteration and Physics
  * Separated JS listeners for command iterations

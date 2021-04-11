@@ -690,37 +690,85 @@
 
 		switch (_mapElement.type) {
 			case 1: { // Revert movement
-				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the map element
+				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement
 					const aidValues = {};
+
+					const mapRadius2CirclesDistanceX = (
+						_checkElement.radius && _mapElement.radius && (
+							Math.round(Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.y - _mapElement.y) ** 2)))
+						)
+					) || 0;
+
+					const mapRadius2CirclesDistanceY = (
+						_checkElement.radius && _mapElement.radius && (
+							Math.round(Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.x - _mapElement.x) ** 2)))
+						)
+					) || 0;
+
+					const mapRadiusReflexionX = (
+						mapRadius2CirclesDistanceX ? ( // Only circle x circle
+							mapRadius2CirclesDistanceX - _checkElement.radius
+						) : (
+							_mapElement.radius
+						)
+					);
+
+					const mapRadiusReflexionY = (
+						mapRadius2CirclesDistanceY ? ( // Only circle x circle
+							mapRadius2CirclesDistanceY - _checkElement.radius
+						) : (
+							_mapElement.radius
+						)
+					);
 
 					aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
 					aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
-					aidValues.baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
-					aidValues.baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
+					aidValues.baseMapElementDistanceX = _mapElement.radius ? mapRadiusReflexionX : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
+					aidValues.baseMapElementDistanceY = _mapElement.radius ? mapRadiusReflexionY : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
 
 					return aidValues;
 				};
 
 				const aidValues = _getAidValues(_checkElement, _mapElement);
 
-				if (phase === 1 && _checkElement.step.x < 0) {
-					_checkElement.step.x = -_checkElement.step.x;
-					_checkElement.x = _mapElement.x + aidValues.baseMapElementDistanceX + aidValues.baseCheckElementDistanceX;
+				if (_checkElement.step.x !== 0) {
+					const adjustPenetrationX = (
+						Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
+					);
+
+					if (phase === 1 && _checkElement.step.x < 0) {
+						_checkElement.step.x = -_checkElement.step.x;
+
+						if (adjustPenetrationX) {
+							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
+						}
+					} else if (phase === 2 && _checkElement.step.x > 0) {
+						_checkElement.step.x = -_checkElement.step.x;
+
+						if (adjustPenetrationX) {
+							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
+						}
+					}
 				}
 
-				if (phase === 2 && _checkElement.step.x > 0) {
-					_checkElement.step.x = -_checkElement.step.x;
-					_checkElement.x = _mapElement.x - aidValues.baseMapElementDistanceX - aidValues.baseCheckElementDistanceX;
-				}
+				if (_checkElement.step.y !== 0) {
+					const adjustPenetrationY = (
+						Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
+					);
 
-				if (phase === 3 && _checkElement.step.y < 0) {
-					_checkElement.step.y = -_checkElement.step.y;
-					_checkElement.y = _mapElement.y + aidValues.baseMapElementDistanceY + aidValues.baseCheckElementDistanceY;
-				}
+					if (phase === 3 && _checkElement.step.y < 0) {
+						_checkElement.step.y = -_checkElement.step.y;
 
-				if (phase === 4 && _checkElement.step.y > 0) {
-					_checkElement.step.y = -_checkElement.step.y;
-					_checkElement.y = _mapElement.y - aidValues.baseMapElementDistanceY - aidValues.baseCheckElementDistanceY;
+						if (adjustPenetrationY) {
+							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
+						}
+					} else if (phase === 4 && _checkElement.step.y > 0) {
+						_checkElement.step.y = -_checkElement.step.y;
+
+						if (adjustPenetrationY) {
+							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
+						}
+					}
 				}
 
 				mayModifyCheckElementLife = true;
@@ -797,6 +845,11 @@
 	};
 
 	const checkMapElementCollision = (checkElement, _map, _idActiveElement = null) => {
+		// Two circles collision formula
+		const _circlesCollision = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther) => (
+			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
+		);
+
 		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep, checkStepSpeed) => {
 			const secureCollisionValue = Math.abs(_getElementSpeed(checkStep, checkStepSpeed)) + (checkStepSpeed || 1);
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
@@ -818,17 +871,11 @@
 			);
 		};
 
-		// Two circles collision formula
-		// const _circlesCollision = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther) => (
-		// 	((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
-		// );
-
 		// Two rectangles Collision axis backward (-X / -Y)
-		const goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement) => (
+		const goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement, _checkCoordOther, _mapCoordOther) => (
 			_checkRadius ? (
 				_mapRadius ? (
-//					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
-					_checkCoord - _checkRadius <= _mapCoord + _mapRadius && _checkCoord - _checkRadius > _mapCoord - _mapRadius
+					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
 				) : (
 					_checkCoord - _checkRadius <= _mapCoord + _mapComplement && _checkCoord - _checkRadius > _mapCoord
 				)
@@ -842,11 +889,10 @@
 		);
 
 		// Two rectangles Collision axis foward (+X / +Y)
-		const goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement) => (
+		const goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, _checkCoordOther, _mapCoordOther) => (
 			_checkRadius ? (
 				_mapRadius ? (
-//					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
-					_checkCoord + _checkRadius >= _mapCoord - _mapRadius && _checkCoord + _checkRadius < _mapCoord + _mapRadius
+					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
 				) : (
 					_checkCoord + _checkRadius >= _mapCoord && _checkCoord + _checkRadius < _mapCoord + _mapComplement
 				)
@@ -872,7 +918,7 @@
 
 			if (goCheckBroadRangeY) {
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
-					const goCheckCollisionBackwardX = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width);
+					const goCheckCollisionBackwardX = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width, _checkElement.y, _mapElement.y);
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
@@ -883,7 +929,7 @@
 						}
 					}
 				} else {
-					const goCheckCollisionFowardX = goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width);
+					const goCheckCollisionFowardX = goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.y, _mapElement.y);
 
 					if (goCheckCollisionFowardX) {
 						// Collided
@@ -904,7 +950,7 @@
 
 			if (goCheckBroadRangeX) {
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
-					const goCheckCollisionBackwardY = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height);
+					const goCheckCollisionBackwardY = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height, _checkElement.x, _mapElement.x);
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
@@ -915,7 +961,7 @@
 						}
 					}
 				} else {
-					const goCheckCollisionFowardY = goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height);
+					const goCheckCollisionFowardY = goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.x, _mapElement.x);
 
 					if (goCheckCollisionFowardY) {
 						// Collided
@@ -1382,7 +1428,7 @@
 					{
 						id: 8,
 						type: 1,
-						radius: 40,
+						radius: 60,
 						x: 600,
 						y: 280,
 						style: {
@@ -1400,6 +1446,18 @@
 						style: {
 							color: {
 								body: 'deepskyblue'
+							}
+						}
+					},
+					{
+						id: 9,
+						type: 1,
+						radius: 120,
+						x: 1300,
+						y: 350,
+						style: {
+							color: {
+								body: 'yellow'
 							}
 						}
 					}
