@@ -1480,6 +1480,8 @@
 					},
 					{
 						id: 6,
+						life: 1500,
+						damageTakenFactor: 20,
 						type: 3,
 						width: 50,
 						height: 50,
@@ -1498,6 +1500,9 @@
 						},
 						hit: {
 							bonusLifeModifier: 250
+						},
+						_actions: {
+							isTakingDamage: false
 						}
 					},
 					{
@@ -1547,6 +1552,23 @@
 							color: {
 								body: 'yellow'
 							}
+						}
+					},
+					{
+						id: 10,
+						type: 3,
+						width: 150,
+						height: 10,
+						x: 20,
+						y: 100,
+						style: {
+							color: {
+								body: 'darkgreen'
+							}
+						},
+						step: {
+							x: 5,
+							y: 0
 						}
 					}
 				]
