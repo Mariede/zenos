@@ -543,15 +543,16 @@
 	const drawMapElements = (_cx, _map) => {
 		const _drawnElementDetails = _mapElement => {
 			// Takes damage
-			if (_mapElement._actions && _mapElement._actions.isTakingDamage) {
-				_mapElement.style.color.savedBody = _mapElement.style.color.body; // Temporary
-				_mapElement.style.color.body = defaults.isTakingDamageColor;
+			if (_mapElement._actions) {
+				if (_mapElement._actions.isTakingDamage) {
+					_mapElement.style.color.body = defaults.isTakingDamageColor;
+					_mapElement._actions.isTakingDamage = false;
+				} else {
+					if (!_mapElement.style.color.savedBody) {
+						_mapElement.style.color.savedBody = _mapElement.style.color.body; // Temporary
+					}
 
-				_mapElement._actions.isTakingDamage = false;
-			} else {
-				if (_mapElement.style.color.savedBody) {
 					_mapElement.style.color.body = _mapElement.style.color.savedBody;
-					delete _mapElement.style.color.savedBody;
 				}
 			}
 		};
@@ -670,29 +671,29 @@
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDetails = (_cx, _player) => {
-			// Takes damage
-			if (_player._actions && _player._actions.isTakingDamage) {
-				_player.style.color.savedBody = _player.style.color.body; // Temporary
-				_player.style.color.body = defaults.isTakingDamageColor;
+			if (_player._actions) {
+				// Takes damage
+				if (_player._actions.isTakingDamage) {
+					_player.style.color.body = defaults.isTakingDamageColor;
+					_player._actions.isTakingDamage = false;
+				} else {
+					if (!_player.style.color.savedBody) {
+						_player.style.color.savedBody = _player.style.color.body; // Temporary
+					}
 
-				_player._actions.isTakingDamage = false;
-			} else {
-				if (_player.style.color.savedBody) {
 					_player.style.color.body = _player.style.color.savedBody;
-					delete _player.style.color.savedBody;
 				}
-			}
 
-			// Weapon shoot
-			if (_player._actions && _player._actions.isShooting) {
-				_player.style.color.savedDetails = _player.style.color.details; // Temporary
-				_player.style.color.details = (_player.skills.weapon.shoot.personal.isShootingColor || defaults.isShootingColor);
+				// Weapon shoot
+				if (_player._actions.isShooting) {
+					_player.style.color.details = (_player.skills.weapon.shoot.personal.isShootingColor || defaults.isShootingColor);
+					_player._actions.isShooting = false;
+				} else {
+					if (!_player.style.color.savedDetails) {
+						_player.style.color.savedDetails = _player.style.color.details; // Temporary
+					}
 
-				_player._actions.isShooting = false;
-			} else {
-				if (_player.style.color.savedDetails) {
 					_player.style.color.details = _player.style.color.savedDetails;
-					delete _player.style.color.savedDetails;
 				}
 			}
 
