@@ -11,7 +11,8 @@
 	const defaults = {
 		damageTakenFactor: 50,
 		isTakingDamageColor: 'red',
-		isShootingColor: 'red'
+		isShootingColor: 'red',
+		shootSpeed: 15
 	};
 
 	// Get random integer number (min and max included)
@@ -346,7 +347,7 @@
 								const checkDirectionYpositive = [9, 10, 11].includes(currentPlayerDirection);
 								const checkDirectionYnegative = [-11, -10, -9].includes(currentPlayerDirection);
 
-								const secureCollisionValue = _player.radius * 1.5;
+								const secureCollisionValue = _player.radius + _player.skills.weapon.shoot.radius;
 
 								const shootDataX = checkDirectionXpositive ? (
 									_player.x + secureCollisionValue
@@ -368,21 +369,23 @@
 									)
 								);
 
+								const shootSpeed = (newShootData.personal.shootSpeed || defaults.shootSpeed);
+
 								const shootStepX = (_player.step.x > 0 || checkDirectionXpositive) ? (
-									newShootData.personal.shootSpeed
+									shootSpeed
 								) : (
 									(_player.step.x < 0 || checkDirectionXnegative) ? (
-										newShootData.personal.shootSpeed * -1
+										shootSpeed * -1
 									) : (
 										0
 									)
 								);
 
 								const shootStepY = (_player.step.y > 0 || checkDirectionYpositive) ? (
-									newShootData.personal.shootSpeed
+									shootSpeed
 								) : (
 									(_player.step.y < 0 || checkDirectionYnegative) ? (
-										newShootData.personal.shootSpeed * -1
+										shootSpeed * -1
 									) : (
 										0
 									)
@@ -407,7 +410,9 @@
 
 								_map.elements.push({ ...newShootData, ...newShootDataAttach });
 
-								_player._actions.isShooting = true;
+								if (_player._actions) {
+									_player._actions.isShooting = true;
+								}
 
 								if (!chekInfiniteAmmo) {
 									_player.skills.weapon.shoot.personal.charges -= 1;
@@ -536,20 +541,50 @@
 	};
 
 	const drawMapElements = (_cx, _map) => {
+		const _drawnElementDetails = _mapElement => {
+			// Takes damage
+			if (_mapElement._actions && _mapElement._actions.isTakingDamage) {
+				_mapElement.style.color.savedBody = _mapElement.style.color.body; // Temporary
+				_mapElement.style.color.body = defaults.isTakingDamageColor;
+
+				_mapElement._actions.isTakingDamage = false;
+			} else {
+				if (_mapElement.style.color.savedBody) {
+					_mapElement.style.color.body = _mapElement.style.color.savedBody;
+					delete _mapElement.style.color.savedBody;
+				}
+			}
+		};
+
+		const mapElements = _map.elements;
+
 		// Elements for base screen
+		for (const mapElement of mapElements) {
+			const hasLife = Object.prototype.hasOwnProperty.call(mapElement, 'life');
 
-		for (const mapElement of _map.elements) {
-			// Movement (if applicable)
-			moveMapElement(mapElement);
+			// Remove life zero or less elements
+			if (hasLife && mapElement.life <= 0) {
+				const itemToRemove = mapElements.findIndex(item => item.id === mapElement.id);
 
-			// Collisions
-			checkElementCollisions(mapElement, _map);
+				if (itemToRemove !== -1) {
+					mapElements.splice(itemToRemove, 1);
+				}
+			} else {
+				// Movement (if applicable)
+				moveMapElement(mapElement);
 
-			// Element direction (if applicable)
-			const currentElementDirection = _getElementDirection(mapElement);
+				// Collisions
+				checkElementCollisions(mapElement, _map);
 
-			// Drawn element body (direction if applicable)
-			_drawnElement(_cx, mapElement, currentElementDirection);
+				// Element direction (if applicable)
+				const currentElementDirection = _getElementDirection(mapElement);
+
+				// Drawn element body (direction if applicable)
+				_drawnElement(_cx, mapElement, currentElementDirection);
+
+				// Drawn element details (damage, ...)
+				_drawnElementDetails(mapElement);
+			}
 		}
 	};
 
@@ -689,7 +724,7 @@
 		// Drawn player body and direction
 		_drawnElement(_cx, _player, currentPlayerDirection);
 
-		// Drawn player details (shield)
+		// Drawn player details (damage, shield, ...)
 		_drawnPlayerDetails(_cx, _player);
 	};
 
@@ -1031,14 +1066,14 @@
 			);
 
 			// Only if it has a shield option
-			if (lifeModifierCurrent >= 0 && elementTakingHit.skills.shield && elementTakingHit.skills.shield.up && elementTakingHit.skills.shield.charges > 0) {
+			if (lifeModifierCurrent >= 0 && elementTakingHit.skills && elementTakingHit.skills.shield && elementTakingHit.skills.shield.up && elementTakingHit.skills.shield.charges > 0) {
 				elementTakingHit.skills.shield.charges -= 1;
 				elementTakingHit.skills.shield.up = false;
 
 				return Math.round(lifeModifierCurrent / elementTakingHit.skills.shield.reduceFactor); // Damage reduced by reduceFactor shield
 			}
 
-			if (lifeModifierCurrent > 0) {
+			if (lifeModifierCurrent > 0 && elementTakingHit._actions) {
 				elementTakingHit._actions.isTakingDamage = true;
 			}
 
@@ -1063,7 +1098,18 @@
 
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
-			checkMapElementCollision(_mapElement, _map, _mapElement.id);
+			const elementCollidedMapElement = checkMapElementCollision(_mapElement, _map, _mapElement.id);
+
+			if (!isNaN(elementCollidedMapElement)) {
+				// Decrease current checkElement life
+				const bonusLifeModifier = (typeof elementCollidedMapElement === 'number' ? elementCollidedMapElement : 0);
+				const lifeModifierCurrent = getElementLifeModifier(_mapElement, bonusLifeModifier);
+
+				if (lifeModifierCurrent) {
+					const resultLife = _mapElement.life - lifeModifierCurrent;
+					_mapElement.life = (resultLife >= 0 ? resultLife : 0);
+				}
+			}
 		}
 	};
 
@@ -1406,6 +1452,8 @@
 					},
 					{
 						id: 5,
+						life: 1000,
+						damageTakenFactor: 15,
 						type: 3,
 						width: 50,
 						height: 50,
@@ -1425,6 +1473,9 @@
 								maxX: 600,
 								minY: 400
 							}
+						},
+						_actions: {
+							isTakingDamage: false
 						}
 					},
 					{
@@ -1741,7 +1792,7 @@
 					weapon: {
 						shoot: { // New map element guide (basic data)
 							type: 2,
-							radius: 15,
+							radius: 10,
 							style: {
 								color: {
 									body: 'red'
