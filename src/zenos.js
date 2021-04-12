@@ -7,6 +7,13 @@
 
 	// Generic game helpers
 
+	// Default values
+	const defaults = {
+		damageTakenFactor: 50,
+		isTakingDamageColor: 'red',
+		isShootingColor: 'red'
+	};
+
 	// Get random integer number (min and max included)
 	const _randomIntFromInterval = (_min, _max) => (
 		Math.floor((Math.random() * (_max - _min + 1)) + _min)
@@ -400,7 +407,7 @@
 
 								_map.elements.push({ ...newShootData, ...newShootDataAttach });
 
-								_player.skills.weapon.shoot.personal.isShooting = true;
+								_player._actions.isShooting = true;
 
 								if (!chekInfiniteAmmo) {
 									_player.skills.weapon.shoot.personal.charges -= 1;
@@ -628,16 +635,29 @@
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDetails = (_cx, _player) => {
-			// Weapon shoot
-			if (_player.skills.weapon.shoot.personal.isShooting) {
-				_player.style.color.saved = _player.style.color.details; // Temporary
-				_player.style.color.details = _player.skills.weapon.shoot.personal.colorWhenShooting;
+			// Takes damage
+			if (_player._actions && _player._actions.isTakingDamage) {
+				_player.style.color.savedBody = _player.style.color.body; // Temporary
+				_player.style.color.body = defaults.isTakingDamageColor;
 
-				_player.skills.weapon.shoot.personal.isShooting = false;
+				_player._actions.isTakingDamage = false;
 			} else {
-				if (_player.style.color.saved) {
-					_player.style.color.details = _player.style.color.saved;
-					delete _player.style.color.saved;
+				if (_player.style.color.savedBody) {
+					_player.style.color.body = _player.style.color.savedBody;
+					delete _player.style.color.savedBody;
+				}
+			}
+
+			// Weapon shoot
+			if (_player._actions && _player._actions.isShooting) {
+				_player.style.color.savedDetails = _player.style.color.details; // Temporary
+				_player.style.color.details = (_player.skills.weapon.shoot.personal.isShootingColor || defaults.isShootingColor);
+
+				_player._actions.isShooting = false;
+			} else {
+				if (_player.style.color.savedDetails) {
+					_player.style.color.details = _player.style.color.savedDetails;
+					delete _player.style.color.savedDetails;
 				}
 			}
 
@@ -995,6 +1015,39 @@
 		return NaN;
 	};
 
+	// Calculate element new modified life (if applicable)
+	const getElementLifeModifier = (elementTakingHit, bonusLifeModifier) => {
+		if (elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
+			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
+			const halfHit = Math.round(damageTakenFactor / 2);
+			const maxHit = Math.round(halfHit + bonusLifeModifier);
+
+			const lifeModifierCurrent = (
+				bonusLifeModifier < 0 ? ( // Element gains life
+					bonusLifeModifier + _randomIntFromInterval(0, halfHit)
+				) : ( // Element loses life
+					_randomIntFromInterval(0, halfHit) + _randomIntFromInterval(halfHit, maxHit)
+				)
+			);
+
+			// Only if it has a shield option
+			if (lifeModifierCurrent >= 0 && elementTakingHit.skills.shield && elementTakingHit.skills.shield.up && elementTakingHit.skills.shield.charges > 0) {
+				elementTakingHit.skills.shield.charges -= 1;
+				elementTakingHit.skills.shield.up = false;
+
+				return Math.round(lifeModifierCurrent / elementTakingHit.skills.shield.reduceFactor); // Damage reduced by reduceFactor shield
+			}
+
+			if (lifeModifierCurrent > 0) {
+				elementTakingHit._actions.isTakingDamage = true;
+			}
+
+			return lifeModifierCurrent;
+		}
+
+		return 0;
+	};
+
 	const checkElementCollisions = (_mapElement, _map) => {
 		if (_mapElement.step) {
 			// Only if element can move
@@ -1014,40 +1067,24 @@
 		}
 	};
 
-	// Calculate players new modified life
-	const getPlayerLifeModifier = (_player, bonusLifeModifier) => {
-		const lifeModifierCurrent = (
-			bonusLifeModifier < 0 ? ( // Player gain life
-				bonusLifeModifier
-			) : ( // Player lose life
-				(_player.damageTakenFactor - _randomIntFromInterval(1, _player.damageTakenFactor - 1)) + bonusLifeModifier
-			)
-		);
-
-		if (lifeModifierCurrent >= 0 && _player.skills.shield.up && _player.skills.shield.charges > 0) {
-			_player.skills.shield.charges -= 1;
-			_player.skills.shield.up = false;
-
-			return Math.round(lifeModifierCurrent / _player.skills.shield.reduceFactor); // Player damage reduced by reduceFactor shield
-		}
-
-		return lifeModifierCurrent;
-	};
-
 	const checkPlayerCollisions = (_player, _map) => {
-		const playerCollidedMapBorderX = checkMapBorderXCollision(_player, _map);
-		const playerCollidedMapBorderY = checkMapBorderYCollision(_player, _map);
+		checkMapBorderXCollision(_player, _map);
+		checkMapBorderYCollision(_player, _map);
 		const playerCollidedMapElement = checkMapElementCollision(_player, _map);
 
-		if (playerCollidedMapBorderX || playerCollidedMapBorderY || !isNaN(playerCollidedMapElement)) {
+		if (!isNaN(playerCollidedMapElement)) {
 			// Decrease player life (the current checkElement)
-			const bonusLifeModifier = (typeof playerCollidedMapElement === 'number' && !isNaN(playerCollidedMapElement)) ? playerCollidedMapElement : 0;
-			const resultLife = _player.life - getPlayerLifeModifier(_player, bonusLifeModifier);
+			const bonusLifeModifier = (typeof playerCollidedMapElement === 'number' ? playerCollidedMapElement : 0);
+			const lifeModifierCurrent = getElementLifeModifier(_player, bonusLifeModifier);
 
-			_player.life = (resultLife >= 0 ? resultLife : 0);
+			if (lifeModifierCurrent) {
+				const resultLife = _player.life - lifeModifierCurrent;
 
-			// Update menu screen
-			setMenuScreen(_player);
+				_player.life = (resultLife >= 0 ? resultLife : 0);
+
+				// Update menu screen
+				setMenuScreen(_player);
+			}
 		}
 	};
 
@@ -1714,13 +1751,16 @@
 								bonusLifeModifier: 50
 							},
 							personal: {
-								isShooting: false,
-								colorWhenShooting: 'yellow',
+								isShootingColor: 'yellow',
 								shootSpeed: 15,
 								charges: 100 // -1 for infinite ammo
 							}
 						}
 					}
+				},
+				_actions: {
+					isTakingDamage: false,
+					isShooting: false
 				}
 			}
 		];
