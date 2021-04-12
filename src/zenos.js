@@ -793,16 +793,14 @@
 					);
 
 					if (phase === 1 && _checkElement.step.x < 0) {
-						_checkElement.step.x = -_checkElement.step.x;
-
 						if (adjustPenetrationX) {
 							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
+							_checkElement.step.x = -_checkElement.step.x;
 						}
 					} else if (phase === 2 && _checkElement.step.x > 0) {
-						_checkElement.step.x = -_checkElement.step.x;
-
 						if (adjustPenetrationX) {
 							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
+							_checkElement.step.x = -_checkElement.step.x;
 						}
 					}
 				}
@@ -813,16 +811,14 @@
 					);
 
 					if (phase === 3 && _checkElement.step.y < 0) {
-						_checkElement.step.y = -_checkElement.step.y;
-
 						if (adjustPenetrationY) {
 							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
+							_checkElement.step.y = -_checkElement.step.y;
 						}
 					} else if (phase === 4 && _checkElement.step.y > 0) {
-						_checkElement.step.y = -_checkElement.step.y;
-
 						if (adjustPenetrationY) {
 							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
+							_checkElement.step.y = -_checkElement.step.y;
 						}
 					}
 				}
