@@ -62,7 +62,7 @@
 
 	// Check if map border is close enough
 	const _checkScreenBorders = _side => (
-		Math.round(_side / 2)
+		_side / 2
 	);
 
 	// Get element current direction
@@ -339,7 +339,7 @@
 								const checkDirectionYpositive = [9, 10, 11].includes(currentPlayerDirection);
 								const checkDirectionYnegative = [-11, -10, -9].includes(currentPlayerDirection);
 
-								const secureCollisionValue = Math.round(_player.radius * 1.5);
+								const secureCollisionValue = _player.radius * 1.5;
 
 								const shootDataX = checkDirectionXpositive ? (
 									_player.x + secureCollisionValue
@@ -695,13 +695,13 @@
 
 					const mapRadius2CirclesDistanceX = (
 						_checkElement.radius && _mapElement.radius && (
-							Math.round(Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.y - _mapElement.y) ** 2)))
+							Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.y - _mapElement.y) ** 2))
 						)
 					) || 0;
 
 					const mapRadius2CirclesDistanceY = (
 						_checkElement.radius && _mapElement.radius && (
-							Math.round(Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.x - _mapElement.x) ** 2)))
+							Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.x - _mapElement.x) ** 2))
 						)
 					) || 0;
 
@@ -1702,7 +1702,7 @@
 						reduceFactor: 2
 					},
 					weapon: {
-						shoot: {
+						shoot: { // New map element guide (basic data)
 							type: 2,
 							radius: 15,
 							style: {
