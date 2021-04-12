@@ -1317,8 +1317,8 @@
 					{
 						id: 1,
 						type: 1,
-						width: 80,
-						height: 310,
+						width: 60,
+						height: 260,
 						x: 158,
 						y: 198,
 						style: {
@@ -1330,8 +1330,8 @@
 					{
 						id: 2,
 						type: 1,
-						width: 80,
-						height: 305,
+						width: 60,
+						height: 255,
 						// Em análise - rotate: 10,
 						x: 150,
 						y: 200,
@@ -1382,11 +1382,11 @@
 							currentDirection: 11
 						},
 						step: {
-							x: 2,
-							y: 3,
+							x: -1,
+							y: 2,
 							rangeLimit: {
-								maxX: 800,
-								minY: 200
+								maxX: 600,
+								minY: 400
 							}
 						}
 					},
@@ -1395,8 +1395,8 @@
 						type: 3,
 						width: 50,
 						height: 50,
-						x: 490,
-						y: 170,
+						x: 900,
+						y: 50,
 						style: {
 							color: {
 								body: '%elements.6.style.color.body',
@@ -1406,7 +1406,7 @@
 						},
 						step: {
 							x: 1,
-							y: -3
+							y: 1
 						},
 						hit: {
 							bonusLifeModifier: 250
