@@ -306,6 +306,106 @@
 		}
 	};
 
+	// Drawns element shots (works better with circle and square elements)
+	// Shot drawning is always in circle format (for performance)
+	const _drawnElementShot = (elementShooting, _map, _newShootData) => {
+		const currentElementDirection = _getElementDirection(elementShooting);
+
+		const checkDirectionXpositive = [-9, 1, 11].includes(currentElementDirection);
+		const checkDirectionXnegative = [-11, -1, 9].includes(currentElementDirection);
+		const checkDirectionYpositive = [9, 10, 11].includes(currentElementDirection);
+		const checkDirectionYnegative = [-11, -10, -9].includes(currentElementDirection);
+
+		const secureCollisionValue = (
+			elementShooting.radius ? (
+				elementShooting.radius + elementShooting.skills.weapon.shoot.radius
+			) : (
+				elementShooting.width >= elementShooting.height ? (
+					(elementShooting.width / 2) + elementShooting.skills.weapon.shoot.radius
+				) : (
+					(elementShooting.height / 2) + elementShooting.skills.weapon.shoot.radius
+				)
+			)
+		);
+
+		const getElementX = (
+			elementShooting.radius ? (
+				elementShooting.x
+			) : (
+				elementShooting.x + (elementShooting.width / 2)
+			)
+		);
+
+		const getElementY = (
+			elementShooting.radius ? (
+				elementShooting.y
+			) : (
+				elementShooting.y + (elementShooting.height / 2)
+			)
+		);
+
+		const shootDataX = checkDirectionXpositive ? (
+			getElementX + secureCollisionValue
+		) : (
+			checkDirectionXnegative ? (
+				getElementX - secureCollisionValue
+			) : (
+				getElementX
+			)
+		);
+
+		const shootDataY = checkDirectionYpositive ? (
+			getElementY + secureCollisionValue
+		) : (
+			checkDirectionYnegative ? (
+				getElementY - secureCollisionValue
+			) : (
+				getElementY
+			)
+		);
+
+		const shootSpeed = (_newShootData.personal.shootSpeed || defaults.shootSpeed);
+
+		const shootStepX = (elementShooting.step.x > 0 || checkDirectionXpositive) ? (
+			shootSpeed
+		) : (
+			(elementShooting.step.x < 0 || checkDirectionXnegative) ? (
+				shootSpeed * -1
+			) : (
+				0
+			)
+		);
+
+		const shootStepY = (elementShooting.step.y > 0 || checkDirectionYpositive) ? (
+			shootSpeed
+		) : (
+			(elementShooting.step.y < 0 || checkDirectionYnegative) ? (
+				shootSpeed * -1
+			) : (
+				0
+			)
+		);
+
+		delete _newShootData.personal; // Not needed for the map element
+
+		const shootDataId = _map.elements.reduce(
+			(maxId, element) => (element.id > maxId ? element.id : maxId),
+			0
+		);
+
+		const newShootDataAttach = {
+			id: shootDataId + 1,
+			x: shootDataX,
+			y: shootDataY,
+			step: {
+				x: shootStepX,
+				y: shootStepY
+			}
+		};
+
+		_map.elements.push({ ..._newShootData, ...newShootDataAttach });
+	};
+
 	// -----------------------------------------------------------------------------------------------
 	// Listeners (load / start)
 	// -----------------------------------------------------------------------------------------------
@@ -340,75 +440,7 @@
 							const chargesLeft = !chekInfiniteAmmo && _player.skills.weapon.shoot.personal.charges;
 
 							if (chekInfiniteAmmo || chargesLeft > 0) {
-								const currentPlayerDirection = _getElementDirection(_player);
-
-								const checkDirectionXpositive = [-9, 1, 11].includes(currentPlayerDirection);
-								const checkDirectionXnegative = [-11, -1, 9].includes(currentPlayerDirection);
-								const checkDirectionYpositive = [9, 10, 11].includes(currentPlayerDirection);
-								const checkDirectionYnegative = [-11, -10, -9].includes(currentPlayerDirection);
-
-								const secureCollisionValue = _player.radius + _player.skills.weapon.shoot.radius;
-
-								const shootDataX = checkDirectionXpositive ? (
-									_player.x + secureCollisionValue
-								) : (
-									checkDirectionXnegative ? (
-										_player.x - secureCollisionValue
-									) : (
-										_player.x
-									)
-								);
-
-								const shootDataY = checkDirectionYpositive ? (
-									_player.y + secureCollisionValue
-								) : (
-									checkDirectionYnegative ? (
-										_player.y - secureCollisionValue
-									) : (
-										_player.y
-									)
-								);
-
-								const shootSpeed = (newShootData.personal.shootSpeed || defaults.shootSpeed);
-
-								const shootStepX = (_player.step.x > 0 || checkDirectionXpositive) ? (
-									shootSpeed
-								) : (
-									(_player.step.x < 0 || checkDirectionXnegative) ? (
-										shootSpeed * -1
-									) : (
-										0
-									)
-								);
-
-								const shootStepY = (_player.step.y > 0 || checkDirectionYpositive) ? (
-									shootSpeed
-								) : (
-									(_player.step.y < 0 || checkDirectionYnegative) ? (
-										shootSpeed * -1
-									) : (
-										0
-									)
-								);
-
-								delete newShootData.personal; // Not needed for the map element
-
-								const shootDataId = _map.elements.reduce(
-									(maxId, element) => (element.id > maxId ? element.id : maxId),
-									0
-								);
-
-								const newShootDataAttach = {
-									id: shootDataId + 1,
-									x: shootDataX,
-									y: shootDataY,
-									step: {
-										x: shootStepX,
-										y: shootStepY
-									}
-								};
-
-								_map.elements.push({ ...newShootData, ...newShootDataAttach });
+								_drawnElementShot(_player, _map, newShootData);
 
 								if (_player._actions) {
 									_player._actions.isShooting = true;
@@ -1811,7 +1843,7 @@
 					weapon: {
 						shoot: { // New map element guide (basic data)
 							type: 2,
-							radius: 10,
+							radius: 10, // Use always radius (for centering element performance)
 							style: {
 								color: {
 									body: 'red'
