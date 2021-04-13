@@ -471,6 +471,14 @@
 					case 'ArrowUp': {
 						if (_player.step.y < 0) {
 							_player.step.x = 0;
+						} else {
+							if (_player.step.x !== 0) {
+								if (_player.step.x > 0) {
+									_player.step.x = 1;
+								} else {
+									_player.step.x = -1;
+								}
+							}
 						}
 
 						if (_player.step.y <= 0) {
@@ -487,6 +495,14 @@
 					case 'ArrowDown': {
 						if (_player.step.y > 0) {
 							_player.step.x = 0;
+						} else {
+							if (_player.step.x !== 0) {
+								if (_player.step.x > 0) {
+									_player.step.x = 1;
+								} else {
+									_player.step.x = -1;
+								}
+							}
 						}
 
 						if (_player.step.y >= 0) {
@@ -503,6 +519,14 @@
 					case 'ArrowLeft': {
 						if (_player.step.x < 0) {
 							_player.step.y = 0;
+						} else {
+							if (_player.step.y !== 0) {
+								if (_player.step.y > 0) {
+									_player.step.y = 1;
+								} else {
+									_player.step.y = -1;
+								}
+							}
 						}
 
 						if (_player.step.x <= 0) {
@@ -519,6 +543,14 @@
 					case 'ArrowRight': {
 						if (_player.step.x > 0) {
 							_player.step.y = 0;
+						} else {
+							if (_player.step.y !== 0) {
+								if (_player.step.y > 0) {
+									_player.step.y = 1;
+								} else {
+									_player.step.y = -1;
+								}
+							}
 						}
 
 						if (_player.step.x >= 0) {
