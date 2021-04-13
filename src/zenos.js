@@ -961,7 +961,7 @@
 		);
 
 		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
-			const secureCollisionValue = Math.abs(checkStep);
+			const secureCollisionValue = Math.abs(checkStep) * 2;
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
 			return (
