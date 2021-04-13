@@ -36,7 +36,7 @@
 		date.setSeconds(_number);
 
 		return (
-			date.toISOString().substr(12, 7)
+			date.toISOString().substr(14, 5)
 		);
 	};
 
@@ -562,7 +562,7 @@
 				}
 
 				// Update menu screen
-				setMenuScreen(_player);
+				setMenuScreen(_player, _map);
 			};
 
 			clearTimeout($debounceKeyDownTimer);
@@ -1184,7 +1184,7 @@
 				_player.life = (resultLife >= 0 ? resultLife : 0);
 
 				// Update menu screen
-				setMenuScreen(_player);
+				setMenuScreen(_player, _map);
 			}
 		}
 	};
@@ -1220,7 +1220,7 @@
 	// Menu screen
 	// -----------------------------------------------------------------------------------------------
 
-	const setMenuScreen = _player => {
+	const setMenuScreen = (_player, _map) => {
 		// Top
 		const elMenuPlayerName = document.querySelector('#screen > div#general > div#menu > div#top span#player-name');
 		const elMenuPlayerLife = document.querySelector('#screen > div#general > div#menu > div#top span#life');
@@ -1257,7 +1257,7 @@
 		elMenuPlayerSpeed.textContent = `🏃💨 ${elMenuSpeedFinalShow}`;
 
 		// Counter
-		elPlayerMenuCounter.textContent = _timerFormatted(_player.timer);
+		elPlayerMenuCounter.textContent = _timerFormatted(_map.timer);
 	};
 
 	// -----------------------------------------------------------------------------------------------
@@ -1347,17 +1347,19 @@
 		setActionScreen(_action, _cx, _player, _map);
 
 		// Menu screen
-		setMenuScreen(_player);
+		setMenuScreen(_player, _map);
 
 		$intervalTimer = setInterval(
 			() => {
-				_player.timer++;
+				_map.timer--;
 
-				if (_player.timer % 5 === 0) { // Decrease life over time
+				if (_map.timer === 0) { // End game if time runs out
+					_player.life = 0;
+				} else if (_map.timer % 5 === 0) { // Decrease life over time
 					_player.life--;
 				}
 
-				setMenuScreen(_player);
+				setMenuScreen(_player, _map);
 			},
 			1000
 		);
@@ -1442,6 +1444,7 @@
 		*/
 		const maps = [
 			{
+				timer: 900,
 				baseLineWidth: 20,
 				style: {
 					outline: 'darkred',
@@ -1840,7 +1843,6 @@
 				name: 'Mike',
 				life: 500,
 				damageTakenFactor: 25,
-				timer: 0,
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY

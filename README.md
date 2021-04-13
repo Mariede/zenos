@@ -10,7 +10,6 @@ It will be converted to a React application soon enough!
 	- Start game with player skills from config options (json data)
 	- Player direction and movement
 	- Name, Life, Shoot, Shield and Speed
-	- Game timer
 	- Blinks when shoot or loses life
  * Map and map's elements render
 	- Start full map from config options (json data)
@@ -22,6 +21,7 @@ It will be converted to a React application soon enough!
 		+ Takes damage or not (blinks when loses life)
 	- Elements direction and movements (when applicable)
 	- Map scrolling or fixed
+	- Map timer
  * Elements collisions
 	- "Rectangle x Rectangle"
 	- "Circle x Circle"
