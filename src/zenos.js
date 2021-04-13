@@ -63,11 +63,6 @@
 
 	// Especific game helpers
 
-	// Get element speed (if speed not defined, base 1)
-	const _getElementSpeed = (_step, _stepSpeed = 1) => (
-		Math.floor((_step || 0) * (_stepSpeed || 1))
-	);
-
 	// Check if map border is close enough
 	const _checkScreenBorders = _side => (
 		_side / 2
@@ -475,9 +470,9 @@
 						} else {
 							if (_player.step.x !== 0) {
 								if (_player.step.x > 0) {
-									_player.step.x = 1;
+									_player.step.x = _player.step.increment;
 								} else {
-									_player.step.x = -1;
+									_player.step.x = -_player.step.increment;
 								}
 							}
 						}
@@ -499,9 +494,9 @@
 						} else {
 							if (_player.step.x !== 0) {
 								if (_player.step.x > 0) {
-									_player.step.x = 1;
+									_player.step.x = _player.step.increment;
 								} else {
-									_player.step.x = -1;
+									_player.step.x = -_player.step.increment;
 								}
 							}
 						}
@@ -523,9 +518,9 @@
 						} else {
 							if (_player.step.y !== 0) {
 								if (_player.step.y > 0) {
-									_player.step.y = 1;
+									_player.step.y = _player.step.increment;
 								} else {
-									_player.step.y = -1;
+									_player.step.y = -_player.step.increment;
 								}
 							}
 						}
@@ -547,9 +542,9 @@
 						} else {
 							if (_player.step.y !== 0) {
 								if (_player.step.y > 0) {
-									_player.step.y = 1;
+									_player.step.y = _player.step.increment;
 								} else {
-									_player.step.y = -1;
+									_player.step.y = -_player.step.increment;
 								}
 							}
 						}
@@ -592,15 +587,13 @@
 	const moveMapElement = _mapElement => {
 		if (_mapElement.step && _mapElement.step.x) {
 			if (_mapElement.step.x !== 0) {
-				const speedStepX = _getElementSpeed(_mapElement.step.x, _mapElement.step.speed);
-				_mapElement.x += speedStepX;
+				_mapElement.x += _mapElement.step.x;
 			}
 		}
 
 		if (_mapElement.step && _mapElement.step.y) {
 			if (_mapElement.step.y !== 0) {
-				const speedStepY = _getElementSpeed(_mapElement.step.y, _mapElement.step.speed);
-				_mapElement.y += speedStepY;
+				_mapElement.y += _mapElement.step.y;
 			}
 		}
 	};
@@ -683,7 +676,7 @@
 	const movePlayer = (_action, _player) => {
 		if (_player.step && _player.step.x) {
 			if (_player.step.x !== 0) {
-				const speedStepX = _getElementSpeed(_player.step.x, _player.step.speed);
+				const speedStepX = _player.step.x;
 
 				if ($boxWidth > _action.offsetWidth) {
 					const screenCheckW = _checkScreenBorders(_action.offsetWidth);
@@ -709,7 +702,7 @@
 
 		if (_player.step && _player.step.y) {
 			if (_player.step.y !== 0) {
-				const speedStepY = _getElementSpeed(_player.step.y, _player.step.speed);
+				const speedStepY = _player.step.y;
 
 				if ($boxHeight > _action.offsetHeight) {
 					const screenCheckY = _checkScreenBorders(_action.offsetHeight);
@@ -967,8 +960,8 @@
 			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
 		);
 
-		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep, checkStepSpeed) => {
-			const secureCollisionValue = Math.abs(_getElementSpeed(checkStep, checkStepSpeed)) + (checkStepSpeed || 1);
+		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
+			const secureCollisionValue = Math.abs(checkStep);
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
 			return (
@@ -1031,7 +1024,7 @@
 		);
 
 		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
-			const goCheckBroadRangeY = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y, _checkElement.step.speed);
+			const goCheckBroadRangeY = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y);
 
 			if (goCheckBroadRangeY) {
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
@@ -1063,7 +1056,7 @@
 		};
 
 		const _checkAtY = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
-			const goCheckBroadRangeX = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.step.x, _checkElement.step.speed);
+			const goCheckBroadRangeX = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.step.x);
 
 			if (goCheckBroadRangeX) {
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
@@ -1116,14 +1109,14 @@
 	const getElementLifeModifier = (elementTakingHit, bonusLifeModifier) => {
 		if (elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
-			const halfHit = Math.round(damageTakenFactor / 2);
-			const maxHit = Math.round(halfHit + bonusLifeModifier);
+			const halfDamageTakenFactor = Math.round(damageTakenFactor / 2);
+			const halfBonusLifeModifier = Math.round(bonusLifeModifier / 2);
 
 			const lifeModifierCurrent = (
 				bonusLifeModifier < 0 ? ( // Element gains life
-					bonusLifeModifier + _randomIntFromInterval(0, halfHit)
+					bonusLifeModifier + _randomIntFromInterval(0, halfBonusLifeModifier * -1)
 				) : ( // Element loses life
-					_randomIntFromInterval(0, halfHit) + _randomIntFromInterval(halfHit, maxHit)
+					_randomIntFromInterval(halfDamageTakenFactor, damageTakenFactor) + _randomIntFromInterval(halfBonusLifeModifier, bonusLifeModifier)
 				)
 			);
 
@@ -1242,8 +1235,8 @@
 		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.charges === -1;
 
 		// Speed calc
-		const playerSpeedStepX = Math.abs(_getElementSpeed(_player.step.x, _player.step.speed));
-		const playerSpeedStepY = Math.abs(_getElementSpeed(_player.step.y, _player.step.speed));
+		const playerSpeedStepX = Math.abs(_player.step.x);
+		const playerSpeedStepY = Math.abs(_player.step.y);
 		const playerSpeedFinal = Math.sqrt((playerSpeedStepX ** 2) + (playerSpeedStepY ** 2));
 
 		const elMenuSpeedFinalShow = `${_numberFormatted(playerSpeedFinal, 1)} m/s`;
@@ -1622,7 +1615,7 @@
 						width: 150,
 						height: 10,
 						x: 20,
-						y: 100,
+						y: 95,
 						style: {
 							color: {
 								body: 'darkgreen'
@@ -1863,8 +1856,7 @@
 					y: 0,
 					increment: 1,
 					xMax: 3,
-					yMax: 3,
-					speed: 1
+					yMax: 3
 				},
 				skills: {
 					shield: {
