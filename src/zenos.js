@@ -452,12 +452,10 @@
 					}
 					case ' ': {
 						if (_player.step.x !== 0) {
-							_player.x += _player.step.x;
 							_player.step.x = 0;
 						}
 
 						if (_player.step.y !== 0) {
-							_player.y += _player.step.y;
 							_player.step.y = 0;
 						}
 
@@ -961,7 +959,7 @@
 		);
 
 		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
-			const secureCollisionValue = Math.abs(checkStep) * 2;
+			const secureCollisionValue = Math.abs(checkStep) * 1.5;
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
 			return (
@@ -1592,7 +1590,7 @@
 						id: 8,
 						type: 1,
 						radius: 80,
-						x: 800,
+						x: 950,
 						y: 500,
 						style: {
 							color: {
