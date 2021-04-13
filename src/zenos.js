@@ -308,7 +308,7 @@
 
 	// Drawns element shots (works better with circle and square elements)
 	// Shot drawning is always in circle format (for performance)
-	const _drawnElementShot = (elementShooting, _map, _newShootData) => {
+	const _drawnElementShot = (elementShooting, _map, _newShootDataBaseElement, _newShootDataSpeed) => {
 		const currentElementDirection = _getElementDirection(elementShooting);
 
 		const checkDirectionXpositive = [-9, 1, 11].includes(currentElementDirection);
@@ -318,12 +318,12 @@
 
 		const secureCollisionValue = (
 			elementShooting.radius ? (
-				elementShooting.radius + elementShooting.skills.weapon.shoot.radius
+				elementShooting.radius + _newShootDataBaseElement.radius
 			) : (
 				elementShooting.width >= elementShooting.height ? (
-					(elementShooting.width / 2) + elementShooting.skills.weapon.shoot.radius
+					(elementShooting.width / 2) + _newShootDataBaseElement.radius
 				) : (
-					(elementShooting.height / 2) + elementShooting.skills.weapon.shoot.radius
+					(elementShooting.height / 2) + _newShootDataBaseElement.radius
 				)
 			)
 		);
@@ -364,7 +364,7 @@
 			)
 		);
 
-		const shootSpeed = (_newShootData.personal.shootSpeed || defaults.shootSpeed);
+		const shootSpeed = (_newShootDataSpeed || defaults.shootSpeed);
 
 		const shootStepX = (elementShooting.step.x > 0 || checkDirectionXpositive) ? (
 			shootSpeed
@@ -386,8 +386,6 @@
 			)
 		);
 
-		delete _newShootData.personal; // Not needed for the map element
-
 		const shootDataId = _map.elements.reduce(
 			(maxId, element) => (element.id > maxId ? element.id : maxId),
 			0
@@ -403,7 +401,7 @@
 			}
 		};
 
-		_map.elements.push({ ..._newShootData, ...newShootDataAttach });
+		_map.elements.push({ ..._newShootDataBaseElement, ...newShootDataAttach });
 	};
 
 	// -----------------------------------------------------------------------------------------------
@@ -429,25 +427,28 @@
 					}
 					case 'w':
 					case 'W': {
-						const newShootData = (_player.skills && _player.skills.weapon && _player.skills.weapon.shoot && typeof _player.skills.weapon.shoot === 'object') ? (
-							{ ..._player.skills.weapon.shoot }
+						const newShootData = (_player.skills && _player.skills.weapon && _player.skills.weapon.shoot) ? (
+							_player.skills.weapon.shoot
 						) : (
 							undefined
 						);
 
-						if (newShootData && _player.skills.weapon.shoot.personal) {
-							const chekInfiniteAmmo = _player.skills.weapon.shoot.personal.charges === -1;
-							const chargesLeft = !chekInfiniteAmmo && _player.skills.weapon.shoot.personal.charges;
+						if (newShootData) {
+							const chekInfiniteAmmo = newShootData.charges === -1;
+							const chargesLeft = !chekInfiniteAmmo && newShootData.charges;
 
 							if (chekInfiniteAmmo || chargesLeft > 0) {
-								_drawnElementShot(_player, _map, newShootData);
+								const newShootDataBaseElement = { ...newShootData.baseElement };
+								const newShootDataSpeed = newShootData.shootSpeed;
+
+								_drawnElementShot(_player, _map, newShootDataBaseElement, newShootDataSpeed);
 
 								if (_player._actions) {
 									_player._actions.isShooting = true;
 								}
 
 								if (!chekInfiniteAmmo) {
-									_player.skills.weapon.shoot.personal.charges -= 1;
+									_player.skills.weapon.shoot.charges -= 1;
 								}
 							}
 						}
@@ -750,7 +751,7 @@
 
 				// Weapon shoot
 				if (_player._actions.isShooting) {
-					_player.style.color.details = (_player.skills.weapon.shoot.personal.isShootingColor || defaults.isShootingColor);
+					_player.style.color.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
 					_player._actions.isShooting = false;
 				} else {
 					if (!_player.style.color.savedDetails) {
@@ -769,7 +770,7 @@
 
 				_cx.beginPath();
 				_cx.arc(_player.x, _player.y, _player.radius * 1.5, 0, 2 * Math.PI);
-				_cx.strokeStyle = _player.skills.shield.color;
+				_cx.strokeStyle = _player.skills.shield.shieldUpColor;
 				_cx.stroke();
 				_cx.closePath();
 
@@ -789,7 +790,7 @@
 		// Drawn player body and direction
 		_drawnElement(_cx, _player, currentPlayerDirection);
 
-		// Drawn player details (damage, shield, ...)
+		// Drawn player details (damage, ...)
 		_drawnPlayerDetails(_cx, _player);
 	};
 
@@ -1238,7 +1239,7 @@
 		const elPlayerMenuCounter = document.querySelector('#screen > div#general > div#menu > div#bottom span#timer');
 
 		// Check finite ammo
-		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.personal && _player.skills.weapon.shoot.personal.charges === -1;
+		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.charges === -1;
 
 		// Speed calc
 		const playerSpeedStepX = Math.abs(_getElementSpeed(_player.step.x, _player.step.speed));
@@ -1254,7 +1255,7 @@
 		elMenuPlayerLife.textContent = `❤️ ${_player.life}`;
 
 		// Shoot
-		elMenuPlayerShoot.textContent = `🔫 ${!chekInfiniteAmmo ? _player.skills.weapon.shoot.personal.charges : '♾️'}`;
+		elMenuPlayerShoot.textContent = `🔫 ${!chekInfiniteAmmo ? _player.skills.weapon.shoot.charges : '♾️'}`;
 
 		// Shield
 		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges}`;
@@ -1867,27 +1868,27 @@
 				},
 				skills: {
 					shield: {
-						color: 'lightcyan',
+						shieldUpColor: 'lightcyan',
 						up: false,
-						charges: 10,
-						reduceFactor: 2
+						reduceFactor: 2,
+						charges: 10
 					},
 					weapon: {
-						shoot: { // New map element guide (basic data)
-							type: 2,
-							radius: 10, // Use always radius (for centering element performance)
-							style: {
-								color: {
-									body: 'red'
+						shoot: {
+							isShootingColor: 'yellow',
+							shootSpeed: 15,
+							charges: 100, // -1 for infinite ammo
+							baseElement : { // New element guide (basic data)
+								type: 2,
+								radius: 10, // Use always radius (for centering element performance)
+								style: {
+									color: {
+										body: 'red'
+									}
+								},
+								hit: {
+									bonusLifeModifier: 50
 								}
-							},
-							hit: {
-								bonusLifeModifier: 50
-							},
-							personal: {
-								isShootingColor: 'yellow',
-								shootSpeed: 15,
-								charges: 100 // -1 for infinite ammo
 							}
 						}
 					}
