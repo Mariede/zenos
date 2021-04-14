@@ -790,7 +790,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
-		let mayModifyCheckElementLife = false;
+		let mayModifyElementsLifes = false;
 
 		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
@@ -919,7 +919,7 @@
 				}
 
 				if ([3, 5, 7].includes(_mapElement.type)) { // Receives damage
-					mayModifyCheckElementLife = true;
+					mayModifyElementsLifes = true;
 				}
 
 				break;
@@ -935,14 +935,14 @@
 				}
 
 				if ([9, 11].includes(_mapElement.type)) { // Receives damage
-					mayModifyCheckElementLife = true;
+					mayModifyElementsLifes = true;
 				}
 
 				break;
 			}
 		}
 
-		return mayModifyCheckElementLife;
+		return mayModifyElementsLifes;
 	};
 
 	const checkMapBorderXCollision = (checkElement, _map) => {
@@ -1054,13 +1054,28 @@
 			)
 		);
 
-		const checkCollisionBonusLifeModifier = _mapElement => (
-			(
+		const getCollidedData = (_checkElement, _mapElement) => {
+			const checkElementHit = (
+				_checkElement.hit && typeof _checkElement.hit.bonusLifeModifier === 'number' && !isNaN(_checkElement.hit.bonusLifeModifier) && _checkElement.hit.bonusLifeModifier
+			) || (
+				0
+			);
+
+			const mapElementHit = (
 				_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
 			) || (
 				0
-			)
-		);
+			);
+
+			return (
+				{
+					elementOrigin: _checkElement,
+					elementOriginHit: checkElementHit,
+					elementTarget: _mapElement,
+					elementTargetHit: mapElementHit
+				}
+			);
+		};
 
 		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
 			const goCheckBroadRangeY = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y);
@@ -1071,10 +1086,10 @@
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
-						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
 
-						if (mayModifyCheckElementLife) {
-							return checkCollisionBonusLifeModifier(_mapElement);
+						if (mayModifyElementsLifes) {
+							return getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				} else {
@@ -1082,16 +1097,16 @@
 
 					if (goCheckCollisionFowardX) {
 						// Collided
-						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
 
-						if (mayModifyCheckElementLife) {
-							return checkCollisionBonusLifeModifier(_mapElement);
+						if (mayModifyElementsLifes) {
+							return getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				}
 			}
 
-			return NaN;
+			return -1;
 		};
 
 		const _checkAtY = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
@@ -1103,10 +1118,10 @@
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
-						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
 
-						if (mayModifyCheckElementLife) {
-							return checkCollisionBonusLifeModifier(_mapElement);
+						if (mayModifyElementsLifes) {
+							return getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				} else {
@@ -1114,16 +1129,16 @@
 
 					if (goCheckCollisionFowardY) {
 						// Collided
-						const mayModifyCheckElementLife = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
 
-						if (mayModifyCheckElementLife) {
-							return checkCollisionBonusLifeModifier(_mapElement);
+						if (mayModifyElementsLifes) {
+							return getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				}
 			}
 
-			return NaN;
+			return -1;
 		};
 
 		for (const mapElement of _map.elements) {
@@ -1131,17 +1146,17 @@
 				const resultAtX = _checkAtX(checkElement, mapElement, _map.elements, _idActiveElement);
 				const resultAtY = _checkAtY(checkElement, mapElement, _map.elements, _idActiveElement);
 
-				if (!isNaN(resultAtX)) {
+				if (resultAtX !== -1) {
 					return resultAtX;
 				}
 
-				if (!isNaN(resultAtY)) {
+				if (resultAtY !== -1) {
 					return resultAtY;
 				}
 			}
 		}
 
-		return NaN;
+		return -1;
 	};
 
 	// Calculate element new modified life (if applicable)
@@ -1203,9 +1218,12 @@
 			checkMapBorderYCollision(_mapElement, _map);
 			const collidedData = checkMapElementCollision(_mapElement, _map, _mapElement.id);
 
-			if (!isNaN(collidedData)) {
+			if (collidedData !== -1) {
 				// Decrease/Increase current checkElement life
-				setElementLifeModifier(_mapElement, collidedData);
+				const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedData;
+
+				setElementLifeModifier(elementOrigin, elementTargetHit);
+				setElementLifeModifier(elementTarget, elementOriginHit);
 			}
 		}
 	};
@@ -1215,9 +1233,12 @@
 		checkMapBorderYCollision(_player, _map);
 		const collidedData = checkMapElementCollision(_player, _map);
 
-		if (!isNaN(collidedData)) {
+		if (collidedData !== -1) {
 			// Decrease/Increase player life (the current checkElement)
-			setElementLifeModifier(_player, collidedData);
+			const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedData;
+
+			setElementLifeModifier(elementOrigin, elementTargetHit);
+			setElementLifeModifier(elementTarget, elementOriginHit);
 
 			// Update menu screen
 			setMenuScreen(_player, _map);
@@ -1572,6 +1593,9 @@
 								minY: 400
 							}
 						},
+						hit: {
+							bonusLifeModifier: 20
+						},
 						_actions: {
 							isTakingDamage: false
 						}
@@ -1597,7 +1621,7 @@
 							y: 1
 						},
 						hit: {
-							bonusLifeModifier: 250
+							bonusLifeModifier: 30
 						},
 						_actions: {
 							isTakingDamage: false
@@ -1900,6 +1924,9 @@
 					xMax: 3,
 					yMax: 3
 				},
+				hit: {
+					bonusLifeModifier: 10 // Melee damage
+				},
 				skills: {
 					shield: {
 						shieldUpColor: 'lightcyan',
@@ -1921,7 +1948,7 @@
 									}
 								},
 								hit: {
-									bonusLifeModifier: 50
+									bonusLifeModifier: 50 // Ranged damage
 								}
 							}
 						}
