@@ -789,7 +789,7 @@
 	// Collisions
 	// -----------------------------------------------------------------------------------------------
 
-	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
+	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase, gocheckBroadRange) => {
 		let mayModifyElementsLifes = false;
 
 		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
@@ -850,7 +850,11 @@
 
 				if (_checkElement.step.x !== 0) {
 					const adjustPenetrationX = (
-						Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
+						gocheckBroadRange ? (
+							Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
+						) : (
+							false
+						)
 					);
 
 					let executeAction = false;
@@ -885,7 +889,11 @@
 
 				if (_checkElement.step.y !== 0) {
 					const adjustPenetrationY = (
-						Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
+						gocheckBroadRange ? (
+							Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
+						) : (
+							false
+						)
 					);
 
 					let executeAction = false;
@@ -1000,7 +1008,7 @@
 		);
 
 		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
-			const secureCollisionValue = Math.abs(checkStep) * 1.5;
+			const secureCollisionValue = ((Math.abs(checkStep) * 1.5) || 1);
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
 			return (
@@ -1086,7 +1094,7 @@
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1, goCheckBroadRangeY);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1097,7 +1105,7 @@
 
 					if (goCheckCollisionFowardX) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2, goCheckBroadRangeY);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1118,7 +1126,7 @@
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3, goCheckBroadRangeX);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1129,7 +1137,7 @@
 
 					if (goCheckCollisionFowardY) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4, goCheckBroadRangeX);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1571,7 +1579,7 @@
 					},
 					{
 						id: 5,
-						life: 1000,
+						life: 750,
 						damageTakenFactor: 15,
 						type: 3,
 						width: 50,
@@ -1602,7 +1610,7 @@
 					},
 					{
 						id: 6,
-						life: 1500,
+						life: 950,
 						damageTakenFactor: 20,
 						type: 3,
 						width: 50,
