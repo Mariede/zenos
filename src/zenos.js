@@ -1145,13 +1145,13 @@
 	};
 
 	// Calculate element new modified life (if applicable)
-	const getElementLifeModifier = (elementTakingHit, bonusLifeModifier) => {
+	const setElementLifeModifier = (elementTakingHit, bonusLifeModifier) => {
 		if (elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
 			const halfDamageTakenFactor = Math.round(damageTakenFactor / 2);
 			const halfBonusLifeModifier = Math.round(bonusLifeModifier / 2);
 
-			const lifeModifierCurrent = (
+			const lifeModifier = (
 				bonusLifeModifier < 0 ? ( // Element gains life
 					bonusLifeModifier + _randomIntFromInterval(0, halfBonusLifeModifier * -1)
 				) : ( // Element loses life
@@ -1159,22 +1159,31 @@
 				)
 			);
 
-			// Only if it has a shield option
-			if (lifeModifierCurrent >= 0 && elementTakingHit.skills && elementTakingHit.skills.shield && elementTakingHit.skills.shield.up && elementTakingHit.skills.shield.charges > 0) {
-				elementTakingHit.skills.shield.charges -= 1;
-				elementTakingHit.skills.shield.up = false;
+			if (lifeModifier !== 0) {
+				let lifeModifierReduceFactor = 1;
 
-				return Math.round(lifeModifierCurrent / elementTakingHit.skills.shield.reduceFactor); // Damage reduced by reduceFactor shield
+				if (lifeModifier > 0) {
+					// Only if it has a shield option - damage reduced by reduceFactor shield
+					if (elementTakingHit.skills && elementTakingHit.skills.shield) {
+						const elementTakingHitShield = elementTakingHit.skills.shield;
+
+						if (elementTakingHitShield.up && elementTakingHitShield.charges > 0) {
+							elementTakingHitShield.charges -= 1;
+							elementTakingHitShield.up = false;
+
+							lifeModifierReduceFactor = elementTakingHitShield.reduceFactor;
+						}
+					}
+
+					if (elementTakingHit._actions) {
+						elementTakingHit._actions.isTakingDamage = true;
+					}
+				}
+
+				const elementResultedLife = elementTakingHit.life - Math.round(lifeModifier / lifeModifierReduceFactor);
+				elementTakingHit.life = (elementResultedLife >= 0 ? elementResultedLife : 0);
 			}
-
-			if (lifeModifierCurrent > 0 && elementTakingHit._actions) {
-				elementTakingHit._actions.isTakingDamage = true;
-			}
-
-			return lifeModifierCurrent;
 		}
-
-		return 0;
 	};
 
 	const checkElementCollisions = (_mapElement, _map) => {
@@ -1192,17 +1201,11 @@
 
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
-			const elementCollidedMapElement = checkMapElementCollision(_mapElement, _map, _mapElement.id);
+			const collidedData = checkMapElementCollision(_mapElement, _map, _mapElement.id);
 
-			if (!isNaN(elementCollidedMapElement)) {
-				// Decrease current checkElement life
-				const bonusLifeModifier = (typeof elementCollidedMapElement === 'number' ? elementCollidedMapElement : 0);
-				const lifeModifierCurrent = getElementLifeModifier(_mapElement, bonusLifeModifier);
-
-				if (lifeModifierCurrent) {
-					const resultLife = _mapElement.life - lifeModifierCurrent;
-					_mapElement.life = (resultLife >= 0 ? resultLife : 0);
-				}
+			if (!isNaN(collidedData)) {
+				// Decrease/Increase current checkElement life
+				setElementLifeModifier(_mapElement, collidedData);
 			}
 		}
 	};
@@ -1210,21 +1213,14 @@
 	const checkPlayerCollisions = (_player, _map) => {
 		checkMapBorderXCollision(_player, _map);
 		checkMapBorderYCollision(_player, _map);
-		const playerCollidedMapElement = checkMapElementCollision(_player, _map);
+		const collidedData = checkMapElementCollision(_player, _map);
 
-		if (!isNaN(playerCollidedMapElement)) {
-			// Decrease player life (the current checkElement)
-			const bonusLifeModifier = (typeof playerCollidedMapElement === 'number' ? playerCollidedMapElement : 0);
-			const lifeModifierCurrent = getElementLifeModifier(_player, bonusLifeModifier);
+		if (!isNaN(collidedData)) {
+			// Decrease/Increase player life (the current checkElement)
+			setElementLifeModifier(_player, collidedData);
 
-			if (lifeModifierCurrent) {
-				const resultLife = _player.life - lifeModifierCurrent;
-
-				_player.life = (resultLife >= 0 ? resultLife : 0);
-
-				// Update menu screen
-				setMenuScreen(_player, _map);
-			}
+			// Update menu screen
+			setMenuScreen(_player, _map);
 		}
 	};
 
@@ -1268,7 +1264,7 @@
 		const elMenuPlayerSpeed = document.querySelector('#screen > div#general > div#menu > div#top span#speed');
 
 		// Bottom
-		const elPlayerMenuCounter = document.querySelector('#screen > div#general > div#menu > div#bottom span#timer');
+		const elMenuPlayerCounter = document.querySelector('#screen > div#general > div#menu > div#bottom span#timer');
 
 		// Check finite ammo
 		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.charges === -1;
@@ -1296,7 +1292,7 @@
 		elMenuPlayerSpeed.textContent = `🏃💨 ${elMenuSpeedFinalShow}`;
 
 		// Counter
-		elPlayerMenuCounter.textContent = _timerFormatted(_map.timer);
+		elMenuPlayerCounter.textContent = _timerFormatted(_map.timer);
 	};
 
 	// -----------------------------------------------------------------------------------------------
