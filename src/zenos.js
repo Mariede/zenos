@@ -792,7 +792,7 @@
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
 		let mayModifyCheckElementLife = false;
 
-		if (_checkElement.type && _checkElement.type === 2) { // Remove active item
+		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
 
 			if (itemToRemove !== -1) {
@@ -801,7 +801,12 @@
 		}
 
 		switch (_mapElement.type) {
-			case 1: { // Revert movement
+			case 2: // Keep movement
+			case 3: // Keep movement
+			case 4: // Stop movement
+			case 5: // Stop movement
+			case 6: // Revert movement
+			case 7: { // Revert movement
 				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement
 					const aidValues = {};
 
@@ -848,15 +853,32 @@
 						Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
 					);
 
+					let executeAction = false;
+
 					if (phase === 1 && _checkElement.step.x < 0) {
 						if (adjustPenetrationX) {
 							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
-							_checkElement.step.x = -_checkElement.step.x;
+							executeAction = true;
 						}
 					} else if (phase === 2 && _checkElement.step.x > 0) {
 						if (adjustPenetrationX) {
 							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
-							_checkElement.step.x = -_checkElement.step.x;
+							executeAction = true;
+						}
+					}
+
+					if (executeAction) {
+						switch (_mapElement.type) {
+							case 4:
+							case 5: {
+								_checkElement.step.x = 0;
+								break;
+							}
+							case 6:
+							case 7: {
+								_checkElement.step.x = -_checkElement.step.x;
+								break;
+							}
 						}
 					}
 				}
@@ -866,36 +888,55 @@
 						Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
 					);
 
+					let executeAction = false;
+
 					if (phase === 3 && _checkElement.step.y < 0) {
 						if (adjustPenetrationY) {
 							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
-							_checkElement.step.y = -_checkElement.step.y;
+							executeAction = true;
 						}
 					} else if (phase === 4 && _checkElement.step.y > 0) {
 						if (adjustPenetrationY) {
 							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
-							_checkElement.step.y = -_checkElement.step.y;
+							executeAction = true;
+						}
+					}
+
+					if (executeAction) {
+						switch (_mapElement.type) {
+							case 4:
+							case 5: {
+								_checkElement.step.y = 0;
+								break;
+							}
+							case 6:
+							case 7: {
+								_checkElement.step.y = -_checkElement.step.y;
+								break;
+							}
 						}
 					}
 				}
 
-				mayModifyCheckElementLife = true;
+				if ([3, 5, 7].includes(_mapElement.type)) { // Receives damage
+					mayModifyCheckElementLife = true;
+				}
 
 				break;
 			}
-			case 2:
-			case 3:
-			case 4:
-			case 5: { // Remove item
+			case 8:
+			case 9:
+			case 10:
+			case 11: { // Remove item
 				const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
 
-				if (_mapElement.type === 2 || _mapElement.type === 3 || (!_checkElement.type || _mapElement.type <= _checkElement.type)) {
-					if (itemToRemove !== -1) {
-						_mapElements.splice(itemToRemove, 1);
-					}
+				if (itemToRemove !== -1) {
+					_mapElements.splice(itemToRemove, 1);
 				}
 
-				mayModifyCheckElementLife = true;
+				if ([9, 11].includes(_mapElement.type)) { // Receives damage
+					mayModifyCheckElementLife = true;
+				}
 
 				break;
 			}
@@ -1431,12 +1472,17 @@
 				-> uses ids from mapsFillSpecial.fillers to replace properties
 
 			element -> type:
-				0 - no collision, no disappear
-				1 - Happens collision -> persistent (revert movement)
-				2 - Happens collision -> disappear on every collision - take and receive - by a player or any element (except borders)
-				3 - Happens collision -> disappear only if receives the collision by a player or any element (except borders)
-				4 - Happens collision -> disappear only if receives the collision by a player, type 4 or 5 (except borders)
-				5 - Happens collision -> disappear only if receives the collision by a player or type 5 (except borders)
+				1 - no collision, nothing happens
+				2 - Happens collision -> persistent (keep movement - no damage)
+				3 - Happens collision -> persistent (keep movement - receives damage)
+				4 - Happens collision -> persistent (stop movement - no damage)
+				5 - Happens collision -> persistent (stop movement - receives damage)
+				6 - Happens collision -> persistent (revert movement - no damage)
+				7 - Happens collision -> persistent (revert movement - receives damage)
+				8 - Happens collision -> disappear on every collision - by a player or any element (except borders) - no damage
+				9 - Happens collision -> disappear on every collision - by a player or any element (except borders) - receives damage
+				10 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - no damage
+				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - receives damage
 
 			player starting point: 'mid' for middle screen ou number in pixels
 		*/
@@ -1455,7 +1501,7 @@
 				elements: [
 					{
 						id: 1,
-						type: 1,
+						type: 7,
 						width: 60,
 						height: 260,
 						x: 158,
@@ -1468,7 +1514,7 @@
 					},
 					{
 						id: 2,
-						type: 1,
+						type: 7,
 						width: 60,
 						height: 255,
 						// Em análise - rotate: 10,
@@ -1482,7 +1528,7 @@
 					},
 					{
 						id: 3,
-						type: 1,
+						type: 7,
 						width: 200,
 						height: 50,
 						x: 290,
@@ -1495,7 +1541,7 @@
 					},
 					{
 						id: 4,
-						type: 1,
+						type: 7,
 						width: 200,
 						height: 50,
 						x: 290,
@@ -1563,7 +1609,7 @@
 					},
 					{
 						id: 7,
-						type: 1,
+						type: 7,
 						width: 150,
 						height: 150,
 						x: 800,
@@ -1576,7 +1622,7 @@
 					},
 					{
 						id: 8,
-						type: 1,
+						type: 7,
 						radius: 60,
 						x: 600,
 						y: 280,
@@ -1588,7 +1634,7 @@
 					},
 					{
 						id: 8,
-						type: 1,
+						type: 7,
 						radius: 80,
 						x: 950,
 						y: 500,
@@ -1600,7 +1646,7 @@
 					},
 					{
 						id: 9,
-						type: 1,
+						type: 7,
 						radius: 120,
 						x: 1300,
 						y: 350,
@@ -1612,7 +1658,7 @@
 					},
 					{
 						id: 10,
-						type: 3,
+						type: 11,
 						width: 150,
 						height: 10,
 						x: 20,
@@ -1871,7 +1917,7 @@
 							shootSpeed: 15,
 							charges: 100, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
-								type: 2,
+								type: 9,
 								radius: 10, // Use always radius (for centering element performance)
 								style: {
 									color: {
