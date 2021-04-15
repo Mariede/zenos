@@ -596,7 +596,7 @@
 		}
 	};
 
-	const drawMapElements = (_cx, _map) => {
+	const drawMapElements = (_cx, _player, _map) => {
 		const _drawnElementDetails = _mapElement => {
 			// Takes damage
 			if (_mapElement._actions) {
@@ -631,7 +631,7 @@
 				moveMapElement(mapElement);
 
 				// Collisions
-				checkElementCollisions(mapElement, _map);
+				checkElementCollisions(mapElement, _player, _map);
 
 				// Element direction (if applicable)
 				const currentElementDirection = _getElementDirection(mapElement);
@@ -645,7 +645,7 @@
 		}
 	};
 
-	const renderMap = (_cx, _map) => {
+	const renderMap = (_cx, _player, _map) => {
 		_cx.save();
 
 		// Drawn base screen Filling
@@ -664,7 +664,7 @@
 		_cx.restore();
 
 		// Elements inside base screen
-		drawMapElements(_cx, _map);
+		drawMapElements(_cx, _player, _map);
 	};
 
 	// -----------------------------------------------------------------------------------------------
@@ -790,9 +790,11 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
+		const isArrayMapElements = Array.isArray(_mapElements);
+
 		let mayModifyElementsLifes = false;
 
-		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
+		if (isArrayMapElements && _checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
 
 			if (itemToRemove !== -1) {
@@ -928,10 +930,12 @@
 			case 9:
 			case 10:
 			case 11: { // Remove item
-				const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
+				if (isArrayMapElements) {
+					const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
 
-				if (itemToRemove !== -1) {
-					_mapElements.splice(itemToRemove, 1);
+					if (itemToRemove !== -1) {
+						_mapElements.splice(itemToRemove, 1);
+					}
 				}
 
 				if ([9, 11].includes(_mapElement.type)) { // Receives damage
@@ -1141,18 +1145,31 @@
 			return -1;
 		};
 
-		for (const mapElement of _map.elements) {
-			if (mapElement.id !== _idActiveElement) {
-				const resultAtX = _checkAtX(checkElement, mapElement, _map.elements, _idActiveElement);
-				const resultAtY = _checkAtY(checkElement, mapElement, _map.elements, _idActiveElement);
+		if (Array.isArray(_map.elements)) {
+			for (const mapElement of _map.elements) {
+				if (mapElement.id !== _idActiveElement) {
+					const resultAtX = _checkAtX(checkElement, mapElement, _map.elements, _idActiveElement);
+					const resultAtY = _checkAtY(checkElement, mapElement, _map.elements, _idActiveElement);
 
-				if (resultAtX !== -1) {
-					return resultAtX;
-				}
+					if (resultAtX !== -1) {
+						return resultAtX;
+					}
 
-				if (resultAtY !== -1) {
-					return resultAtY;
+					if (resultAtY !== -1) {
+						return resultAtY;
+					}
 				}
+			}
+		} else { // Here _map is the player object (for performance gain)
+			const resultAtX = _checkAtX(checkElement, _map, null, _idActiveElement);
+			const resultAtY = _checkAtY(checkElement, _map, null, _idActiveElement);
+
+			if (resultAtX !== -1) {
+				return resultAtX;
+			}
+
+			if (resultAtY !== -1) {
+				return resultAtY;
 			}
 		}
 
@@ -1201,7 +1218,7 @@
 		}
 	};
 
-	const checkElementCollisions = (_mapElement, _map) => {
+	const checkElementCollisions = (_mapElement, _player, _map) => {
 		if (_mapElement.step) {
 			// Only if element can move
 			if (_mapElement.step.rangeLimit) {
@@ -1216,6 +1233,7 @@
 
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
+			checkMapElementCollision(_mapElement, _player, _mapElement.id); // When element moves onto stopped player (no damage check)
 			const collidedData = checkMapElementCollision(_mapElement, _map, _mapElement.id);
 
 			if (collidedData !== -1) {
@@ -1255,7 +1273,7 @@
 			_cx.clearRect(0, 0, $boxWidth, $boxHeight);
 
 			// Map
-			renderMap(_cx, _map);
+			renderMap(_cx, _player, _map);
 
 			// Player
 			renderPlayer(_action, _cx, _player, _map);
@@ -1907,6 +1925,7 @@
 				name: 'Mike',
 				life: 500,
 				damageTakenFactor: 25,
+				type: 2,
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
