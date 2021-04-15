@@ -9,7 +9,8 @@
 
 	// Default values
 	const defaults = {
-		damageTakenFactor: 50,
+		damageTakenFactor: 50, // Only applicable if element has a life property
+		timeBetweenHits: 750, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
 		isShootingColor: 'red',
 		shootSpeed: 15
@@ -1590,7 +1591,7 @@
 					{
 						id: 5,
 						life: 750,
-						damageTakenFactor: 15,
+						damageTakenFactor: 15, // Only applicable if element has a life property
 						type: 3,
 						radius: 30,
 						x: 500,
@@ -1600,18 +1601,18 @@
 								body: '%elements.5.style.color.body',
 								details: 'aquamarine'
 							},
-							currentDirection: 11
+							currentDirection: 11 // Must have for getting and drawning element direction
 						},
 						step: {
 							x: -1,
 							y: 2,
-							rangeLimit: {
+							rangeLimit: { // Range limit for x or y movement (only for map elements)
 								maxX: 600,
 								minY: 400
 							}
 						},
 						hit: {
-							bonusLifeModifier: 20
+							bonusLifeModifier: 20 // Melee damage bonus
 						},
 						_actions: {
 							isTakingDamage: false
@@ -1620,7 +1621,7 @@
 					{
 						id: 6,
 						life: 950,
-						damageTakenFactor: 20,
+						damageTakenFactor: 20, // Only applicable if element has a life property
 						type: 3,
 						width: 50,
 						height: 50,
@@ -1631,14 +1632,14 @@
 								body: '%elements.6.style.color.body',
 								details: 'darkorange'
 							},
-							currentDirection: 11
+							currentDirection: 11 // Must have for getting and drawning element direction
 						},
 						step: {
 							x: 1,
 							y: 1
 						},
 						hit: {
-							bonusLifeModifier: 30
+							bonusLifeModifier: 30 // Melee damage bonus
 						},
 						_actions: {
 							isTakingDamage: false
@@ -1923,8 +1924,9 @@
 			{
 				name: 'Mike',
 				life: 500,
-				damageTakenFactor: 25,
-				type: 2,
+				damageTakenFactor: 25, // Only applicable if element has a life property
+				timeBetweenHits: 500, // Time between element melee hits, only applicable if element can hit
+				type: 2, // Type of the player object (based on the maps element types)
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
@@ -1933,7 +1935,7 @@
 						body: 'black',
 						details: 'red'
 					},
-					currentDirection: 1
+					currentDirection: 1 // Must have for getting and drawning element direction
 				},
 				step: {
 					x: 0,
@@ -1943,7 +1945,7 @@
 					yMax: 3
 				},
 				hit: {
-					bonusLifeModifier: 10 // Melee damage
+					bonusLifeModifier: 10 // Melee damage bonus
 				},
 				skills: {
 					shield: {
