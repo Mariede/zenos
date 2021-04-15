@@ -1592,8 +1592,7 @@
 						life: 750,
 						damageTakenFactor: 15,
 						type: 3,
-						width: 50,
-						height: 50,
+						radius: 30,
 						x: 500,
 						y: 500,
 						style: {
