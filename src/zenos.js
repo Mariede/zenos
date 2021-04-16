@@ -12,6 +12,7 @@
 			_isShooting - true when element is shooting (if applicabble)
 			_isTakingDamage - true when element is taking damage (if applicabble)
 			_isShieldUp - true when element shield is up (if applicabble)
+			_isTimeBetweenHits - must be lower than next hit time for a melee hit to be cast
 			_savedBody - for blinking style body color of element (when taking damage)
 			_savedDetails - for blinking style details color of element (when shooting)
 	*/
@@ -19,7 +20,7 @@
 	// Default values
 	const defaults = {
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
-		timeBetweenHits: 750, // In miliseconds, only applicable if element can hit
+		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
 		isShootingColor: 'lightcyan',
 		shootSpeed: 15,
@@ -127,7 +128,7 @@
 	};
 
 	// Drawn element body and direction (if applicable)
-	const _drawnElement = (_cx, _element, _currentPlayerDirection) => {
+	const _drawnElement = (_cx, _element, _currentElementDirection) => {
 		const elementIsACircle = _element.radius || false;
 
 		// Drawn element body
@@ -188,7 +189,7 @@
 
 			const baseAngle = Math.PI / 180;
 
-			switch (_currentPlayerDirection) {
+			switch (_currentElementDirection) {
 				case -11: { // NW
 					if (elementIsACircle) {
 						const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
@@ -1183,7 +1184,7 @@
 	};
 
 	// Calculate element new modified life (if applicable)
-	const setElementLifeModifier = (elementTakingHit, bonusLifeModifier) => {
+	const setElementLifeModifier = (elementHitting, elementTakingHit, bonusLifeModifier) => {
 		if (elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
 			const damageReducer = (damageTakenFactor >= defaults.damageTakenFactor ? 1 : damageTakenFactor / defaults.damageTakenFactor);
@@ -1200,26 +1201,39 @@
 			);
 
 			if (lifeModifier !== 0) {
-				let lifeModifierReduceFactor = 1;
+				let lifeModifierReduceFactor = 1,
+					goModifyLife = false;
 
 				if (lifeModifier > 0) {
-					// Only if it has a shield option - damage reduced by reduceFactor shield
-					if (elementTakingHit.skills && elementTakingHit.skills.shield) {
-						const elementTakingHitShield = elementTakingHit.skills.shield;
+					const dateNow = new Date();
+					const currentHitTimeCheck = dateNow.getTime();
 
-						if (elementTakingHit._isShieldUp && elementTakingHitShield.charges > 0) {
-							elementTakingHitShield.charges -= 1;
-							elementTakingHit._isShieldUp = false;
+					if (!elementHitting._isTimeBetweenHits || currentHitTimeCheck > elementHitting._isTimeBetweenHits) {
+						// Only if it has a shield option - damage reduced by reduceFactor shield
+						if (elementTakingHit.skills && elementTakingHit.skills.shield) {
+							const elementTakingHitShield = elementTakingHit.skills.shield;
 
-							lifeModifierReduceFactor = (elementTakingHitShield.shieldReduceFactor || defaults.shieldReduceFactor);
+							if (elementTakingHit._isShieldUp && elementTakingHitShield.charges > 0) {
+								elementTakingHitShield.charges -= 1;
+								elementTakingHit._isShieldUp = false;
+
+								lifeModifierReduceFactor = (elementTakingHitShield.shieldReduceFactor || defaults.shieldReduceFactor);
+							}
 						}
-					}
 
-					elementTakingHit._isTakingDamage = true;
+						elementTakingHit._isTakingDamage = true;
+						elementHitting._isTimeBetweenHits = currentHitTimeCheck + (elementHitting.timeBetweenHits || defaults.timeBetweenHits);
+
+						goModifyLife = true;
+					}
+				} else {
+					goModifyLife = true;
 				}
 
-				const elementResultedLife = elementTakingHit.life - Math.round(lifeModifier / lifeModifierReduceFactor);
-				elementTakingHit.life = (elementResultedLife >= 0 ? elementResultedLife : 0);
+				if (goModifyLife) {
+					const elementResultedLife = elementTakingHit.life - Math.round(lifeModifier / lifeModifierReduceFactor);
+					elementTakingHit.life = (elementResultedLife >= 0 ? elementResultedLife : 0);
+				}
 			}
 		}
 	};
@@ -1246,8 +1260,8 @@
 				// Decrease/Increase current checkElement life
 				const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedData;
 
-				setElementLifeModifier(elementOrigin, elementTargetHit);
-				setElementLifeModifier(elementTarget, elementOriginHit);
+				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
+				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
 			}
 		}
 	};
@@ -1261,8 +1275,8 @@
 			// Decrease/Increase player life (the current checkElement)
 			const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedData;
 
-			setElementLifeModifier(elementOrigin, elementTargetHit);
-			setElementLifeModifier(elementTarget, elementOriginHit);
+			setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
+			setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
 
 			// Update menu screen
 			setMenuScreen(_player, _map);
@@ -1924,7 +1938,7 @@
 				name: 'Mike',
 				life: 500,
 				damageTakenFactor: 25, // Only applicable if element has a life property
-				timeBetweenHits: 500, // Time between element melee hits, only applicable if element can hit
+				timeBetweenHits: 250, // Time between element melee hits, only applicable if element can hit
 				type: 2, // Type of the player object (based on the maps element types)
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
