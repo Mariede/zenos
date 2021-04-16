@@ -797,11 +797,9 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
-		const isArrayMapElements = Array.isArray(_mapElements);
-
 		let mayModifyElementsLifes = false;
 
-		if (isArrayMapElements && _checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
+		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
 
 			if (itemToRemove !== -1) {
@@ -933,12 +931,10 @@
 			case 9:
 			case 10:
 			case 11: { // Remove item
-				if (isArrayMapElements) {
-					const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
+				const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
 
-					if (itemToRemove !== -1) {
-						_mapElements.splice(itemToRemove, 1);
-					}
+				if (itemToRemove !== -1) {
+					_mapElements.splice(itemToRemove, 1);
 				}
 
 				if ([9, 11].includes(_mapElement.type)) { // Receives damage
@@ -1000,7 +996,7 @@
 		return false;
 	};
 
-	const checkMapElementCollision = (checkElement, _map, _idActiveElement = null) => {
+	const checkMapElementCollision = (checkElement, _map, _idActiveElement = null, _playerAsTargetMapElement = null) => {
 		// Two circles collision formula
 		const _circlesCollision = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther) => (
 			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
@@ -1148,7 +1144,7 @@
 			return -1;
 		};
 
-		if (Array.isArray(_map.elements)) {
+		if (_playerAsTargetMapElement === null) {
 			for (const mapElement of _map.elements) {
 				if (mapElement.id !== _idActiveElement) {
 					const resultAtX = _checkAtX(checkElement, mapElement, _map.elements, _idActiveElement);
@@ -1163,9 +1159,9 @@
 					}
 				}
 			}
-		} else { // Here _map is the player object (for performance gain)
-			const resultAtX = _checkAtX(checkElement, _map, null, _idActiveElement);
-			const resultAtY = _checkAtY(checkElement, _map, null, _idActiveElement);
+		} else { // Exception case: player object as a target map element
+			const resultAtX = _checkAtX(checkElement, _playerAsTargetMapElement, _map.elements, _idActiveElement);
+			const resultAtY = _checkAtY(checkElement, _playerAsTargetMapElement, _map.elements, _idActiveElement);
 
 			if (resultAtX !== -1) {
 				return resultAtX;
@@ -1249,7 +1245,7 @@
 
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
-			checkMapElementCollision(_mapElement, _player, _mapElement.id); // When element moves onto stopped player (no damage check)
+			checkMapElementCollision(_mapElement, _map, _mapElement.id, _player); // When element moves onto stopped player (no damage check)
 			const collidedData = checkMapElementCollision(_mapElement, _map, _mapElement.id);
 
 			if (collidedData !== -1) {
