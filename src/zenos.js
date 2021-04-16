@@ -858,25 +858,7 @@
 				const aidValues = _getAidValues(_checkElement, _mapElement);
 
 				if (_checkElement.step.x !== 0) {
-					const adjustPenetrationX = (
-						Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
-					);
-
-					let executeAction = false;
-
-					if (phase === 1 && _checkElement.step.x < 0) {
-						if (adjustPenetrationX) {
-							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
-							executeAction = true;
-						}
-					} else if (phase === 2 && _checkElement.step.x > 0) {
-						if (adjustPenetrationX) {
-							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
-							executeAction = true;
-						}
-					}
-
-					if (executeAction) {
+					const executeActionX = (_checkElement, _mapElement) => {
 						switch (_mapElement.type) {
 							case 4:
 							case 5: {
@@ -889,29 +871,27 @@
 								break;
 							}
 						}
+					};
+
+					const adjustPenetrationX = (
+						Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
+					);
+
+					if (phase === 1 && _checkElement.step.x < 0) {
+						if (adjustPenetrationX) {
+							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
+							executeActionX(_checkElement, _mapElement);
+						}
+					} else if (phase === 2 && _checkElement.step.x > 0) {
+						if (adjustPenetrationX) {
+							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
+							executeActionX(_checkElement, _mapElement);
+						}
 					}
 				}
 
 				if (_checkElement.step.y !== 0) {
-					const adjustPenetrationY = (
-						Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
-					);
-
-					let executeAction = false;
-
-					if (phase === 3 && _checkElement.step.y < 0) {
-						if (adjustPenetrationY) {
-							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
-							executeAction = true;
-						}
-					} else if (phase === 4 && _checkElement.step.y > 0) {
-						if (adjustPenetrationY) {
-							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
-							executeAction = true;
-						}
-					}
-
-					if (executeAction) {
+					const executeActionY = (_checkElement, _mapElement) => {
 						switch (_mapElement.type) {
 							case 4:
 							case 5: {
@@ -923,6 +903,22 @@
 								_checkElement.step.y = -_checkElement.step.y;
 								break;
 							}
+						}
+					};
+
+					const adjustPenetrationY = (
+						Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
+					);
+
+					if (phase === 3 && _checkElement.step.y < 0) {
+						if (adjustPenetrationY) {
+							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
+							executeActionY(_checkElement, _mapElement);
+						}
+					} else if (phase === 4 && _checkElement.step.y > 0) {
+						if (adjustPenetrationY) {
+							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
+							executeActionY(_checkElement, _mapElement);
 						}
 					}
 				}
