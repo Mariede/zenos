@@ -1192,8 +1192,7 @@
 					goModifyLife = false;
 
 				if (lifeModifier > 0) {
-					const dateNow = new Date();
-					const currentHitTimeCheck = dateNow.getTime();
+					const currentHitTimeCheck = Date.now();
 
 					if (!elementHitting._isTimeBetweenHits || currentHitTimeCheck > elementHitting._isTimeBetweenHits) {
 						// Only if it has a shield option - damage reduced by reduceFactor shield
