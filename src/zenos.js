@@ -9,7 +9,7 @@
 
 	// Default values
 	const defaults = {
-		damageTakenFactor: 50, // Only applicable if element has a life property
+		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 750, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
 		isShootingColor: 'red',
@@ -1181,6 +1181,8 @@
 	const setElementLifeModifier = (elementTakingHit, bonusLifeModifier) => {
 		if (elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
+			const damageReducer = (damageTakenFactor >= defaults.damageTakenFactor ? 1 : damageTakenFactor / defaults.damageTakenFactor);
+
 			const halfDamageTakenFactor = Math.round(damageTakenFactor / 2);
 			const halfBonusLifeModifier = Math.round(bonusLifeModifier / 2);
 
@@ -1188,7 +1190,7 @@
 				bonusLifeModifier < 0 ? ( // Element gains life
 					bonusLifeModifier + _randomIntFromInterval(0, halfBonusLifeModifier * -1)
 				) : ( // Element loses life
-					_randomIntFromInterval(halfDamageTakenFactor, damageTakenFactor) + _randomIntFromInterval(halfBonusLifeModifier, bonusLifeModifier)
+					_randomIntFromInterval(halfDamageTakenFactor, damageTakenFactor) + (_randomIntFromInterval(halfBonusLifeModifier, bonusLifeModifier) * damageReducer)
 				)
 			);
 
@@ -1612,7 +1614,7 @@
 							}
 						},
 						hit: {
-							bonusLifeModifier: 20 // Melee damage bonus
+							bonusLifeModifier: 20 // Melee damage bonus (max)
 						},
 						_actions: {
 							isTakingDamage: false
@@ -1639,7 +1641,7 @@
 							y: 1
 						},
 						hit: {
-							bonusLifeModifier: 30 // Melee damage bonus
+							bonusLifeModifier: 30 // Melee damage bonus (max)
 						},
 						_actions: {
 							isTakingDamage: false
@@ -1945,7 +1947,7 @@
 					yMax: 3
 				},
 				hit: {
-					bonusLifeModifier: 10 // Melee damage bonus
+					bonusLifeModifier: 15 // Melee damage bonus (max)
 				},
 				skills: {
 					shield: {
@@ -1958,7 +1960,7 @@
 						shoot: {
 							isShootingColor: 'yellow',
 							shootSpeed: 15,
-							charges: 100, // -1 for infinite ammo
+							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
 								type: 9,
 								radius: 10, // Use always radius (for centering element performance)
@@ -1968,7 +1970,7 @@
 									}
 								},
 								hit: {
-									bonusLifeModifier: 50 // Ranged damage
+									bonusLifeModifier: 50 // Ranged damage (max)
 								}
 							}
 						}
