@@ -19,6 +19,7 @@
 
 	// Default values
 	const defaults = {
+		elementTypesProducesDamage: [3, 5, 7, 9, 11], // Element types that may produce damage
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
@@ -797,8 +798,6 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
-		let mayModifyElementsLifes = false;
-
 		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
 
@@ -921,10 +920,6 @@
 					}
 				}
 
-				if ([3, 5, 7].includes(_mapElement.type)) { // Receives damage
-					mayModifyElementsLifes = true;
-				}
-
 				break;
 			}
 			case 8:
@@ -937,13 +932,13 @@
 					_mapElements.splice(itemToRemove, 1);
 				}
 
-				if ([9, 11].includes(_mapElement.type)) { // Receives damage
-					mayModifyElementsLifes = true;
-				}
-
 				break;
 			}
 		}
+
+		const mayModifyElementsLifes = (
+			defaults.elementTypesProducesDamage.includes(_mapElement.type) || defaults.elementTypesProducesDamage.includes(_checkElement.type)
+		);
 
 		return mayModifyElementsLifes;
 	};
@@ -1177,7 +1172,7 @@
 
 	// Calculate element new modified life (if applicable)
 	const setElementLifeModifier = (elementHitting, elementTakingHit, bonusLifeModifier) => {
-		if (elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
+		if (defaults.elementTypesProducesDamage.includes(elementHitting.type) && elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
 			const damageReducer = (damageTakenFactor >= defaults.damageTakenFactor ? 1 : damageTakenFactor / defaults.damageTakenFactor);
 
@@ -1245,8 +1240,20 @@
 
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
-			checkMapElementCollision(_mapElement, _map, _mapElement.id, _player); // When element moves onto stopped player (no damage check)
+
+			const collidedPlayer = checkMapElementCollision(_mapElement, _map, _mapElement.id, _player); // Target player (element moves onto player)
 			const collidedData = checkMapElementCollision(_mapElement, _map, _mapElement.id);
+
+			if (collidedPlayer !== -1) {
+				// Decrease/Increase current checkElement life
+				const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedPlayer;
+
+				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
+				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
+
+				// Update menu screen
+				setMenuScreen(_player, _map);
+			}
 
 			if (collidedData !== -1) {
 				// Decrease/Increase current checkElement life
@@ -1261,11 +1268,12 @@
 	const checkPlayerCollisions = (_player, _map) => {
 		checkMapBorderXCollision(_player, _map);
 		checkMapBorderYCollision(_player, _map);
-		const collidedData = checkMapElementCollision(_player, _map);
 
-		if (collidedData !== -1) {
+		const collidedPlayer = checkMapElementCollision(_player, _map); // Origin player (player moves onto element)
+
+		if (collidedPlayer !== -1) {
 			// Decrease/Increase player life (the current checkElement)
-			const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedData;
+			const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedPlayer;
 
 			setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
 			setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
@@ -1521,15 +1529,15 @@
 			element -> type:
 				1 - no collision, nothing happens
 				2 - Happens collision -> persistent (keep movement - no damage)
-				3 - Happens collision -> persistent (keep movement - receives damage)
+				3 - Happens collision -> persistent (keep movement - damage)
 				4 - Happens collision -> persistent (stop movement - no damage)
-				5 - Happens collision -> persistent (stop movement - receives damage)
+				5 - Happens collision -> persistent (stop movement - damage)
 				6 - Happens collision -> persistent (revert movement - no damage)
-				7 - Happens collision -> persistent (revert movement - receives damage)
+				7 - Happens collision -> persistent (revert movement - damage)
 				8 - Happens collision -> disappear on every collision - by a player or any element (except borders) - no damage
-				9 - Happens collision -> disappear on every collision - by a player or any element (except borders) - receives damage
+				9 - Happens collision -> disappear on every collision - by a player or any element (except borders) - damage
 				10 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - no damage
-				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - receives damage
+				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - damage
 
 			player starting point: 'mid' for middle screen ou number in pixels
 		*/
@@ -1623,7 +1631,7 @@
 							}
 						},
 						hit: {
-							bonusLifeModifier: 20 // Melee damage bonus (max)
+							bonusLifeModifier: 20 // Melee damage bonus, only if element produces damage (max)
 						}
 					},
 					{
@@ -1647,7 +1655,7 @@
 							y: 1
 						},
 						hit: {
-							bonusLifeModifier: 30 // Melee damage bonus (max)
+							bonusLifeModifier: 30 // Melee damage bonus, only if element produces damage (max)
 						}
 					},
 					{
@@ -1701,7 +1709,7 @@
 					},
 					{
 						id: 10,
-						type: 11,
+						type: 5,
 						width: 150,
 						height: 10,
 						x: 20,
@@ -1931,7 +1939,7 @@
 				life: 500,
 				damageTakenFactor: 25, // Only applicable if element has a life property
 				timeBetweenHits: 250, // Time between element melee hits, only applicable if element can hit
-				type: 2, // Type of the player object (based on the maps element types)
+				type: 3, // Type of the player object (based on the maps element types)
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
@@ -1950,7 +1958,7 @@
 					yMax: 3
 				},
 				hit: {
-					bonusLifeModifier: 15 // Melee damage bonus (max)
+					bonusLifeModifier: 15 // Melee damage bonus, only if element produces damage (max)
 				},
 				skills: {
 					shield: {
@@ -1964,7 +1972,7 @@
 							shootSpeed: 15,
 							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
-								type: 9, // Always use 8 or 9 for munition element (disappear on collision)
+								type: 9, // Always use 9 for munition element (disappear on collision)
 								radius: 10, // Always use radius for munition element (centering)
 								style: {
 									color: {
@@ -1972,7 +1980,7 @@
 									}
 								},
 								hit: {
-									bonusLifeModifier: 50 // Ranged damage (max)
+									bonusLifeModifier: 50 // Ranged damage bonus, only if element produces damage (max)
 								}
 							}
 						}
