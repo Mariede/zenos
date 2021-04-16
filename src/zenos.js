@@ -7,13 +7,24 @@
 
 	// Generic game helpers
 
+	/*
+		Temporary json bindings at execution time:
+			_isShooting - true when element is shooting (if applicabble)
+			_isTakingDamage - true when element is taking damage (if applicabble)
+			_isShieldUp - true when element shield is up (if applicabble)
+			_savedBody - for blinking style body color of element (when taking damage)
+			_savedDetails - for blinking style details color of element (when shooting)
+	*/
+
 	// Default values
 	const defaults = {
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 750, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
-		isShootingColor: 'red',
-		shootSpeed: 15
+		isShootingColor: 'lightcyan',
+		shootSpeed: 15,
+		isShieldUpColor: 'lightcyan',
+		shieldReduceFactor: 2
 	};
 
 	// Get random integer number (min and max included)
@@ -413,10 +424,10 @@
 				switch (_event.key) {
 					case 'q':
 					case 'Q': {
-						if (!_player.skills.shield.up && _player.skills.shield.charges > 0) {
-							_player.skills.shield.up = true;
+						if (!_player._isShieldUp && _player.skills.shield.charges > 0) {
+							_player._isShieldUp = true;
 						} else {
-							_player.skills.shield.up = false;
+							_player._isShieldUp = false;
 						}
 
 						break;
@@ -439,9 +450,7 @@
 
 								_drawnElementShot(_player, _map, newShootDataBaseElement, newShootDataSpeed);
 
-								if (_player._actions) {
-									_player._actions.isShooting = true;
-								}
+								_player._isShooting = true;
 
 								if (!chekInfiniteAmmo) {
 									_player.skills.weapon.shoot.charges -= 1;
@@ -600,17 +609,15 @@
 	const drawMapElements = (_cx, _player, _map) => {
 		const _drawnElementDetails = _mapElement => {
 			// Takes damage
-			if (_mapElement._actions) {
-				if (_mapElement._actions.isTakingDamage) {
-					_mapElement.style.color.body = defaults.isTakingDamageColor;
-					_mapElement._actions.isTakingDamage = false;
-				} else {
-					if (!_mapElement.style.color.savedBody) {
-						_mapElement.style.color.savedBody = _mapElement.style.color.body; // Temporary
-					}
-
-					_mapElement.style.color.body = _mapElement.style.color.savedBody;
+			if (_mapElement._isTakingDamage) {
+				_mapElement.style.color.body = defaults.isTakingDamageColor;
+				_mapElement._isTakingDamage = false;
+			} else {
+				if (!_mapElement.style.color._savedBody) {
+					_mapElement.style.color._savedBody = _mapElement.style.color.body; // Temporary
 				}
+
+				_mapElement.style.color.body = _mapElement.style.color._savedBody;
 			}
 		};
 
@@ -728,41 +735,39 @@
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDetails = (_cx, _player) => {
-			if (_player._actions) {
-				// Takes damage
-				if (_player._actions.isTakingDamage) {
-					_player.style.color.body = defaults.isTakingDamageColor;
-					_player._actions.isTakingDamage = false;
-				} else {
-					if (!_player.style.color.savedBody) {
-						_player.style.color.savedBody = _player.style.color.body; // Temporary
-					}
-
-					_player.style.color.body = _player.style.color.savedBody;
+			// Takes damage
+			if (_player._isTakingDamage) {
+				_player.style.color.body = defaults.isTakingDamageColor;
+				_player._isTakingDamage = false;
+			} else {
+				if (!_player.style.color._savedBody) {
+					_player.style.color._savedBody = _player.style.color.body; // Temporary
 				}
 
-				// Weapon shoot
-				if (_player._actions.isShooting) {
-					_player.style.color.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
-					_player._actions.isShooting = false;
-				} else {
-					if (!_player.style.color.savedDetails) {
-						_player.style.color.savedDetails = _player.style.color.details; // Temporary
-					}
+				_player.style.color.body = _player.style.color._savedBody;
+			}
 
-					_player.style.color.details = _player.style.color.savedDetails;
+			// Weapon shoot
+			if (_player._isShooting) {
+				_player.style.color.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
+				_player._isShooting = false;
+			} else {
+				if (!_player.style.color._savedDetails) {
+					_player.style.color._savedDetails = _player.style.color.details; // Temporary
 				}
+
+				_player.style.color.details = _player.style.color._savedDetails;
 			}
 
 			// Shield
-			if (_player.skills.shield.up && _player.skills.shield.charges > 0) {
+			if (_player._isShieldUp && _player.skills.shield.charges > 0) {
 				_cx.save();
 
 				_cx.lineWidth = 1;
 
 				_cx.beginPath();
 				_cx.arc(_player.x, _player.y, _player.radius * 1.5, 0, 2 * Math.PI);
-				_cx.strokeStyle = _player.skills.shield.shieldUpColor;
+				_cx.strokeStyle = (_player.skills.shield.isShieldUpColor || defaults.isShieldUpColor);
 				_cx.stroke();
 				_cx.closePath();
 
@@ -1202,17 +1207,15 @@
 					if (elementTakingHit.skills && elementTakingHit.skills.shield) {
 						const elementTakingHitShield = elementTakingHit.skills.shield;
 
-						if (elementTakingHitShield.up && elementTakingHitShield.charges > 0) {
+						if (elementTakingHit._isShieldUp && elementTakingHitShield.charges > 0) {
 							elementTakingHitShield.charges -= 1;
-							elementTakingHitShield.up = false;
+							elementTakingHit._isShieldUp = false;
 
-							lifeModifierReduceFactor = elementTakingHitShield.reduceFactor;
+							lifeModifierReduceFactor = (elementTakingHitShield.shieldReduceFactor || defaults.shieldReduceFactor);
 						}
 					}
 
-					if (elementTakingHit._actions) {
-						elementTakingHit._actions.isTakingDamage = true;
-					}
+					elementTakingHit._isTakingDamage = true;
 				}
 
 				const elementResultedLife = elementTakingHit.life - Math.round(lifeModifier / lifeModifierReduceFactor);
@@ -1615,9 +1618,6 @@
 						},
 						hit: {
 							bonusLifeModifier: 20 // Melee damage bonus (max)
-						},
-						_actions: {
-							isTakingDamage: false
 						}
 					},
 					{
@@ -1642,9 +1642,6 @@
 						},
 						hit: {
 							bonusLifeModifier: 30 // Melee damage bonus (max)
-						},
-						_actions: {
-							isTakingDamage: false
 						}
 					},
 					{
@@ -1951,9 +1948,8 @@
 				},
 				skills: {
 					shield: {
-						shieldUpColor: 'lightcyan',
-						up: false,
-						reduceFactor: 2,
+						isShieldUpColor: 'ghostwhite',
+						shieldReduceFactor: 4,
 						charges: 10
 					},
 					weapon: {
@@ -1962,8 +1958,8 @@
 							shootSpeed: 15,
 							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
-								type: 9,
-								radius: 10, // Use always radius (for centering element performance)
+								type: 9, // Always use 8 or 9 for munition element (disappear on collision)
+								radius: 10, // Always use radius for munition element (centering)
 								style: {
 									color: {
 										body: 'red'
@@ -1975,10 +1971,6 @@
 							}
 						}
 					}
-				},
-				_actions: {
-					isTakingDamage: false,
-					isShooting: false
 				}
 			}
 		];
