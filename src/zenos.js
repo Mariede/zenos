@@ -97,9 +97,11 @@
 	const _getElementDirection = _element => {
 		let currentElementDirection = 0;
 
-		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
+		const elementHasDirection = Object.prototype.hasOwnProperty.call(_element, 'currentDirection');
+
+		if (elementHasDirection) { // Only makes sense if element has a side direction
 			if (_element.step.x === 0 && _element.step.y === 0) {
-				currentElementDirection = _element.style.currentDirection;
+				currentElementDirection = _element.currentDirection;
 			} else {
 				let saveThis = false;
 
@@ -120,12 +122,40 @@
 				}
 
 				if (saveThis) {
-					_element.style.currentDirection = currentElementDirection;
+					_element.currentDirection = currentElementDirection; // Saves the number but function output is the related string (easier to read)
 				}
 			}
 		}
 
-		return currentElementDirection;
+		switch (currentElementDirection) {
+			case -11: { // North West
+				return 'NW';
+			}
+			case -10: { // North
+				return 'N';
+			}
+			case -9: { // North East
+				return 'NE';
+			}
+			case -1: { // West
+				return 'W';
+			}
+			case 1: { // East
+				return 'E';
+			}
+			case 9: { // South West
+				return 'SW';
+			}
+			case 10: { // South
+				return 'S';
+			}
+			case 11: { // South East
+				return 'SE';
+			}
+			default: {
+				return '';
+			}
+		}
 	};
 
 	// Drawn element body and direction (if applicable)
@@ -159,7 +189,9 @@
 		}
 
 		// Drawn element direction
-		if (_element.style.currentDirection) { // Only makes sense if element has a side direction
+		const elementHasDirection = Object.prototype.hasOwnProperty.call(_element, 'currentDirection');
+
+		if (elementHasDirection) { // Only makes sense if element has a side direction
 			const _drawnElementDirection = (_cx, _element, _elementIsACircle, _getX, _getY) => {
 				_cx.save();
 
@@ -191,7 +223,7 @@
 			const baseAngle = Math.PI / 180;
 
 			switch (_currentElementDirection) {
-				case -11: { // NW
+				case 'NW': {
 					if (elementIsACircle) {
 						const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
@@ -206,7 +238,7 @@
 
 					break;
 				}
-				case -10: { // N
+				case 'N': {
 					if (elementIsACircle) {
 						const getX = _element.x;
 						const getY = _element.y - _element.radius;
@@ -221,7 +253,7 @@
 
 					break;
 				}
-				case -9: { // NE
+				case 'NE': {
 					if (elementIsACircle) {
 						const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
@@ -236,7 +268,7 @@
 
 					break;
 				}
-				case -1: { // W
+				case 'W': {
 					if (elementIsACircle) {
 						const getX = _element.x - _element.radius;
 						const getY = _element.y;
@@ -251,7 +283,7 @@
 
 					break;
 				}
-				case 1: { // E
+				case 'E': {
 					if (elementIsACircle) {
 						const getX = _element.x + _element.radius;
 						const getY = _element.y;
@@ -266,7 +298,7 @@
 
 					break;
 				}
-				case 9: { // SW
+				case 'SW': {
 					if (elementIsACircle) {
 						const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
@@ -281,7 +313,7 @@
 
 					break;
 				}
-				case 10: { // S
+				case 'S': {
 					if (elementIsACircle) {
 						const getX = _element.x;
 						const getY = _element.y + _element.radius;
@@ -296,7 +328,7 @@
 
 					break;
 				}
-				case 11: { // SE
+				case 'SE': {
 					if (elementIsACircle) {
 						const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
 						const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
@@ -320,10 +352,10 @@
 	const _drawnElementShot = (elementShooting, _map, _newShootDataBaseElement, _newShootDataSpeed) => {
 		const currentElementDirection = _getElementDirection(elementShooting);
 
-		const checkDirectionXpositive = [-9, 1, 11].includes(currentElementDirection);
-		const checkDirectionXnegative = [-11, -1, 9].includes(currentElementDirection);
-		const checkDirectionYpositive = [9, 10, 11].includes(currentElementDirection);
-		const checkDirectionYnegative = [-11, -10, -9].includes(currentElementDirection);
+		const checkDirectionXpositive = ['NE', 'E', 'SE'].includes(currentElementDirection);
+		const checkDirectionXnegative = ['NW', 'W', 'SW'].includes(currentElementDirection);
+		const checkDirectionYpositive = ['SW', 'S', 'SE'].includes(currentElementDirection);
+		const checkDirectionYnegative = ['NW', 'N', 'NE'].includes(currentElementDirection);
 
 		const secureCollisionValue = (
 			elementShooting.radius ? (
@@ -627,10 +659,10 @@
 
 		// Elements for base screen
 		for (const mapElement of mapElements) {
-			const hasLife = Object.prototype.hasOwnProperty.call(mapElement, 'life');
-
 			// Remove life zero or less elements
-			if (hasLife && mapElement.life <= 0) {
+			const elementHasLife = Object.prototype.hasOwnProperty.call(mapElement, 'life');
+
+			if (elementHasLife && mapElement.life <= 0) {
 				const itemToRemove = mapElements.findIndex(item => item.id === mapElement.id);
 
 				if (itemToRemove !== -1) {
@@ -1614,12 +1646,12 @@
 						radius: 30,
 						x: 500,
 						y: 500,
+						currentDirection: 9, // Must have for getting and drawning element direction
 						style: {
 							color: {
 								body: '%elements.5.style.color.body',
 								details: 'aquamarine'
-							},
-							currentDirection: 11 // Must have for getting and drawning element direction
+							}
 						},
 						step: {
 							x: -1,
@@ -1642,12 +1674,12 @@
 						height: 50,
 						x: 900,
 						y: 50,
+						currentDirection: 11, // Must have for getting and drawning element direction
 						style: {
 							color: {
 								body: '%elements.6.style.color.body',
 								details: 'darkorange'
-							},
-							currentDirection: 11 // Must have for getting and drawning element direction
+							}
 						},
 						step: {
 							x: 1,
@@ -1942,12 +1974,12 @@
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
+				currentDirection: 1, // Must have for getting and drawning element direction
 				style: {
 					color: {
 						body: 'black',
 						details: 'red'
-					},
-					currentDirection: 1 // Must have for getting and drawning element direction
+					}
 				},
 				step: {
 					x: 0,
