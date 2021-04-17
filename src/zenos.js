@@ -19,7 +19,7 @@
 
 	// Default values
 	const defaults = {
-		elementTypesProducesDamage: [3, 5, 7, 9, 11], // Element types that may produce damage
+		elementTypesCanHit: [3, 5, 7, 9, 11], // Element types that may produce damage or gain (hit possible)
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
@@ -969,7 +969,7 @@
 		}
 
 		const mayModifyElementsLifes = (
-			defaults.elementTypesProducesDamage.includes(_mapElement.type) || defaults.elementTypesProducesDamage.includes(_checkElement.type)
+			defaults.elementTypesCanHit.includes(_mapElement.type) || defaults.elementTypesCanHit.includes(_checkElement.type)
 		);
 
 		return mayModifyElementsLifes;
@@ -1204,7 +1204,7 @@
 
 	// Calculate element new modified life (if applicable)
 	const setElementLifeModifier = (elementHitting, elementTakingHit, bonusLifeModifier) => {
-		if (defaults.elementTypesProducesDamage.includes(elementHitting.type) && elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
+		if (defaults.elementTypesCanHit.includes(elementHitting.type) && elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
 			const damageReducer = (damageTakenFactor >= defaults.damageTakenFactor ? 1 : damageTakenFactor / defaults.damageTakenFactor);
 
