@@ -1527,7 +1527,7 @@
 						type: 2
 					},
 					{
-						id: '%elements.5.style.color.body',
+						id: '%elements.11.style.color.body',
 						content: _cx => {
 							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
 							gradient.addColorStop(0.5, 'green');
@@ -1538,7 +1538,7 @@
 						type: 6
 					},
 					{
-						id: '%elements.6.style.color.body',
+						id: '%elements.12.style.color.body',
 						content: _cx => {
 							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
 							gradient.addColorStop(0.5, 'gold');
@@ -1570,7 +1570,8 @@
 				10 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - no hit possible
 				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - hit may produce damage or gain
 
-			player starting point: 'mid' for middle screen ou number in pixels
+			** player starting point: 'mid' for middle screen ou number in pixels
+			** Hint: put all diable elements (with life property) in the end of the array for render performance
 		*/
 		const maps = [
 			{
@@ -1640,57 +1641,6 @@
 					},
 					{
 						id: 5,
-						life: 750,
-						damageTakenFactor: 15, // Only applicable if element has a life property
-						type: 3,
-						radius: 30,
-						x: 500,
-						y: 500,
-						currentDirection: 9, // Must have for getting and drawning element direction
-						style: {
-							color: {
-								body: '%elements.5.style.color.body',
-								details: 'aquamarine'
-							}
-						},
-						step: {
-							x: -1,
-							y: 2,
-							rangeLimit: { // Range limit for x or y movement (only for map elements)
-								maxX: 600,
-								minY: 400
-							}
-						},
-						hit: {
-							bonusLifeModifier: 20 // Melee damage bonus, only if element produces damage (max)
-						}
-					},
-					{
-						id: 6,
-						life: 950,
-						damageTakenFactor: 20, // Only applicable if element has a life property
-						type: 3,
-						width: 50,
-						height: 50,
-						x: 900,
-						y: 50,
-						currentDirection: 11, // Must have for getting and drawning element direction
-						style: {
-							color: {
-								body: '%elements.6.style.color.body',
-								details: 'darkorange'
-							}
-						},
-						step: {
-							x: 1,
-							y: 1
-						},
-						hit: {
-							bonusLifeModifier: 30 // Melee damage bonus, only if element produces damage (max)
-						}
-					},
-					{
-						id: 7,
 						type: 7,
 						width: 150,
 						height: 150,
@@ -1703,7 +1653,7 @@
 						}
 					},
 					{
-						id: 8,
+						id: 6,
 						type: 7,
 						radius: 60,
 						x: 600,
@@ -1715,7 +1665,7 @@
 						}
 					},
 					{
-						id: 9,
+						id: 7,
 						type: 7,
 						radius: 80,
 						x: 950,
@@ -1727,7 +1677,7 @@
 						}
 					},
 					{
-						id: 10,
+						id: 8,
 						type: 7,
 						radius: 120,
 						x: 1300,
@@ -1739,7 +1689,7 @@
 						}
 					},
 					{
-						id: 11,
+						id: 9,
 						type: 5,
 						width: 80,
 						height: 20,
@@ -1756,7 +1706,7 @@
 						}
 					},
 					{
-						id: 12,
+						id: 10,
 						type: 11,
 						width: 20,
 						height: 20,
@@ -1769,6 +1719,57 @@
 						},
 						hit: {
 							bonusLifeModifier: -500 // If negative, element gains life
+						}
+					},
+					{
+						id: 11,
+						life: 750,
+						damageTakenFactor: 15, // Only applicable if element has a life property
+						type: 3,
+						radius: 30,
+						x: 500,
+						y: 500,
+						currentDirection: 9, // Must have for getting and drawning element direction
+						style: {
+							color: {
+								body: '%elements.11.style.color.body',
+								details: 'aquamarine'
+							}
+						},
+						step: {
+							x: -1,
+							y: 2,
+							rangeLimit: { // Range limit for x or y movement (only for map elements)
+								maxX: 600,
+								minY: 400
+							}
+						},
+						hit: {
+							bonusLifeModifier: 20 // Melee damage bonus, only if element produces damage (max)
+						}
+					},
+					{
+						id: 12,
+						life: 950,
+						damageTakenFactor: 20, // Only applicable if element has a life property
+						type: 3,
+						width: 50,
+						height: 50,
+						x: 900,
+						y: 50,
+						currentDirection: 11, // Must have for getting and drawning element direction
+						style: {
+							color: {
+								body: '%elements.12.style.color.body',
+								details: 'darkorange'
+							}
+						},
+						step: {
+							x: 1,
+							y: 1
+						},
+						hit: {
+							bonusLifeModifier: 30 // Melee damage bonus, only if element produces damage (max)
 						}
 					}
 				]
