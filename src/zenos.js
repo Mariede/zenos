@@ -829,9 +829,9 @@
 	// Collisions
 	// -----------------------------------------------------------------------------------------------
 
-	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
-		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove origin element
-			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
+	const collisionActions = (_checkElement, _mapElement, _mapElements, phase) => {
+		if (_checkElement.type && [8, 9].includes(_checkElement.type) && _checkElement.id) { // Remove origin element
+			const itemToRemove = _mapElements.findIndex(item => item.id === _checkElement.id);
 
 			if (itemToRemove !== -1) {
 				_mapElements.splice(itemToRemove, 1);
@@ -1023,7 +1023,7 @@
 		return false;
 	};
 
-	const checkMapElementCollision = (checkElement, _map, _idActiveElement = null, _playerAsTargetMapElement = null) => {
+	const checkMapElementCollision = (checkElement, _map, _playerAsTargetMapElement = null) => {
 		// Two circles collision formula
 		const _circlesCollision = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther) => (
 			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
@@ -1107,7 +1107,7 @@
 			);
 		};
 
-		const _checkAtX = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
+		const _checkAtX = (_checkElement, _mapElement, _mapElements) => {
 			const goCheckBroadRangeY = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y);
 
 			if (goCheckBroadRangeY) {
@@ -1116,7 +1116,7 @@
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 1);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 1);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1127,7 +1127,7 @@
 
 					if (goCheckCollisionFowardX) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 2);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 2);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1139,7 +1139,7 @@
 			return -1;
 		};
 
-		const _checkAtY = (_checkElement, _mapElement, _mapElements, _idActiveElement) => {
+		const _checkAtY = (_checkElement, _mapElement, _mapElements) => {
 			const goCheckBroadRangeX = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.step.x);
 
 			if (goCheckBroadRangeX) {
@@ -1148,7 +1148,7 @@
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 3);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 3);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1159,7 +1159,7 @@
 
 					if (goCheckCollisionFowardY) {
 						// Collided
-						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, _idActiveElement, 4);
+						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 4);
 
 						if (mayModifyElementsLifes) {
 							return getCollidedData(_checkElement, _mapElement);
@@ -1173,9 +1173,9 @@
 
 		if (_playerAsTargetMapElement === null) {
 			for (const mapElement of _map.elements) {
-				if (mapElement.id !== _idActiveElement) {
-					const resultAtX = _checkAtX(checkElement, mapElement, _map.elements, _idActiveElement);
-					const resultAtY = _checkAtY(checkElement, mapElement, _map.elements, _idActiveElement);
+				if (mapElement.id !== checkElement.id) {
+					const resultAtX = _checkAtX(checkElement, mapElement, _map.elements);
+					const resultAtY = _checkAtY(checkElement, mapElement, _map.elements);
 
 					if (resultAtX !== -1) {
 						return resultAtX;
@@ -1187,8 +1187,8 @@
 				}
 			}
 		} else { // Exception case: player object as a target map element
-			const resultAtX = _checkAtX(checkElement, _playerAsTargetMapElement, _map.elements, _idActiveElement);
-			const resultAtY = _checkAtY(checkElement, _playerAsTargetMapElement, _map.elements, _idActiveElement);
+			const resultAtX = _checkAtX(checkElement, _playerAsTargetMapElement, _map.elements);
+			const resultAtY = _checkAtY(checkElement, _playerAsTargetMapElement, _map.elements);
 
 			if (resultAtX !== -1) {
 				return resultAtX;
@@ -1272,8 +1272,8 @@
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
 
-			const collidedPlayer = checkMapElementCollision(_mapElement, _map, _mapElement.id, _player); // Target player (element moves onto player)
-			const collidedData = checkMapElementCollision(_mapElement, _map, _mapElement.id);
+			const collidedPlayer = checkMapElementCollision(_mapElement, _map, _player); // Target player (element moves onto player)
+			const collidedData = checkMapElementCollision(_mapElement, _map);
 
 			if (collidedPlayer !== -1) {
 				// Decrease/Increase current checkElement life
