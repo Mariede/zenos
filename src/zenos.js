@@ -1559,16 +1559,16 @@
 
 			element -> type:
 				1 - no collision, nothing happens
-				2 - Happens collision -> persistent (keep movement - no damage)
-				3 - Happens collision -> persistent (keep movement - damage)
-				4 - Happens collision -> persistent (stop movement - no damage)
-				5 - Happens collision -> persistent (stop movement - damage)
-				6 - Happens collision -> persistent (revert movement - no damage)
-				7 - Happens collision -> persistent (revert movement - damage)
-				8 - Happens collision -> disappear on every collision - by a player or any element (except borders) - no damage
-				9 - Happens collision -> disappear on every collision - by a player or any element (except borders) - damage
-				10 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - no damage
-				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - damage
+				2 - Happens collision -> persistent (keep movement) - no hit possible
+				3 - Happens collision -> persistent (keep movement) - hit may produce damage or gain
+				4 - Happens collision -> persistent (stop movement) - no hit possible
+				5 - Happens collision -> persistent (stop movement) - hit may produce damage or gain
+				6 - Happens collision -> persistent (revert movement) - no hit possible
+				7 - Happens collision -> persistent (revert movement) - hit may produce damage or gain
+				8 - Happens collision -> disappear on every collision - by a player or any element (except borders) - no hit possible
+				9 - Happens collision -> disappear on every collision - by a player or any element (except borders) - hit may produce damage or gain
+				10 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - no hit possible
+				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - hit may produce damage or gain
 
 			player starting point: 'mid' for middle screen ou number in pixels
 		*/
@@ -1634,7 +1634,7 @@
 						y: 550,
 						style: {
 							color: {
-								body: 'red'
+								body: 'olive'
 							}
 						}
 					},
@@ -1698,7 +1698,7 @@
 						y: 150,
 						style: {
 							color: {
-								body: 'tomato'
+								body: 'silver'
 							}
 						}
 					},
@@ -1715,7 +1715,7 @@
 						}
 					},
 					{
-						id: 8,
+						id: 9,
 						type: 7,
 						radius: 80,
 						x: 950,
@@ -1727,7 +1727,7 @@
 						}
 					},
 					{
-						id: 9,
+						id: 10,
 						type: 7,
 						radius: 120,
 						x: 1300,
@@ -1739,12 +1739,12 @@
 						}
 					},
 					{
-						id: 10,
+						id: 11,
 						type: 5,
-						width: 150,
-						height: 10,
+						width: 80,
+						height: 20,
 						x: 20,
-						y: 95,
+						y: 90,
 						style: {
 							color: {
 								body: 'darkgreen'
@@ -1753,6 +1753,22 @@
 						step: {
 							x: 5,
 							y: 0
+						}
+					},
+					{
+						id: 12,
+						type: 11,
+						width: 20,
+						height: 20,
+						x: 960,
+						y: 260,
+						style: {
+							color: {
+								body: 'red'
+							}
+						},
+						hit: {
+							bonusLifeModifier: -500 // If negative, element gains life
 						}
 					}
 				]
