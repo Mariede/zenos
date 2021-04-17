@@ -830,7 +830,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, _idActiveElement, phase) => {
-		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove active element (origin)
+		if (_checkElement.type && [8, 9].includes(_checkElement.type)) { // Remove origin element
 			const itemToRemove = _mapElements.findIndex(item => item.id === _idActiveElement);
 
 			if (itemToRemove !== -1) {
@@ -839,13 +839,13 @@
 		}
 
 		switch (_mapElement.type) {
-			case 2: // Keep movement
-			case 3: // Keep movement
-			case 4: // Stop movement
-			case 5: // Stop movement
-			case 6: // Revert movement
-			case 7: { // Revert movement
-				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement
+			case 2:
+			case 3: // Keep origin movement - no penetration in target element
+			case 4:
+			case 5: // Stop origin movement - no penetration in target element
+			case 6:
+			case 7: { // Revert origin movement - no penetration in target element
+				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement (target)
 					const aidValues = {};
 
 					const mapRadius2CirclesDistanceX = (
@@ -955,9 +955,9 @@
 				break;
 			}
 			case 8:
-			case 9:
+			case 9: // Target disappear (both elements removed from map - origin and target)
 			case 10:
-			case 11: { // Remove item
+			case 11: { // Target disappear (element removed from map)
 				const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
 
 				if (itemToRemove !== -1) {
