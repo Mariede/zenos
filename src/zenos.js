@@ -100,30 +100,34 @@
 		const elementHasDirection = Object.prototype.hasOwnProperty.call(_element, 'currentDirection');
 
 		if (elementHasDirection) { // Only makes sense if element has a side direction
-			if (_element.step.x === 0 && _element.step.y === 0) {
-				currentElementDirection = _element.currentDirection;
+			if (_element.step) {
+				if (_element.step.x === 0 && _element.step.y === 0) {
+					currentElementDirection = _element.currentDirection;
+				} else {
+					let saveThis = false;
+
+					if (_element.step.x > 0) {
+						currentElementDirection += 1;
+						saveThis = true;
+					} else if (_element.step.x < 0) {
+						currentElementDirection -= 1;
+						saveThis = true;
+					}
+
+					if (_element.step.y > 0) {
+						currentElementDirection += 10;
+						saveThis = true;
+					} else if (_element.step.y < 0) {
+						currentElementDirection -= 10;
+						saveThis = true;
+					}
+
+					if (saveThis) {
+						_element.currentDirection = currentElementDirection; // Saves the number but function output is the related string (easier to read)
+					}
+				}
 			} else {
-				let saveThis = false;
-
-				if (_element.step.x > 0) {
-					currentElementDirection += 1;
-					saveThis = true;
-				} else if (_element.step.x < 0) {
-					currentElementDirection -= 1;
-					saveThis = true;
-				}
-
-				if (_element.step.y > 0) {
-					currentElementDirection += 10;
-					saveThis = true;
-				} else if (_element.step.y < 0) {
-					currentElementDirection -= 10;
-					saveThis = true;
-				}
-
-				if (saveThis) {
-					_element.currentDirection = currentElementDirection; // Saves the number but function output is the related string (easier to read)
-				}
+				currentElementDirection = _element.currentDirection;
 			}
 		}
 
@@ -405,22 +409,24 @@
 			)
 		);
 
+		const shootCheckingStepX = elementShooting.step && elementShooting.step.x;
+		const shootCheckingStepY = elementShooting.step && elementShooting.step.y;
 		const shootSpeed = (_newShootDataSpeed || defaults.shootSpeed);
 
-		const shootStepX = (elementShooting.step.x > 0 || checkDirectionXpositive) ? (
+		const shootStepX = (shootCheckingStepX > 0 || checkDirectionXpositive) ? (
 			shootSpeed
 		) : (
-			(elementShooting.step.x < 0 || checkDirectionXnegative) ? (
+			(shootCheckingStepX < 0 || checkDirectionXnegative) ? (
 				shootSpeed * -1
 			) : (
 				0
 			)
 		);
 
-		const shootStepY = (elementShooting.step.y > 0 || checkDirectionYpositive) ? (
+		const shootStepY = (shootCheckingStepY > 0 || checkDirectionYpositive) ? (
 			shootSpeed
 		) : (
-			(elementShooting.step.y < 0 || checkDirectionYnegative) ? (
+			(shootCheckingStepY < 0 || checkDirectionYnegative) ? (
 				shootSpeed * -1
 			) : (
 				0
@@ -628,15 +634,28 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const moveMapElement = _mapElement => {
-		if (_mapElement.step && _mapElement.step.x) {
-			if (_mapElement.step.x !== 0) {
-				_mapElement.x += _mapElement.step.x;
+		if (_mapElement.step) {
+			if (_mapElement.step.x) {
+				if (_mapElement.step.x !== 0) {
+					_mapElement.x += _mapElement.step.x;
+				}
 			}
-		}
 
-		if (_mapElement.step && _mapElement.step.y) {
-			if (_mapElement.step.y !== 0) {
-				_mapElement.y += _mapElement.step.y;
+			if (_mapElement.step.y) {
+				if (_mapElement.step.y !== 0) {
+					_mapElement.y += _mapElement.step.y;
+				}
+			}
+
+			// Check step range limits (if applicable)
+			if (_mapElement.step.rangeLimit) {
+				if (_mapElement.x < (_mapElement.step.rangeLimit.minX || 0) || _mapElement.x > (_mapElement.step.rangeLimit.maxX || $boxWidth)) {
+					_mapElement.step.x = -_mapElement.step.x;
+				}
+
+				if (_mapElement.y < (_mapElement.step.rangeLimit.minY || 0) || _mapElement.y > (_mapElement.step.rangeLimit.maxY || $boxHeight)) {
+					_mapElement.step.y = -_mapElement.step.y;
+				}
 			}
 		}
 	};
@@ -715,55 +734,57 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const movePlayer = (_action, _player) => {
-		if (_player.step && _player.step.x) {
-			if (_player.step.x !== 0) {
-				const speedStepX = _player.step.x;
+		if (_player.step) {
+			if (_player.step.x) {
+				if (_player.step.x !== 0) {
+					const speedStepX = _player.step.x;
 
-				if ($boxWidth > _action.offsetWidth) {
-					const screenCheckW = _checkScreenBorders(_action.offsetWidth);
+					if ($boxWidth > _action.offsetWidth) {
+						const screenCheckW = _checkScreenBorders(_action.offsetWidth);
 
-					if (speedStepX > 0) {
-						if (_player.x <= $boxWidth) {
-							if (_player.x + screenCheckW + speedStepX >= _action.offsetWidth && _player.x - speedStepX <= $boxWidth - screenCheckW) {
-								_action.scrollLeft += speedStepX;
+						if (speedStepX > 0) {
+							if (_player.x <= $boxWidth) {
+								if (_player.x + screenCheckW + speedStepX >= _action.offsetWidth && _player.x - speedStepX <= $boxWidth - screenCheckW) {
+									_action.scrollLeft += speedStepX;
+								}
 							}
-						}
-					} else {
-						if (_player.x >= 0) {
-							if (_player.x + screenCheckW + speedStepX <= $boxWidth && _player.x - speedStepX >= screenCheckW) {
-								_action.scrollLeft += speedStepX;
+						} else {
+							if (_player.x >= 0) {
+								if (_player.x + screenCheckW + speedStepX <= $boxWidth && _player.x - speedStepX >= screenCheckW) {
+									_action.scrollLeft += speedStepX;
+								}
 							}
 						}
 					}
-				}
 
-				_player.x += speedStepX;
+					_player.x += speedStepX;
+				}
 			}
-		}
 
-		if (_player.step && _player.step.y) {
-			if (_player.step.y !== 0) {
-				const speedStepY = _player.step.y;
+			if (_player.step.y) {
+				if (_player.step.y !== 0) {
+					const speedStepY = _player.step.y;
 
-				if ($boxHeight > _action.offsetHeight) {
-					const screenCheckY = _checkScreenBorders(_action.offsetHeight);
+					if ($boxHeight > _action.offsetHeight) {
+						const screenCheckY = _checkScreenBorders(_action.offsetHeight);
 
-					if (speedStepY > 0) {
-						if (_player.y <= $boxHeight) {
-							if (_player.y + screenCheckY + speedStepY >= _action.offsetHeight && _player.y - speedStepY <= $boxHeight - screenCheckY) {
-								_action.scrollTop += speedStepY;
+						if (speedStepY > 0) {
+							if (_player.y <= $boxHeight) {
+								if (_player.y + screenCheckY + speedStepY >= _action.offsetHeight && _player.y - speedStepY <= $boxHeight - screenCheckY) {
+									_action.scrollTop += speedStepY;
+								}
 							}
-						}
-					} else {
-						if (_player.y >= 0) {
-							if (_player.y + screenCheckY + speedStepY <= $boxHeight && _player.y - speedStepY >= screenCheckY) {
-								_action.scrollTop += speedStepY;
+						} else {
+							if (_player.y >= 0) {
+								if (_player.y + screenCheckY + speedStepY <= $boxHeight && _player.y - speedStepY >= screenCheckY) {
+									_action.scrollTop += speedStepY;
+								}
 							}
 						}
 					}
-				}
 
-				_player.y += speedStepY;
+					_player.y += speedStepY;
+				}
 			}
 		}
 	};
@@ -1267,17 +1288,6 @@
 
 	const checkElementCollisions = (_mapElement, _player, _map) => {
 		if (_mapElement.step) {
-			// Only if element can move
-			if (_mapElement.step.rangeLimit) {
-				if (_mapElement.x < (_mapElement.step.rangeLimit.minX || 0) || _mapElement.x > (_mapElement.step.rangeLimit.maxX || $boxWidth)) {
-					_mapElement.step.x = -_mapElement.step.x;
-				}
-
-				if (_mapElement.y < (_mapElement.step.rangeLimit.minY || 0) || _mapElement.y > (_mapElement.step.rangeLimit.maxY || $boxHeight)) {
-					_mapElement.step.y = -_mapElement.step.y;
-				}
-			}
-
 			checkMapBorderXCollision(_mapElement, _map);
 			checkMapBorderYCollision(_mapElement, _map);
 
@@ -1706,7 +1716,7 @@
 								body: 'darkgreen'
 							}
 						},
-						step: {
+						step: { // Only applicable if element can move
 							x: 5,
 							y: 0
 						}
@@ -1723,7 +1733,7 @@
 								body: 'red'
 							}
 						},
-						hit: {
+						hit: { // Only applicable if element type can hit
 							bonusLifeModifier: -500 // If negative, element gains life
 						}
 					},
@@ -1742,7 +1752,7 @@
 								details: 'aquamarine'
 							}
 						},
-						step: {
+						step: { // Only applicable if element can move
 							x: -1,
 							y: 2,
 							rangeLimit: { // Range limit for x or y movement (only for map elements)
@@ -1750,7 +1760,7 @@
 								minY: 400
 							}
 						},
-						hit: {
+						hit: { // Only applicable if element type can hit
 							bonusLifeModifier: 20 // Melee damage bonus, only if element produces damage (max)
 						}
 					},
@@ -1770,11 +1780,11 @@
 								details: 'darkorange'
 							}
 						},
-						step: {
+						step: { // Only applicable if element can move
 							x: 1,
 							y: 1
 						},
-						hit: {
+						hit: { // Only applicable if element type can hit
 							bonusLifeModifier: 30 // Melee damage bonus, only if element produces damage (max)
 						}
 					}
@@ -2004,14 +2014,14 @@
 						details: 'red'
 					}
 				},
-				step: {
+				step: { // Only applicable if element can move
 					x: 0,
 					y: 0,
 					increment: 1,
 					xMax: 3,
 					yMax: 3
 				},
-				hit: {
+				hit: { // Only applicable if element type can hit
 					bonusLifeModifier: 15 // Melee damage bonus, only if element produces damage (max)
 				},
 				skills: {
@@ -2033,7 +2043,7 @@
 										body: 'red'
 									}
 								},
-								hit: {
+								hit: { // Only applicable if element type can hit
 									bonusLifeModifier: 50 // Ranged damage bonus, only if element produces damage (max)
 								}
 							}
