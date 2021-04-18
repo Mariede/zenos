@@ -450,10 +450,10 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const listeners = {
-		debounceKeyDownHandler: (_event, _player, _map, _debounceKeyDownWait) => {
+		keyDownHandlerPlay: (_event, _player, _map) => {
 			_event.preventDefault();
 
-			// Movements / actions -> shield (q) / space / arrow up / arrow down/ arrow left / arrow right (debounced)
+			// Movements / actions -> shield (q) / space / arrow up / arrow down/ arrow left / arrow right
 			const keyPressed = () => {
 				switch (_event.key) {
 					case 'q':
@@ -607,10 +607,11 @@
 				setMenuScreen(_player, _map);
 			};
 
-			clearTimeout($debounceKeyDownTimer);
-			$debounceKeyDownTimer = setTimeout(keyPressed, _debounceKeyDownWait);
+			if (!_event.repeat) {
+				keyPressed();
+			}
 		},
-		restartkeyPressHandler: _event => {
+		keyPressHandlerRestart: _event => {
 			_event.preventDefault();
 
 			// Restart game
@@ -1398,8 +1399,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	// Globals
-	let $debounceKeyDownHandler,
-		$debounceKeyDownTimer,
+	let $keyDownHandlerPlay,
 		$intervalTimer,
 		$animationFrameId,
 		$isOver,
@@ -1458,7 +1458,7 @@
 
 		document.body.removeEventListener(
 			'keydown',
-			$debounceKeyDownHandler,
+			$keyDownHandlerPlay,
 			false
 		);
 
@@ -1472,9 +1472,7 @@
 		$boxWidth = _canvas.width;
 		$boxHeight = _canvas.height;
 
-		const debounceKeyDownWait = 50;
-
-		$debounceKeyDownHandler = event => listeners.debounceKeyDownHandler(event, _player, _map, debounceKeyDownWait);
+		$keyDownHandlerPlay = event => listeners.keyDownHandlerPlay(event, _player, _map);
 
 		// Action screen
 		setActionScreen(_action, _cx, _player, _map);
@@ -1500,7 +1498,7 @@
 		// Game keyboard listener
 		document.body.addEventListener(
 			'keydown',
-			$debounceKeyDownHandler,
+			$keyDownHandlerPlay,
 			false
 		);
 	};
@@ -2090,7 +2088,7 @@
 		// Load listener
 		document.body.addEventListener(
 			'keypress',
-			listeners.restartkeyPressHandler,
+			listeners.keyPressHandlerRestart,
 			false
 		);
 
