@@ -11,6 +11,14 @@
 
 		<link rel="stylesheet" href="zenos.css">
 		<script src="zenos.js" defer></script>
+
+		<script>
+			const toggleHitLogContent = e => {
+				e.preventDefault();
+				const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content');
+				hitLogContent.classList.toggle('hide');
+			};
+		</script>
 	</head>
 	<body>
 		<noscript>Hello, you need to enable JavaScript to run this application.</noscript>
@@ -30,6 +38,7 @@
 					</div>
 					<div id="bottom">
 						<span id="timer"></span>
+						<span id="hit-log" onClick="toggleHitLogContent(event)"><div id="content" class="hide"></div><span id="show">hit log</span></span>
 					</div>
 				</div>
 				<div id="info">

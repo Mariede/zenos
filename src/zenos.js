@@ -1249,8 +1249,16 @@
 				}
 
 				if (goModifyLife) {
-					const elementResultedLife = elementTakingHit.life - Math.round(lifeModifier / lifeModifierReduceFactor);
+					const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
+
+					const lifeModifierFinal = Math.round(lifeModifier / lifeModifierReduceFactor);
+					const elementResultedLife = elementTakingHit.life - lifeModifierFinal;
+
 					elementTakingHit.life = (elementResultedLife >= 0 ? elementResultedLife : 0);
+
+					const logToWrite = `${elementTakingHit.name ? `Player <strong>${elementTakingHit.name}</strong>` : `Mob <strong>${elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${lifeModifierFinal}</strong>, modifier <strong>${bonusLifeModifier}</strong> | damage taken factor <strong>${damageTakenFactor}</strong> | reduce factor <strong>${lifeModifierReduceFactor}</strong>`;
+
+					hitLogContent.innerHTML = `<div class="${lifeModifierFinal > 0 ? 'lose' : 'gain'}">${logToWrite}</div>${hitLogContent.innerHTML}`;
 				}
 			}
 		}
@@ -1669,7 +1677,7 @@
 						type: 7,
 						radius: 80,
 						x: 950,
-						y: 500,
+						y: 550,
 						style: {
 							color: {
 								body: 'deepskyblue'

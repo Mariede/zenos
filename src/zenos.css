@@ -76,6 +76,49 @@ img {
 	font-size: 24px;
 }
 
+#screen > div#general > div#menu > div#bottom > span#hit-log {
+	position: absolute;
+	bottom: 50px;
+	right: 5px;
+	text-align: left;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+#screen > div#general > div#menu > div#bottom > span#hit-log > span#show {
+	font-style: italic;
+}
+
+#screen > div#general > div#menu > div#bottom > span#hit-log > div#content {
+	position: relative;
+	bottom: 0;
+	right: 0;
+	display: inline-block;
+	border: 2px solid darkgrey;
+	border-radius: 5px;
+	background-color: rgba(128, 128, 128, 0.8);
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: 65vh;
+}
+
+#screen > div#general > div#menu > div#bottom > span#hit-log > div#content.hide {
+	display: none;
+}
+
+#screen > div#general > div#menu > div#bottom > span#hit-log > div#content > div {
+	padding: 0 5px;
+	white-space: nowrap;
+}
+
+#screen > div#general > div#menu > div#bottom > span#hit-log > div#content > div.lose {
+	color: honeydew;
+}
+
+#screen > div#general > div#menu > div#bottom > span#hit-log > div#content > div.gain {
+	color: lightgreen;
+}
+
 #screen > div#general > div#info {
 	display: flex;
 	flex-wrap: wrap;
@@ -83,4 +126,5 @@ img {
 	align-items: center;
 	font-size: 14px;
 	font-style: italic;
+	padding: 0 5px;
 }
