@@ -909,7 +909,7 @@
 				const aidValues = _getAidValues(_checkElement, _mapElement);
 
 				if (_checkElement.step.x !== 0) {
-					const executeActionX = (_checkElement, _mapElement) => {
+					const _executeActionX = (_checkElement, _mapElement) => {
 						switch (_mapElement.type) {
 							case 4:
 							case 5: {
@@ -931,18 +931,18 @@
 					if (phase === 1 && _checkElement.step.x < 0) {
 						if (adjustPenetrationX) {
 							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
-							executeActionX(_checkElement, _mapElement);
+							_executeActionX(_checkElement, _mapElement);
 						}
 					} else if (phase === 2 && _checkElement.step.x > 0) {
 						if (adjustPenetrationX) {
 							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
-							executeActionX(_checkElement, _mapElement);
+							_executeActionX(_checkElement, _mapElement);
 						}
 					}
 				}
 
 				if (_checkElement.step.y !== 0) {
-					const executeActionY = (_checkElement, _mapElement) => {
+					const _executeActionY = (_checkElement, _mapElement) => {
 						switch (_mapElement.type) {
 							case 4:
 							case 5: {
@@ -964,12 +964,12 @@
 					if (phase === 3 && _checkElement.step.y < 0) {
 						if (adjustPenetrationY) {
 							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
-							executeActionY(_checkElement, _mapElement);
+							_executeActionY(_checkElement, _mapElement);
 						}
 					} else if (phase === 4 && _checkElement.step.y > 0) {
 						if (adjustPenetrationY) {
 							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
-							executeActionY(_checkElement, _mapElement);
+							_executeActionY(_checkElement, _mapElement);
 						}
 					}
 				}
@@ -1051,7 +1051,7 @@
 			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
 		);
 
-		const goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
+		const _goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
 			const secureCollisionValue = Math.abs(checkStep) + 1;
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
@@ -1073,7 +1073,7 @@
 		};
 
 		// Two rectangles Collision axis backward (-X / -Y)
-		const goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement, _checkCoordOther, _mapCoordOther) => (
+		const _goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement, _checkCoordOther, _mapCoordOther) => (
 			_checkRadius ? (
 				_mapRadius ? (
 					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
@@ -1090,7 +1090,7 @@
 		);
 
 		// Two rectangles Collision axis foward (+X / +Y)
-		const goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, _checkCoordOther, _mapCoordOther) => (
+		const _goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, _checkCoordOther, _mapCoordOther) => (
 			_checkRadius ? (
 				_mapRadius ? (
 					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
@@ -1106,7 +1106,7 @@
 			)
 		);
 
-		const getCollidedData = (_checkElement, _mapElement) => {
+		const _getCollidedData = (_checkElement, _mapElement) => {
 			const checkElementHit = (
 				_checkElement.hit && typeof _checkElement.hit.bonusLifeModifier === 'number' && !isNaN(_checkElement.hit.bonusLifeModifier) && _checkElement.hit.bonusLifeModifier
 			) || (
@@ -1130,29 +1130,29 @@
 		};
 
 		const _checkAtX = (_checkElement, _mapElement, _mapElements) => {
-			const goCheckBroadRangeY = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y);
+			const goCheckBroadRangeY = _goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.step.y);
 
 			if (goCheckBroadRangeY) {
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
-					const goCheckCollisionBackwardX = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width, _checkElement.y, _mapElement.y);
+					const goCheckCollisionBackwardX = _goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width, _checkElement.y, _mapElement.y);
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
 						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 1);
 
 						if (mayModifyElementsLifes) {
-							return getCollidedData(_checkElement, _mapElement);
+							return _getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				} else {
-					const goCheckCollisionFowardX = goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.y, _mapElement.y);
+					const goCheckCollisionFowardX = _goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.y, _mapElement.y);
 
 					if (goCheckCollisionFowardX) {
 						// Collided
 						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 2);
 
 						if (mayModifyElementsLifes) {
-							return getCollidedData(_checkElement, _mapElement);
+							return _getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				}
@@ -1162,29 +1162,29 @@
 		};
 
 		const _checkAtY = (_checkElement, _mapElement, _mapElements) => {
-			const goCheckBroadRangeX = goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.step.x);
+			const goCheckBroadRangeX = _goCheckBroadRange(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.step.x);
 
 			if (goCheckBroadRangeX) {
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
-					const goCheckCollisionBackwardY = goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height, _checkElement.x, _mapElement.x);
+					const goCheckCollisionBackwardY = _goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height, _checkElement.x, _mapElement.x);
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
 						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 3);
 
 						if (mayModifyElementsLifes) {
-							return getCollidedData(_checkElement, _mapElement);
+							return _getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				} else {
-					const goCheckCollisionFowardY = goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.x, _mapElement.x);
+					const goCheckCollisionFowardY = _goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.x, _mapElement.x);
 
 					if (goCheckCollisionFowardY) {
 						// Collided
 						const mayModifyElementsLifes = collisionActions(_checkElement, _mapElement, _mapElements, 4);
 
 						if (mayModifyElementsLifes) {
-							return getCollidedData(_checkElement, _mapElement);
+							return _getCollidedData(_checkElement, _mapElement);
 						}
 					}
 				}
