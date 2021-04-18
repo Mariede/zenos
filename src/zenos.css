@@ -119,6 +119,10 @@ img {
 	color: lightgreen;
 }
 
+#screen > div#general > div#menu > div#bottom > span#hit-log > div#content > div.dead {
+	color: red;
+}
+
 #screen > div#general > div#info {
 	display: flex;
 	flex-wrap: wrap;

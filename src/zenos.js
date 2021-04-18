@@ -1276,11 +1276,11 @@
 					const lifeModifierFinal = Math.round(lifeModifier / lifeModifierReduceFactor);
 					const elementResultedLife = elementTakingHit.life - lifeModifierFinal;
 
-					elementTakingHit.life = (elementResultedLife >= 0 ? elementResultedLife : 0);
+					elementTakingHit.life = (elementResultedLife > 0 ? elementResultedLife : 0);
 
 					const logToWrite = `${elementTakingHit.name ? `Player <strong>${elementTakingHit.name}</strong>` : `Mob <strong>${elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${lifeModifierFinal}</strong>, modifier <strong>${bonusLifeModifier}</strong> | damage taken factor <strong>${damageTakenFactor}</strong> | reduce factor <strong>${lifeModifierReduceFactor}</strong>`;
 
-					hitLogContent.innerHTML = `<div class="${lifeModifierFinal > 0 ? 'lose' : 'gain'}">${logToWrite}</div>${hitLogContent.innerHTML}`;
+					hitLogContent.innerHTML = `<div class="${elementResultedLife > 0 ? (lifeModifierFinal > 0 ? 'lose' : 'gain') : 'dead'}">${logToWrite}</div>${hitLogContent.innerHTML}`;
 				}
 			}
 		}
