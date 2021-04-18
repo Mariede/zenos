@@ -456,11 +456,11 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const listeners = {
-		keyDownHandlerPlay: (_event, _player, _map) => {
+		keyDownHandlerBeginGame: (_event, _player, _map) => {
 			_event.preventDefault();
 
 			// Movements / actions -> shield (q) / space / arrow up / arrow down/ arrow left / arrow right
-			const keyPressed = () => {
+			const _beginGame = () => {
 				switch (_event.key) {
 					case 'q':
 					case 'Q': {
@@ -614,10 +614,10 @@
 			};
 
 			if (!_event.repeat) {
-				keyPressed();
+				_beginGame();
 			}
 		},
-		keyPressHandlerRestart: _event => {
+		keyPressHandlerRestartGame: _event => {
 			_event.preventDefault();
 
 			// Restart game
@@ -1423,7 +1423,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	// Globals
-	let $keyDownHandlerPlay,
+	let $keyDownHandlerBeginGame,
 		$intervalTimer,
 		$animationFrameId,
 		$isOver,
@@ -1482,7 +1482,7 @@
 
 		document.body.removeEventListener(
 			'keydown',
-			$keyDownHandlerPlay,
+			$keyDownHandlerBeginGame,
 			false
 		);
 
@@ -1496,7 +1496,7 @@
 		$boxWidth = _canvas.width;
 		$boxHeight = _canvas.height;
 
-		$keyDownHandlerPlay = event => listeners.keyDownHandlerPlay(event, _player, _map);
+		$keyDownHandlerBeginGame = event => listeners.keyDownHandlerBeginGame(event, _player, _map);
 
 		// Action screen
 		setActionScreen(_action, _cx, _player, _map);
@@ -1528,7 +1528,7 @@
 		// Game keyboard listener
 		document.body.addEventListener(
 			'keydown',
-			$keyDownHandlerPlay,
+			$keyDownHandlerBeginGame,
 			false
 		);
 	};
@@ -2118,7 +2118,7 @@
 		// Load listener
 		document.body.addEventListener(
 			'keypress',
-			listeners.keyPressHandlerRestart,
+			listeners.keyPressHandlerRestartGame,
 			false
 		);
 
