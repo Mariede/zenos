@@ -1271,16 +1271,13 @@
 				}
 
 				if (goModifyLife) {
-					const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
-
 					const lifeModifierFinal = Math.round(lifeModifier / lifeModifierReduceFactor);
 					const elementResultedLife = elementTakingHit.life - lifeModifierFinal;
 
 					elementTakingHit.life = (elementResultedLife > 0 ? elementResultedLife : 0);
 
-					const logToWrite = `${elementTakingHit.name ? `Player <strong>${elementTakingHit.name}</strong>` : `Mob <strong>${elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${lifeModifierFinal}</strong>, modifier <strong>${bonusLifeModifier}</strong> | damage taken factor <strong>${damageTakenFactor}</strong> | reduce factor <strong>${lifeModifierReduceFactor}</strong>`;
-
-					hitLogContent.innerHTML = `<div class="${elementResultedLife > 0 ? (lifeModifierFinal > 0 ? 'lose' : 'gain') : 'dead'}">${logToWrite}</div>${hitLogContent.innerHTML}`;
+					// Hit log
+					setHitLog(elementTakingHit, lifeModifierFinal, bonusLifeModifier, damageTakenFactor, lifeModifierReduceFactor);
 				}
 			}
 		}
@@ -1358,6 +1355,23 @@
 		} catch (err) {
 			console.error(err); // eslint-disable-line no-console
 		}
+	};
+
+	// -----------------------------------------------------------------------------------------------
+	// Hit log screen
+	// -----------------------------------------------------------------------------------------------
+	const setHitLog = (_elementTakingHit, _lifeModifierFinal, _bonusLifeModifier, _damageTakenFactor, _lifeModifierReduceFactor) => {
+		const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
+
+		const logToWrite = (
+			_bonusLifeModifier !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
+				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${_lifeModifierFinal}</strong>, modifier <strong>${_bonusLifeModifier}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
+			) : (
+				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; loses <strong>${_lifeModifierFinal}</strong> (time)`
+			)
+		);
+
+		hitLogContent.innerHTML = `<div class="${_elementTakingHit.life > 0 ? (_lifeModifierFinal > 0 ? 'lose' : 'gain') : 'dead'}">${logToWrite}</div>${hitLogContent.innerHTML}`;
 	};
 
 	// -----------------------------------------------------------------------------------------------
@@ -1497,7 +1511,13 @@
 				if (_map.timer === 0) { // End game if time runs out
 					_player.life = 0;
 				} else if (_map.timer % 5 === 0) { // Decrease life over time
-					_player.life--;
+					const lifeModifierFinal = 1;
+					const playerResultedLife = _player.life - lifeModifierFinal;
+
+					_player.life = (playerResultedLife > 0 ? playerResultedLife : 0);
+
+					// Hit log
+					setHitLog(_player, lifeModifierFinal);
 				}
 
 				setMenuScreen(_player, _map);
