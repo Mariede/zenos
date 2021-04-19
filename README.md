@@ -163,8 +163,11 @@ It will be converted to a React application soon enough!
  * "Rectangle x Rectangle".
    > Right now, "Circle x Rectangle" or "Rectangle x Circle" acts as "Rectangle x Rectangle" collision
  * Configurable collisions actions.
+
+## Elements physics
  * Elements iteration and Physics.
- * Separated JS listeners for command iterations.
+ * Elements change their speed based on their element types and related colision actions.
 
 ##  Hit log screen
- * Shows hit logs in the game with some details like: hit value, hit bonus, damage taken factor and reduce factor.
+ * It is an option in the game menu.
+ * Shows hit logs in the game with some details, like: hit value, hit bonus, damage taken factor and reduce factor.
