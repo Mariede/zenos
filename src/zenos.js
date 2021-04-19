@@ -2043,7 +2043,7 @@
 					xMax: 3,
 					yMax: 3
 				},
-				hit: 15, // Only applicable if element type can hit
+				hit: 10, // Only applicable if element type can hit
 				skills: {
 					shield: {
 						isShieldUpColor: 'ghostwhite',
