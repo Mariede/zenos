@@ -1971,26 +1971,34 @@
 			map => {
 				// Initial map player coordinates
 				const mapStartPointX = (
-					map.players.startPointX === 'mid' ? (
-						_canvas.width < _action.offsetWidth ? _canvas.width / 2 : _action.offsetWidth / 2
-					) : (
-						typeof map.players.startPointX === 'number' && !isNaN(map.players.startPointX) ? (
-							map.players.startPointX
+					map.players ? (
+						map.players.startPointX === 'mid' ? (
+							_canvas.width < _action.offsetWidth ? _canvas.width / 2 : _action.offsetWidth / 2
 						) : (
-							0
+							typeof map.players.startPointX === 'number' && !isNaN(map.players.startPointX) ? (
+								map.players.startPointX
+							) : (
+								0
+							)
 						)
+					) : (
+						0
 					)
 				);
 
 				const mapStartPointY = (
-					map.players.startPointY === 'mid' ? (
-						_canvas.height < _action.offsetHeight ? _canvas.height / 2 : _action.offsetHeight / 2
-					) : (
-						typeof map.players.startPointY === 'number' && !isNaN(map.players.startPointY) ? (
-							map.players.startPointY
+					map.players ? (
+						map.players.startPointY === 'mid' ? (
+							_canvas.height < _action.offsetHeight ? _canvas.height / 2 : _action.offsetHeight / 2
 						) : (
-							0
+							typeof map.players.startPointY === 'number' && !isNaN(map.players.startPointY) ? (
+								map.players.startPointY
+							) : (
+								0
+							)
 						)
+					) : (
+						0
 					)
 				);
 
