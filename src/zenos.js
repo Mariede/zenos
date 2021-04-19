@@ -1108,13 +1108,13 @@
 
 		const _getCollidedData = (_checkElement, _mapElement) => {
 			const checkElementHit = (
-				_checkElement.hit && typeof _checkElement.hit.bonusLifeModifier === 'number' && !isNaN(_checkElement.hit.bonusLifeModifier) && _checkElement.hit.bonusLifeModifier
+				typeof _checkElement.hit === 'number' && !isNaN(_checkElement.hit) && _checkElement.hit
 			) || (
 				0
 			);
 
 			const mapElementHit = (
-				_mapElement.hit && typeof _mapElement.hit.bonusLifeModifier === 'number' && !isNaN(_mapElement.hit.bonusLifeModifier) && _mapElement.hit.bonusLifeModifier
+				typeof _mapElement.hit === 'number' && !isNaN(_mapElement.hit) && _mapElement.hit
 			) || (
 				0
 			);
@@ -1225,19 +1225,19 @@
 	};
 
 	// Calculate element new modified life (if applicable)
-	const setElementLifeModifier = (elementHitting, elementTakingHit, bonusLifeModifier) => {
+	const setElementLifeModifier = (elementHitting, elementTakingHit, hitBonus) => {
 		if (defaults.elementTypesCanHit.includes(elementHitting.type) && elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
 			const damageReducer = (damageTakenFactor >= defaults.damageTakenFactor ? 1 : damageTakenFactor / defaults.damageTakenFactor);
 
 			const halfDamageTakenFactor = Math.round(damageTakenFactor / 2);
-			const halfBonusLifeModifier = Math.round(bonusLifeModifier / 2);
+			const halfHitBonus = Math.round(hitBonus / 2);
 
 			const lifeModifier = (
-				bonusLifeModifier < 0 ? ( // Element gains life
-					bonusLifeModifier + _randomIntFromInterval(0, halfBonusLifeModifier * -1)
+				hitBonus < 0 ? ( // Element gains life
+					hitBonus + _randomIntFromInterval(0, halfHitBonus * -1)
 				) : ( // Element loses life
-					_randomIntFromInterval(halfDamageTakenFactor, damageTakenFactor) + (_randomIntFromInterval(halfBonusLifeModifier, bonusLifeModifier) * damageReducer)
+					_randomIntFromInterval(halfDamageTakenFactor, damageTakenFactor) + (_randomIntFromInterval(halfHitBonus, hitBonus) * damageReducer)
 				)
 			);
 
@@ -1277,7 +1277,7 @@
 					elementTakingHit.life = (elementResultedLife > 0 ? elementResultedLife : 0);
 
 					// Hit log
-					setHitLog(elementTakingHit, lifeModifierFinal, bonusLifeModifier, damageTakenFactor, lifeModifierReduceFactor);
+					setHitLog(elementTakingHit, lifeModifierFinal, hitBonus, damageTakenFactor, lifeModifierReduceFactor);
 				}
 			}
 		}
@@ -1360,12 +1360,12 @@
 	// -----------------------------------------------------------------------------------------------
 	// Hit log screen
 	// -----------------------------------------------------------------------------------------------
-	const setHitLog = (_elementTakingHit, _lifeModifierFinal, _bonusLifeModifier, _damageTakenFactor, _lifeModifierReduceFactor) => {
+	const setHitLog = (_elementTakingHit, _lifeModifierFinal, _hitBonus, _damageTakenFactor, _lifeModifierReduceFactor) => {
 		const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
 
 		const logToWrite = (
-			_bonusLifeModifier !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
-				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${_lifeModifierFinal}</strong>, modifier <strong>${_bonusLifeModifier}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
+			_hitBonus !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
+				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${_lifeModifierFinal}</strong>, modifier <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
 			) : (
 				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; loses <strong>${_lifeModifierFinal}</strong> (time)`
 			)
@@ -1753,9 +1753,7 @@
 								body: 'red'
 							}
 						},
-						hit: { // Only applicable if element type can hit
-							bonusLifeModifier: -500 // If negative, element gains life
-						}
+						hit: -500 // Only applicable if element type can hit (if negative, element gains life)
 					},
 					{
 						id: 11,
@@ -1780,9 +1778,7 @@
 								minY: 400
 							}
 						},
-						hit: { // Only applicable if element type can hit
-							bonusLifeModifier: 20 // Melee damage bonus, only if element produces damage (max)
-						}
+						hit: 20 // Only applicable if element type can hit
 					},
 					{
 						id: 12,
@@ -1804,9 +1800,7 @@
 							x: 1,
 							y: 1
 						},
-						hit: { // Only applicable if element type can hit
-							bonusLifeModifier: 30 // Melee damage bonus, only if element produces damage (max)
-						}
+						hit: 30 // Only applicable if element type can hit
 					}
 				]
 			}
@@ -2041,9 +2035,7 @@
 					xMax: 3,
 					yMax: 3
 				},
-				hit: { // Only applicable if element type can hit
-					bonusLifeModifier: 15 // Melee damage bonus, only if element produces damage (max)
-				},
+				hit: 15, // Only applicable if element type can hit
 				skills: {
 					shield: {
 						isShieldUpColor: 'ghostwhite',
@@ -2063,9 +2055,7 @@
 										body: 'red'
 									}
 								},
-								hit: { // Only applicable if element type can hit
-									bonusLifeModifier: 50 // Ranged damage bonus, only if element produces damage (max)
-								}
+								hit: 50 // Only applicable if element type can hit (ranged)
 							}
 						}
 					}
