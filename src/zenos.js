@@ -852,7 +852,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const collisionActions = (_checkElement, _mapElement, _mapElements, phase) => {
-		if (_checkElement.type && [8, 9].includes(_checkElement.type) && _checkElement.id) { // Remove origin element
+		if ([8, 9].includes(_checkElement.type) && _checkElement.id) { // Remove origin element
 			const itemToRemove = _mapElements.findIndex(item => item.id === _checkElement.id);
 
 			if (itemToRemove !== -1) {
@@ -1594,17 +1594,17 @@
 				-> uses ids from mapsFillSpecial.fillers to replace properties
 
 			element -> type:
-				1 - no collision, nothing happens
-				2 - Happens collision -> persistent (keep movement) - no hit possible
-				3 - Happens collision -> persistent (keep movement) - hit may produce damage or gain
-				4 - Happens collision -> persistent (stop movement) - no hit possible
-				5 - Happens collision -> persistent (stop movement) - hit may produce damage or gain
-				6 - Happens collision -> persistent (revert movement) - no hit possible
-				7 - Happens collision -> persistent (revert movement) - hit may produce damage or gain
-				8 - Happens collision -> disappear on every collision - by a player or any element (except borders) - no hit possible
-				9 - Happens collision -> disappear on every collision - by a player or any element (except borders) - hit may produce damage or gain
-				10 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - no hit possible
-				11 - Happens collision -> disappear only if receives the collision - by a player or any element (except borders) - hit may produce damage or gain
+				1 - No collision, nothing happens
+				2 - Collision -> persistent (origin keeps movement) - no hit possible
+				3 - Collision -> persistent (origin keeps movement) - hit may produce damage or gain
+				4 - Collision -> persistent (origin stops movement) - no hit possible
+				5 - Collision -> persistent (origin stops movement) - hit may produce damage or gain
+				6 - Collision -> persistent (origin reverts movement) - no hit possible
+				7 - Collision -> persistent (origin reverts movement) - hit may produce damage or gain
+				8 - Collision -> disappear on every collision - as origin or target (except borders) - no hit possible
+				9 - Collision -> disappear on every collision - as origin or target (except borders) - hit may produce damage or gain
+				10 - Collision -> disappear only if receives the collision - as target (except borders) - no hit possible
+				11 - Collision -> disappear only if receives the collision - as target (except borders) - hit may produce damage or gain
 
 			** player starting point: 'mid' for middle screen ou number in pixels
 			** Hint: put all diable elements (with life property) in the end of the array for render performance
