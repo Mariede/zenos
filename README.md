@@ -16,19 +16,20 @@ It will be converted to a React application soon enough!
 
 ### Json element
  * **name**: Mandatory. The name of the player.
- * **life**: Mandatory. When it reachs zero game ends.
+ * **life**: Mandatory. When it reaches zero game ends.
  * **damageTakenFactor**: Optional (default 50). It is like the armor, but the less the better.
    > Don't go above 50 or it will become less usefull
- * **timeBetweenHits**: Optional (default 450). It is the time between melee hits.
+ * **timeBetweenHits**: Optional (default 450). It is the time between player hits.
    > In miliseconds
  * **type**: Mandatory. It is a number. Every element in the map has a type.
-   > See more about element types below - we use type 3 for players
+   > See more about element types below - we use type 3 for players (a type 3 can hit)
  * **radius**: Mandatory. Use always circle (radius) for players. It is the body hit box.
  * **x**: Mandatory. The current position in x axis. Coordinate x.
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning player looking direction.
    > See more about element directions below - we may use 1 for starting players in the map (East)
- * **style**: Defines the style of the player drawn (not usefull when using images and sprites).
+ * **style**: Defines the style of the player drawn - color of hitbox body and details.
+   > Body receives the image when using images or sprites
  * **step**: Mandatory. Applicable for player's movement:
     * **x**: Moving speed at x axis.
     * **y**: Moving speed at y axis.
@@ -36,7 +37,7 @@ It will be converted to a React application soon enough!
     * **xMax**: The maximum moving speed at x axis.
     * **yMax**: The maximum moving speed at y axis.
  * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
-   > Only applicable case the origin element type **can hit** and the target has a **life property**
+   > Only applicable if the origin element type **can hit** (player) and the target has a **life property**
  * **skills**: Are the player skills that can be used in the game:
     * **shield**:
         * **isShieldUpColor**: Optional (default lightcyan). The color of the skill when up.
@@ -78,9 +79,9 @@ It will be converted to a React application soon enough!
         2. Background-image (repeat / no-repeat / repeat-x / repeat-y)
         3. Canvas gradient fill style (linear or radial)
  * **players**:
-    * **startPointX**: Optional (default 0). Base map coordinate in x axis where players will be loaded first.
+    * **startPointX**: Optional - zero if not present. Base map coordinate in x axis where players will be loaded first.
       > Use 'mid' to load them in the mid of screen (x axis)
-    * **startPointY**: Optional (default 0). Base map coordinate in y axis where players will be loaded first.
+    * **startPointY**: Optional - zero if not present. Base map coordinate in y axis where players will be loaded first.
       > Use 'mid' to load them in the mid of screen (y axis)
 * **elements**: Mandatory. Array containing **all the elements** that exists inside the map (map elements).
   > See more about map elements below
@@ -89,7 +90,32 @@ It will be converted to a React application soon enough!
  * Array containing **all the elements** that exists inside the map (map elements).
 
 ### Json element
- * soon...
+ * **id**: Mandatory. A number that specifies a unique identifier for the element.
+ * **life**: Optional. If the element has a life property it can take hits and be destroyed.
+   > If life property exists, when it reaches zero the element will disappear from the map
+ * **damageTakenFactor**: Only applicable if element has a life property (default 50). It is like the armor, but the less the better.
+   > Don't go above 50 or it will become less usefull
+ * **timeBetweenHits**: Only applicable if element type can hit (default 450). It is the time between element hits.
+   > In miliseconds
+ * **type**: Mandatory. It is a number. Every element in the map has a type.
+   > See more about element types below
+ * **radius** or **width**/**height**: Mandatory exclusive. Radius for circles, Width/Height for rectangles. It is the body hit box.
+ * **x**: Mandatory. The current position in x axis. Coordinate x.
+ * **y**: Mandatory. The current position in y axis. Coordinate y.
+ * **currentDirection**: Optional. Must have for getting and drawning element looking direction.
+   > See more about element directions below - we may check element direction table when starting elements in the map (East)
+ * **style**: Defines the style of the element drawn - color of hitbox body.
+   > Body receives the image when using images or sprites
+ * **step**: Only applicable if element can move:
+    * **x**: Moving speed at x axis.
+    * **y**: Moving speed at y axis.
+    * **rangeLimit**: Optional. Defines boundaries limits in x and y axis for movement (if specified, at least one is mandatory):
+      * **minX**: Minimum x coordinate accepted for movement, in normal conditions.
+      * **maxX**: Maximum x coordinate accepted for movement, in normal conditions.
+      * **minY**: Minimum y coordinate accepted for movement, in normal conditions.
+      * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
+ * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
+   > Only applicable if the origin element type **can hit** and the target has a **life property**
 
 ### Temporary json bindings at execution time
  * **_isTakingDamage**: true when element is taking damage.

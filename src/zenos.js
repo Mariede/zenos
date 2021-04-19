@@ -2024,7 +2024,7 @@
 				name: 'Mike',
 				life: 500,
 				damageTakenFactor: 25, // Only applicable if element has a life property
-				timeBetweenHits: 250, // Time between element melee hits, only applicable if element can hit
+				timeBetweenHits: 250, // Time between element hits, only applicable if element can hit (in this case considered melee hits)
 				type: 3, // Type of the player object (based on the maps element types)
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
