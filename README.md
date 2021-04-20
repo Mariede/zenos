@@ -28,7 +28,7 @@ It will be converted to a React application soon enough!
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning player looking direction.
    > See more about element directions below - we may use 1 for starting players in the map (East)
- * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
+ * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** (player) and the target has a **life property**
  * **style**: Defines the style of the player drawn - color of hitbox body and details.
    > Body receives the image when using images or sprites
@@ -105,7 +105,7 @@ It will be converted to a React application soon enough!
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning element looking direction.
    > See more about element directions below - we may check element direction table when starting elements in the map (East)
- * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
+ * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** and the target has a **life property**
  * **style**: Defines the style of the element drawn - color of hitbox body.
    > Body receives the image when using images or sprites

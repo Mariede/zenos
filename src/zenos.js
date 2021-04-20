@@ -1136,14 +1136,14 @@
 		);
 
 		const _getCollidedData = (_checkElement, _mapElement) => {
-			const checkElementHit = (
-				typeof _checkElement.hit === 'number' && !isNaN(_checkElement.hit) && _checkElement.hit
+			const checkElementHitBonus = (
+				typeof _checkElement.hitBonus === 'number' && !isNaN(_checkElement.hitBonus) && _checkElement.hitBonus
 			) || (
 				0
 			);
 
-			const mapElementHit = (
-				typeof _mapElement.hit === 'number' && !isNaN(_mapElement.hit) && _mapElement.hit
+			const mapElementHitBonus = (
+				typeof _mapElement.hitBonus === 'number' && !isNaN(_mapElement.hitBonus) && _mapElement.hitBonus
 			) || (
 				0
 			);
@@ -1151,9 +1151,9 @@
 			return (
 				{
 					elementOrigin: _checkElement,
-					elementOriginHit: checkElementHit,
+					elementOriginHitBonus: checkElementHitBonus,
 					elementTarget: _mapElement,
-					elementTargetHit: mapElementHit
+					elementTargetHitBonus: mapElementHitBonus
 				}
 			);
 		};
@@ -1322,10 +1322,10 @@
 
 			if (collidedPlayer !== -1) {
 				// Decrease/Increase current checkElement life
-				const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedPlayer;
+				const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = collidedPlayer;
 
-				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
-				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
+				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
+				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
 
 				// Update menu screen
 				setMenuScreen(_player, _map);
@@ -1333,10 +1333,10 @@
 
 			if (collidedData !== -1) {
 				// Decrease/Increase current checkElement life
-				const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedData;
+				const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = collidedData;
 
-				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
-				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
+				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
+				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
 			}
 		}
 	};
@@ -1349,10 +1349,10 @@
 
 		if (collidedPlayer !== -1) {
 			// Decrease/Increase player life (the current checkElement)
-			const { elementOrigin, elementOriginHit, elementTarget, elementTargetHit } = collidedPlayer;
+			const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = collidedPlayer;
 
-			setElementLifeModifier(elementTarget, elementOrigin, elementTargetHit);
-			setElementLifeModifier(elementOrigin, elementTarget, elementOriginHit);
+			setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
+			setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
 
 			// Update menu screen
 			setMenuScreen(_player, _map);
@@ -1394,7 +1394,7 @@
 
 		const logToWrite = (
 			_hitBonus !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
-				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${_lifeModifierFinal}</strong>, modifier <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
+				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${_lifeModifierFinal}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
 			) : (
 				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; loses <strong>${_lifeModifierFinal}</strong> (time)`
 			)
@@ -1777,7 +1777,7 @@
 						height: 20,
 						x: 960,
 						y: 260,
-						hit: -500, // Only applicable if element type can hit (if negative, element gains life)
+						hitBonus: -500, // Only applicable if element type can hit (if negative, element gains life)
 						style: {
 							color: {
 								body: 'red'
@@ -1793,7 +1793,7 @@
 						x: 500,
 						y: 500,
 						currentDirection: 9, // Must have for getting and drawning element direction
-						hit: 20, // Only applicable if element type can hit
+						hitBonus: 20, // Only applicable if element type can hit
 						style: {
 							color: {
 								body: '%elements.11.style.color.body',
@@ -1812,14 +1812,14 @@
 					{
 						id: 12,
 						life: 950,
-						damageTakenFactor: 20, // Only applicable if element has a life property
+						damageTakenFactor: 25, // Only applicable if element has a life property
 						type: 3,
 						width: 50,
 						height: 50,
 						x: 900,
 						y: 50,
 						currentDirection: 11, // Must have for getting and drawning element direction
-						hit: 30, // Only applicable if element type can hit
+						hitBonus: 30, // Only applicable if element type can hit
 						style: {
 							color: {
 								body: '%elements.12.style.color.body',
@@ -2052,14 +2052,14 @@
 			{
 				name: 'Mike',
 				life: 500,
-				damageTakenFactor: 25, // Only applicable if element has a life property
+				damageTakenFactor: 35, // Only applicable if element has a life property
 				timeBetweenHits: 250, // Time between element hits, only applicable if element can hit (in this case considered melee hits)
 				type: 3, // Type of the player object (based on the maps element types)
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
 				currentDirection: 1, // Must have for getting and drawning element direction
-				hit: 10, // Only applicable if element type can hit
+				hitBonus: 10, // Only applicable if element type can hit
 				style: {
 					color: {
 						body: 'black',
@@ -2087,7 +2087,7 @@
 							baseElement : { // New element guide (basic data)
 								type: 9, // Always use 9 for munition element (disappear on collision)
 								radius: 10, // Always use radius for munition element (centering)
-								hit: 50, // Only applicable if element type can hit (ranged)
+								hitBonus: 50, // Only applicable if element type can hit (ranged)
 								style: {
 									color: {
 										body: 'red'
