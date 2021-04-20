@@ -633,6 +633,23 @@
 	// Map
 	// -----------------------------------------------------------------------------------------------
 
+	const moveMapElementRangeLimit = _mapElement => {
+		// Check step range limits (if applicable)
+		if (_mapElement.step.rangeLimit) {
+			const rangeLimit = _mapElement.step.rangeLimit;
+			const speedStepX = _mapElement.step.x || 0;
+			const speedStepY = _mapElement.step.y || 0;
+
+			if ((speedStepX < 0 && _mapElement.x < (rangeLimit.minX || 0)) || (speedStepX > 0 && _mapElement.x > (rangeLimit.maxX || $boxWidth))) {
+				_mapElement.step.x = -_mapElement.step.x;
+			}
+
+			if ((speedStepY < 0 && _mapElement.y < (rangeLimit.minY || 0)) || (speedStepY > 0 && _mapElement.y > (rangeLimit.maxY || $boxHeight))) {
+				_mapElement.step.y = -_mapElement.step.y;
+			}
+		}
+	};
+
 	const moveMapElement = _mapElement => {
 		if (_mapElement.step) {
 			if (_mapElement.step.x) {
@@ -647,16 +664,7 @@
 				}
 			}
 
-			// Check step range limits (if applicable)
-			if (_mapElement.step.rangeLimit) {
-				if (_mapElement.x < (_mapElement.step.rangeLimit.minX || 0) || _mapElement.x > (_mapElement.step.rangeLimit.maxX || $boxWidth)) {
-					_mapElement.step.x = -_mapElement.step.x;
-				}
-
-				if (_mapElement.y < (_mapElement.step.rangeLimit.minY || 0) || _mapElement.y > (_mapElement.step.rangeLimit.maxY || $boxHeight)) {
-					_mapElement.step.y = -_mapElement.step.y;
-				}
-			}
+			moveMapElementRangeLimit(_mapElement);
 		}
 	};
 
