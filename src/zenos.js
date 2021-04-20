@@ -642,12 +642,24 @@
 			const speedStepX = _mapElement.step.x || 0;
 			const speedStepY = _mapElement.step.y || 0;
 
-			if ((speedStepX < 0 && _mapElement.x < (rangeLimit.minX || 0)) || (speedStepX > 0 && _mapElement.x > (rangeLimit.maxX || $boxWidth))) {
-				_mapElement.step.x = -_mapElement.step.x;
+			const checkMapElementX = (
+				_mapElement.radius ? _mapElement.x : _mapElement.x + (_mapElement.width / 2)
+			);
+
+			const checkMapElementY = (
+				_mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2)
+			);
+
+			if (speedStepX !== 0) {
+				if ((speedStepX < 0 && checkMapElementX < (rangeLimit.minX || 0)) || (speedStepX > 0 && checkMapElementX > (rangeLimit.maxX || $boxWidth))) {
+					_mapElement.step.x = -_mapElement.step.x;
+				}
 			}
 
-			if ((speedStepY < 0 && _mapElement.y < (rangeLimit.minY || 0)) || (speedStepY > 0 && _mapElement.y > (rangeLimit.maxY || $boxHeight))) {
-				_mapElement.step.y = -_mapElement.step.y;
+			if (speedStepY !== 0) {
+				if ((speedStepY < 0 && checkMapElementY < (rangeLimit.minY || 0)) || (speedStepY > 0 && checkMapElementY > (rangeLimit.maxY || $boxHeight))) {
+					_mapElement.step.y = -_mapElement.step.y;
+				}
 			}
 		}
 	};
@@ -657,12 +669,40 @@
 		let playerHasAggro = false;
 
 		if (_mapElement.life && _mapElement.life > 0) {
-			const getAggroCheck = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
-			const getAggroRange = defaults.playerAggroRange ** 2;
+			const aggroCheck = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
+			const aggroRange = defaults.playerAggroRange ** 2;
 
-			if (getAggroCheck <= getAggroRange) {
+			if (aggroCheck <= aggroRange) {
+				const speedStepX = _mapElement.step.x || 0;
+				const speedStepY = _mapElement.step.y || 0;
+
+				const checkMapElementX = Math.round(
+					_mapElement.radius ? _mapElement.x : _mapElement.x + (_mapElement.width / 2)
+				);
+
+				const checkMapElementY = Math.round(
+					_mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2)
+				);
+
+				const secureContactValue = _player.radius;
+
+				if (speedStepX !== 0) {
+					if ((_player.x > checkMapElementX + secureContactValue) || (_player.x < checkMapElementX - secureContactValue)) {
+						if ((speedStepX < 0 && checkMapElementX < _player.x) || (speedStepX > 0 && checkMapElementX > _player.x)) {
+							_mapElement.step.x = -_mapElement.step.x;
+						}
+					}
+				}
+
+				if (speedStepY !== 0) {
+					if ((_player.y > checkMapElementY + secureContactValue) || (_player.y < checkMapElementY - secureContactValue)) {
+						if ((speedStepY < 0 && checkMapElementY < _player.y) || (speedStepY > 0 && checkMapElementY > _player.y)) {
+							_mapElement.step.y = -_mapElement.step.y;
+						}
+					}
+				}
+
 				playerHasAggro = true;
-				// Work in progress... ****
 			}
 		}
 
@@ -684,7 +724,6 @@
 			}
 
 			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _player);
-
 			moveMapElementRangeLimit(_mapElement, playerHasAggro);
 		}
 	};
@@ -2055,7 +2094,7 @@
 				damageTakenFactor: 35, // Only applicable if element has a life property
 				timeBetweenHits: 250, // Time between element hits, only applicable if element can hit (in this case considered melee hits)
 				type: 3, // Type of the player object (based on the maps element types)
-				radius: 20,
+				radius: 20, // Always radius for players
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
 				currentDirection: 1, // Must have for getting and drawning element direction

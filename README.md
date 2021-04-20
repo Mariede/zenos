@@ -60,6 +60,7 @@ It will be converted to a React application soon enough!
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
  * **playerAggroRange**: Range (in pixels) where player can get a map element aggro (200).
+   > A map element can be aggressive (aggro) with it has a **life** property
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Map entity
@@ -126,6 +127,7 @@ It will be converted to a React application soon enough!
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
  * **playerAggroRange**: Range (in pixels) where player can get a map element aggro (200).
+   > A map element can be aggressive (aggro) with it has a **life** property
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Element types
