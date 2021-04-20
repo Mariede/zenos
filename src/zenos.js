@@ -20,6 +20,7 @@
 	// Default values
 	const defaults = {
 		elementTypesCanHit: [3, 5, 7, 9, 11], // Element types that may produce damage or gain (hit possible)
+		playerAggroRange: 200, // Range (in pixels) where player can get a map element aggro
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
 		isTakingDamageColor: 'red',
@@ -633,10 +634,11 @@
 	// Map
 	// -----------------------------------------------------------------------------------------------
 
-	const moveMapElementRangeLimit = _mapElement => {
-		// Check step range limits (if applicable)
-		if (_mapElement.step.rangeLimit) {
+	// Check step range limits (if applicable)
+	const moveMapElementRangeLimit = (_mapElement, _playerHasAggro) => {
+		if (!_playerHasAggro && _mapElement.step.rangeLimit) {
 			const rangeLimit = _mapElement.step.rangeLimit;
+
 			const speedStepX = _mapElement.step.x || 0;
 			const speedStepY = _mapElement.step.y || 0;
 
@@ -650,7 +652,24 @@
 		}
 	};
 
-	const moveMapElement = _mapElement => {
+	// Check if player got aggroed and move accordly (if applicable)
+	const moveMapElementPlayerAggro = (_mapElement, _player) => {
+		let playerHasAggro = false;
+
+		if (_mapElement.life && _mapElement.life > 0) {
+			const getAggroCheck = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
+			const getAggroRange = defaults.playerAggroRange ** 2;
+
+			if (getAggroCheck <= getAggroRange) {
+				playerHasAggro = true;
+				// Work in progress... ****
+			}
+		}
+
+		return playerHasAggro;
+	};
+
+	const moveMapElement = (_mapElement, _player) => {
 		if (_mapElement.step) {
 			if (_mapElement.step.x) {
 				if (_mapElement.step.x !== 0) {
@@ -664,7 +683,9 @@
 				}
 			}
 
-			moveMapElementRangeLimit(_mapElement);
+			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _player);
+
+			moveMapElementRangeLimit(_mapElement, playerHasAggro);
 		}
 	};
 
@@ -698,7 +719,7 @@
 				}
 			} else {
 				// Movement (if applicable)
-				moveMapElement(mapElement);
+				moveMapElement(mapElement, _player);
 
 				// Collisions
 				checkElementCollisions(mapElement, _player, _map);
@@ -1756,12 +1777,12 @@
 						height: 20,
 						x: 960,
 						y: 260,
+						hit: -500, // Only applicable if element type can hit (if negative, element gains life)
 						style: {
 							color: {
 								body: 'red'
 							}
-						},
-						hit: -500 // Only applicable if element type can hit (if negative, element gains life)
+						}
 					},
 					{
 						id: 11,
@@ -1772,6 +1793,7 @@
 						x: 500,
 						y: 500,
 						currentDirection: 9, // Must have for getting and drawning element direction
+						hit: 20, // Only applicable if element type can hit
 						style: {
 							color: {
 								body: '%elements.11.style.color.body',
@@ -1785,8 +1807,7 @@
 								maxX: 600,
 								minY: 400
 							}
-						},
-						hit: 20 // Only applicable if element type can hit
+						}
 					},
 					{
 						id: 12,
@@ -1798,6 +1819,7 @@
 						x: 900,
 						y: 50,
 						currentDirection: 11, // Must have for getting and drawning element direction
+						hit: 30, // Only applicable if element type can hit
 						style: {
 							color: {
 								body: '%elements.12.style.color.body',
@@ -1807,8 +1829,7 @@
 						step: { // Only applicable if element can move
 							x: 1,
 							y: 1
-						},
-						hit: 30 // Only applicable if element type can hit
+						}
 					}
 				]
 			}
@@ -2038,6 +2059,7 @@
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
 				currentDirection: 1, // Must have for getting and drawning element direction
+				hit: 10, // Only applicable if element type can hit
 				style: {
 					color: {
 						body: 'black',
@@ -2051,7 +2073,6 @@
 					xMax: 3,
 					yMax: 3
 				},
-				hit: 10, // Only applicable if element type can hit
 				skills: {
 					shield: {
 						isShieldUpColor: 'ghostwhite',
@@ -2066,12 +2087,12 @@
 							baseElement : { // New element guide (basic data)
 								type: 9, // Always use 9 for munition element (disappear on collision)
 								radius: 10, // Always use radius for munition element (centering)
+								hit: 50, // Only applicable if element type can hit (ranged)
 								style: {
 									color: {
 										body: 'red'
 									}
-								},
-								hit: 50 // Only applicable if element type can hit (ranged)
+								}
 							}
 						}
 					}

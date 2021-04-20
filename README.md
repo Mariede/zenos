@@ -28,6 +28,8 @@ It will be converted to a React application soon enough!
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning player looking direction.
    > See more about element directions below - we may use 1 for starting players in the map (East)
+ * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
+   > Only applicable if the origin element type **can hit** (player) and the target has a **life property**
  * **style**: Defines the style of the player drawn - color of hitbox body and details.
    > Body receives the image when using images or sprites
  * **step**: Mandatory. Applicable for player's movement:
@@ -36,8 +38,6 @@ It will be converted to a React application soon enough!
     * **increment**: The value used to increase or decrease the moving speed.
     * **xMax**: The maximum moving speed at x axis.
     * **yMax**: The maximum moving speed at y axis.
- * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
-   > Only applicable if the origin element type **can hit** (player) and the target has a **life property**
  * **skills**: Are the player skills that can be used in the game:
     * **shield**:
         * **isShieldUpColor**: Optional (default lightcyan). The color of the skill when up.
@@ -59,6 +59,7 @@ It will be converted to a React application soon enough!
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
+ * **playerAggroRange**: Range (in pixels) where player can get a map element aggro (200).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Map entity
@@ -104,6 +105,8 @@ It will be converted to a React application soon enough!
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning element looking direction.
    > See more about element directions below - we may check element direction table when starting elements in the map (East)
+ * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
+   > Only applicable if the origin element type **can hit** and the target has a **life property**
  * **style**: Defines the style of the element drawn - color of hitbox body.
    > Body receives the image when using images or sprites
  * **step**: Only applicable if element can move:
@@ -114,8 +117,6 @@ It will be converted to a React application soon enough!
       * **maxX**: Maximum x coordinate accepted for movement, in normal conditions.
       * **minY**: Minimum y coordinate accepted for movement, in normal conditions.
       * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
- * **hit**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
-   > Only applicable if the origin element type **can hit** and the target has a **life property**
 
 ### Temporary json bindings at execution time
  * **_isTakingDamage**: true when element is taking damage.
@@ -124,6 +125,7 @@ It will be converted to a React application soon enough!
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
+ * **playerAggroRange**: Range (in pixels) where player can get a map element aggro (200).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Element types
