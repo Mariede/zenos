@@ -677,29 +677,52 @@
 				const speedStepX = _mapElement.step.x || 0;
 				const speedStepY = _mapElement.step.y || 0;
 
-				const checkMapElementX = Math.round(
+				const checkMapElementX = (
 					_mapElement.radius ? _mapElement.x : _mapElement.x + (_mapElement.width / 2)
 				);
 
-				const checkMapElementY = Math.round(
+				const checkMapElementY = (
 					_mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2)
 				);
 
-				const secureContactValue = _player.radius;
+				const secureNearAggroValue = _player.radius;
+
+				const validateAggroX = (_player.x > checkMapElementX + secureNearAggroValue) || (_player.x < checkMapElementX - secureNearAggroValue);
+				const validateAggroY = (_player.y > checkMapElementY + secureNearAggroValue) || (_player.y < checkMapElementY - secureNearAggroValue);
 
 				if (speedStepX !== 0) {
-					if ((_player.x > checkMapElementX + secureContactValue) || (_player.x < checkMapElementX - secureContactValue)) {
+					if (!_mapElement.step._savedX) {
+						_mapElement.step._savedX = _mapElement.step.x; // Temporary
+					}
+
+					if (validateAggroX) {
 						if ((speedStepX < 0 && checkMapElementX < _player.x) || (speedStepX > 0 && checkMapElementX > _player.x)) {
 							_mapElement.step.x = -_mapElement.step.x;
 						}
+					} else {
+						_mapElement.step.x = 0;
+					}
+				} else {
+					if (validateAggroX) {
+						_mapElement.step.x = _mapElement.step._savedX;
 					}
 				}
 
 				if (speedStepY !== 0) {
-					if ((_player.y > checkMapElementY + secureContactValue) || (_player.y < checkMapElementY - secureContactValue)) {
+					if (!_mapElement.step._savedY) {
+						_mapElement.step._savedY = _mapElement.step.y; // Temporary
+					}
+
+					if (validateAggroY) {
 						if ((speedStepY < 0 && checkMapElementY < _player.y) || (speedStepY > 0 && checkMapElementY > _player.y)) {
 							_mapElement.step.y = -_mapElement.step.y;
 						}
+					} else {
+						_mapElement.step.y = 0;
+					}
+				} else {
+					if (validateAggroY) {
+						_mapElement.step.y = _mapElement.step._savedY;
 					}
 				}
 
@@ -1693,7 +1716,7 @@
 				elements: [
 					{
 						id: 1,
-						type: 7,
+						type: 2,
 						width: 60,
 						height: 260,
 						x: 158,
@@ -1706,7 +1729,7 @@
 					},
 					{
 						id: 2,
-						type: 7,
+						type: 2,
 						width: 60,
 						height: 255,
 						// Em análise - rotate: 10,
@@ -1733,7 +1756,7 @@
 					},
 					{
 						id: 4,
-						type: 7,
+						type: 2,
 						width: 200,
 						height: 50,
 						x: 290,
@@ -1746,7 +1769,7 @@
 					},
 					{
 						id: 5,
-						type: 7,
+						type: 2,
 						width: 150,
 						height: 150,
 						x: 800,
@@ -1759,7 +1782,7 @@
 					},
 					{
 						id: 6,
-						type: 7,
+						type: 2,
 						radius: 60,
 						x: 600,
 						y: 280,
@@ -1771,7 +1794,7 @@
 					},
 					{
 						id: 7,
-						type: 7,
+						type: 2,
 						radius: 80,
 						x: 950,
 						y: 550,
@@ -1783,7 +1806,7 @@
 					},
 					{
 						id: 8,
-						type: 7,
+						type: 2,
 						radius: 120,
 						x: 1300,
 						y: 350,
