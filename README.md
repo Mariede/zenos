@@ -59,8 +59,6 @@ It will be converted to a React application soon enough!
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
- * **playerAggroRange**: Range (in pixels) where player can get a map element aggro (200).
-   > A map element can be aggressive (aggro) with it has a **life** property
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Map entity
@@ -108,6 +106,8 @@ It will be converted to a React application soon enough!
    > See more about element directions below - we may check element direction table when starting elements in the map (East)
  * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** and the target has a **life property**
+ * **playerAggroRange**: Optional (default 200). Range (in pixels) where player can get a map element aggro.
+   > A map element can be aggressive (aggro) only if it has a **life** property and **playerAggroRange** property **is not equal -1**
  * **style**: Defines the style of the element drawn - color of hitbox body.
    > Body receives the image when using images or sprites
  * **step**: Only applicable if element can move:
@@ -126,8 +126,6 @@ It will be converted to a React application soon enough!
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
- * **playerAggroRange**: Range (in pixels) where player can get a map element aggro (200).
-   > A map element can be aggressive (aggro) with it has a **life** property
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Element types

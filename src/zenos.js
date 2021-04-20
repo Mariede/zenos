@@ -668,9 +668,10 @@
 	const moveMapElementPlayerAggro = (_mapElement, _player) => {
 		let playerHasAggro = false;
 
-		if (_mapElement.life && _mapElement.life > 0) {
+		// If playerAggroRange equals -1 or element has no life: no aggro permitted for the element
+		if (_mapElement.playerAggroRange !== -1 && _mapElement.life && _mapElement.life > 0) {
 			const aggroCheck = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
-			const aggroRange = defaults.playerAggroRange ** 2;
+			const aggroRange = (_mapElement.playerAggroRange || defaults.playerAggroRange) ** 2;
 
 			if (aggroCheck <= aggroRange) {
 				const speedStepX = _mapElement.step.x || 0;
@@ -1859,6 +1860,7 @@
 						y: 50,
 						currentDirection: 11, // Must have for getting and drawning element direction
 						hitBonus: 30, // Only applicable if element type can hit
+						playerAggroRange: 280, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						style: {
 							color: {
 								body: '%elements.12.style.color.body',
