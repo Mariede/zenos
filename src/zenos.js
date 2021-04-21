@@ -21,7 +21,7 @@
 
 	// Default values
 	const defaults = {
-		elementTypesCanHit: [3, 5, 7, 9, 11], // Element types that may produce damage or gain (hit possible)
+		elementTypesCanHit: [3, 5, 7, 9, 11, 101], // Element types that may produce damage or gain (hit possible)
 		playerAggroRange: 200, // Range (in pixels) where player can get a map element aggro
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
@@ -676,6 +676,14 @@
 			const aggroRange = (_mapElement.playerAggroRange || defaults.playerAggroRange) ** 2;
 
 			if (aggroCheck <= aggroRange) {
+				if (!_mapElement.step._savedX && _mapElement.step._savedX !== 0) {
+					_mapElement.step._savedX = _mapElement.step.x; // Temporary
+				}
+
+				if (!_mapElement.step._savedY && _mapElement.step._savedY !== 0) {
+					_mapElement.step._savedY = _mapElement.step.y; // Temporary
+				}
+
 				const speedStepX = _mapElement.step.x || 0;
 				const speedStepY = _mapElement.step.y || 0;
 
@@ -693,10 +701,6 @@
 				const validateAggroY = (_player.y > checkMapElementY + secureNearAggroValue) || (_player.y < checkMapElementY - secureNearAggroValue);
 
 				if (speedStepX !== 0) {
-					if (!_mapElement.step._savedX) {
-						_mapElement.step._savedX = _mapElement.step.x; // Temporary
-					}
-
 					if (validateAggroX) {
 						if ((speedStepX < 0 && checkMapElementX < _player.x) || (speedStepX > 0 && checkMapElementX > _player.x)) {
 							_mapElement.step.x = -_mapElement.step.x;
@@ -711,10 +715,6 @@
 				}
 
 				if (speedStepY !== 0) {
-					if (!_mapElement.step._savedY) {
-						_mapElement.step._savedY = _mapElement.step.y; // Temporary
-					}
-
 					if (validateAggroY) {
 						if ((speedStepY < 0 && checkMapElementY < _player.y) || (speedStepY > 0 && checkMapElementY > _player.y)) {
 							_mapElement.step.y = -_mapElement.step.y;
@@ -730,12 +730,12 @@
 
 				playerHasAggro = true;
 			} else {
-				if (_mapElement.step._savedX && _mapElement.step.x !== _mapElement.step._savedX) {
+				if (_mapElement.step._savedX || _mapElement.step._savedX === 0) {
 					_mapElement.step.x = _mapElement.step._savedX;
 					delete _mapElement.step._savedX;
 				}
 
-				if (_mapElement.step._savedY && _mapElement.step.y !== _mapElement.step._savedY) {
+				if (_mapElement.step._savedY || _mapElement.step._savedY === 0) {
 					_mapElement.step.y = _mapElement.step._savedY;
 					delete _mapElement.step._savedY;
 				}
@@ -747,19 +747,22 @@
 
 	const moveMapElement = (_mapElement, _player) => {
 		if (_mapElement.step) {
-			if (_mapElement.step.x) {
-				if (_mapElement.step.x !== 0) {
-					_mapElement.x += _mapElement.step.x;
-				}
-			}
-
-			if (_mapElement.step.y) {
-				if (_mapElement.step.y !== 0) {
-					_mapElement.y += _mapElement.step.y;
-				}
-			}
-
 			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _player);
+
+			if (![100, 101].includes(_mapElement.type)) { // Types 100 and 101 defines the platform mode. Element map has a direction but can not move
+				if (_mapElement.step.x) {
+					if (_mapElement.step.x !== 0) {
+						_mapElement.x += _mapElement.step.x;
+					}
+				}
+
+				if (_mapElement.step.y) {
+					if (_mapElement.step.y !== 0) {
+						_mapElement.y += _mapElement.step.y;
+					}
+				}
+			}
+
 			moveMapElementRangeLimit(_mapElement, playerHasAggro);
 		}
 	};
@@ -967,6 +970,8 @@
 		switch (_mapElement.type) {
 			case 2:
 			case 3: // Keep origin movement - no penetration in target element
+			case 100:
+			case 101: // Keep origin movement - no penetration in target element - platform mode (stacked in place)
 			case 4:
 			case 5: // Stop origin movement - no penetration in target element
 			case 6:
@@ -1727,6 +1732,8 @@
 				9 - Collision -> disappear on every collision - as origin or target (except borders) - hit may produce damage or gain
 				10 - Collision -> disappear only if receives the collision - as target (except borders) - no hit possible
 				11 - Collision -> disappear only if receives the collision - as target (except borders) - hit may produce damage or gain
+				100 - Collision -> persistent (origin keeps movement) - no hit possible (Platform mode)
+				101 - Collision -> persistent (origin keeps movement) - hit may produce damage or gain (Platform mode)
 
 			** player starting point: 'mid' for middle screen ou number in pixels
 			** Hint: put all diable elements (with life property) in the end of the array for render performance
@@ -1773,7 +1780,7 @@
 					},
 					{
 						id: 3,
-						type: 7,
+						type: 2,
 						width: 200,
 						height: 50,
 						x: 290,
@@ -1848,7 +1855,7 @@
 					},
 					{
 						id: 9,
-						type: 5,
+						type: 7,
 						width: 80,
 						height: 20,
 						x: 20,
@@ -1858,8 +1865,8 @@
 								body: 'darkgreen'
 							}
 						},
-						step: { // Only applicable if element can move
-							x: 5,
+						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
+							x: 4,
 							y: 0
 						}
 					},
@@ -1893,7 +1900,7 @@
 								details: 'aquamarine'
 							}
 						},
-						step: { // Only applicable if element can move
+						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
 							x: -1,
 							y: 2,
 							rangeLimit: { // Range limit for x or y movement (only for map elements)
@@ -1920,8 +1927,31 @@
 								details: 'darkorange'
 							}
 						},
-						step: { // Only applicable if element can move
+						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
 							x: 1,
+							y: 1
+						}
+					},
+					{
+						id: 13,
+						life: 400,
+						damageTakenFactor: 45, // Only applicable if element has a life property
+						type: 101, // Type 100 and 101 defines the plataform mode (element can have a direction, but can not move)
+						width: 35,
+						height: 35,
+						x: 700,
+						y: 150,
+						currentDirection: 10, // Must have for getting and drawning element direction
+						hitBonus: 200, // Only applicable if element type can hit
+						playerAggroRange: 400, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						style: {
+							color: {
+								body: 'brown',
+								details: 'cyan'
+							}
+						},
+						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
+							x: 0,
 							y: 1
 						}
 					}
@@ -2160,7 +2190,7 @@
 						details: 'red'
 					}
 				},
-				step: { // Only applicable if element can move
+				step: { // Only applicable if element can move or it is in platform mode (stacked in place)
 					x: 0,
 					y: 0,
 					increment: 1,

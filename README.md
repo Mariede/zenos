@@ -58,7 +58,7 @@ It will be converted to a React application soon enough!
  * **_savedDetails**: for blinking style details color of element (when shooting).
 
 ### Defaults only values
- * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
+ * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Map entity
@@ -88,7 +88,7 @@ It will be converted to a React application soon enough!
 
 ## Map elements entities
  * Array containing **all the elements** that exists inside the map (map elements).
- * Can be structures, walls, doors, keys, food, ornaments, objects, monsters, ...
+ * Can be structures, walls, towers, doors, keys, food, ornaments, objects, monsters, ...
  * If it has a life property, can use a moving "aggro" algoritm.
 
 ### Json element
@@ -116,10 +116,10 @@ It will be converted to a React application soon enough!
     * **x**: Moving speed at x axis.
     * **y**: Moving speed at y axis.
     * **rangeLimit**: Optional. Defines boundaries limits in x and y axis for movement (if specified, at least one is mandatory):
-      * **minX**: Minimum x coordinate accepted for movement, in normal conditions.
-      * **maxX**: Maximum x coordinate accepted for movement, in normal conditions.
-      * **minY**: Minimum y coordinate accepted for movement, in normal conditions.
-      * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
+        * **minX**: Minimum x coordinate accepted for movement, in normal conditions.
+        * **maxX**: Maximum x coordinate accepted for movement, in normal conditions.
+        * **minY**: Minimum y coordinate accepted for movement, in normal conditions.
+        * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
 
 ### Temporary json bindings at execution time
  * **_isTakingDamage**: true when element is taking damage.
@@ -129,7 +129,7 @@ It will be converted to a React application soon enough!
  * **_savedY**: for map elements when getting aggro to save last step y value.
 
 ### Defaults only values
- * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).
+ * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
 
 ## Element types
@@ -138,17 +138,20 @@ It will be converted to a React application soon enough!
  * Odd type numbers means the element can hit and do damage or rise life.
  * The act of collision have an **origin element** and a **target element**.
  * Existing types:
-  1. No collision, nothing happens
-  2. Collision &#8594; action: persistent, origin keeps movement - can hit: no
-  3. Collision &#8594; action: persistent, origin keeps movement - can hit: yes
-  4. Collision &#8594; action: persistent, origin stops movement at the collided axis - can hit: no
-  5. Collision &#8594; action: persistent, origin stops movement at the collided axis - can hit: yes
-  6. Collision &#8594; action: persistent, origin reverts movement at the collided axis - can hit: no
-  7. Collision &#8594; action: persistent, origin reverts movement at the collided axis - can hit: yes
-  8. Collision &#8594; action: disappear on every collision (as origin or as target) - can hit: no
-  9. Collision &#8594; action: disappear on every collision (as origin or as target) - can hit: yes
-  10. Collision &#8594; action: disappear only if receives the collision (as target) - can hit: no
-  11. Collision &#8594; action: disappear only if receives the collision (as target) - can hit: yes
+    + **1**. No collision, nothing happens
+    + **2**. Collision &#8594; action: persistent, origin keeps movement - can hit: no
+    + **3**. Collision &#8594; action: persistent, origin keeps movement - can hit: yes
+    + **4**. Collision &#8594; action: persistent, origin stops movement at the collided axis - can hit: no
+    + **5**. Collision &#8594; action: persistent, origin stops movement at the collided axis - can hit: yes
+    + **6**. Collision &#8594; action: persistent, origin reverts movement at the collided axis - can hit: no
+    + **7**. Collision &#8594; action: persistent, origin reverts movement at the collided axis - can hit: yes
+    + **8**. Collision &#8594; action: disappear on every collision (as origin or as target) - can hit: no
+    + **9**. Collision &#8594; action: disappear on every collision (as origin or as target) - can hit: yes
+    + **10**. Collision &#8594; action: disappear only if receives the collision (as target) - can hit: no
+    + **11**. Collision &#8594; action: disappear only if receives the collision (as target) - can hit: yes
+    + **100**. Collision &#8594; action: persistent, origin keeps movement - can hit: no (Platform mode)
+    + **101**. Collision &#8594; action: persistent, origin keeps movement - can hit: yes (Platform mode)
+      > An element in **platform mode** can have a direction but can not move (keep stacked in place)
  * Every element that has a life property will disappear if life reachs zero.
 
 ## Element directions
