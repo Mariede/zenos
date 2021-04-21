@@ -364,14 +364,16 @@
 		const checkDirectionYpositive = ['SW', 'S', 'SE'].includes(currentElementDirection);
 		const checkDirectionYnegative = ['NW', 'N', 'NE'].includes(currentElementDirection);
 
+		const newShootBaseValue = _newShootDataBaseElement.radius ? _newShootDataBaseElement.radius : (_newShootDataBaseElement.width / 2);
+
 		const secureCollisionValue = (
 			elementShooting.radius ? (
-				elementShooting.radius + _newShootDataBaseElement.radius
+				elementShooting.radius + newShootBaseValue
 			) : (
 				elementShooting.width >= elementShooting.height ? (
-					(elementShooting.width / 2) + _newShootDataBaseElement.radius
+					(elementShooting.width / 2) + newShootBaseValue
 				) : (
-					(elementShooting.height / 2) + _newShootDataBaseElement.radius
+					(elementShooting.height / 2) + newShootBaseValue
 				)
 			)
 		);
@@ -695,7 +697,7 @@
 					_mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2)
 				);
 
-				const secureNearAggroValue = _player.radius;
+				const secureNearAggroValue = (_player.radius || (_player.width / 2));
 
 				const validateAggroX = (_player.x > checkMapElementX + secureNearAggroValue) || (_player.x < checkMapElementX - secureNearAggroValue);
 				const validateAggroY = (_player.y > checkMapElementY + secureNearAggroValue) || (_player.y < checkMapElementY - secureNearAggroValue);
@@ -924,12 +926,16 @@
 
 			// Shield
 			if (_player._isShieldUp && _player.skills.shield.charges > 0) {
+				const playerX = _player.radius ? _player.x : _player.x + (_player.width / 2);
+				const playerY = _player.radius ? _player.y : _player.y + (_player.height / 2);
+				const shieldSize = (_player.radius || (_player.width / 2)) * 1.5;
+
 				_cx.save();
 
 				_cx.lineWidth = 1;
 
 				_cx.beginPath();
-				_cx.arc(_player.x, _player.y, _player.radius * 1.5, 0, 2 * Math.PI);
+				_cx.arc(playerX, playerY, shieldSize, 0, 2 * Math.PI);
 				_cx.strokeStyle = (_player.skills.shield.isShieldUpColor || defaults.isShieldUpColor);
 				_cx.stroke();
 				_cx.closePath();
@@ -2179,7 +2185,7 @@
 				damageTakenFactor: 35, // Only applicable if element has a life property
 				timeBetweenHits: 250, // Time between element hits, only applicable if element can hit (in this case considered melee hits)
 				type: 3, // Type of the player object (based on the maps element types)
-				radius: 20, // Always radius for players
+				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY
 				currentDirection: 1, // Must have for getting and drawning element direction

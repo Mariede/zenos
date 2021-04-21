@@ -23,13 +23,13 @@ It will be converted to a React application soon enough!
    > In miliseconds
  * **type**: Mandatory. It is a number. Every element in the map has a type.
    > See more about element types below - we use type 3 for players (a type 3 can hit)
- * **radius**: Mandatory. Use always circle (radius) for players. It is the body hit box.
+ * **radius** or **width**/**height**: Mandatory exclusive. Radius for circles, Width/Height for rectangles. It is the body hit box.
  * **x**: Mandatory. The current position in x axis. Coordinate x.
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning player looking direction.
    > See more about element directions below - we may use 1 for starting players in the map (East)
  * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
-   > Only applicable if the origin element type **can hit** (player) and the target has a **life property**
+   > Only applicable if the origin element type **can hit** and the target has a **life property**
  * **style**: Defines the style of the player drawn - color of hitbox body and details.
    > Body receives the image when using images or sprites
  * **step**: Mandatory. Applicable for player's movement:
@@ -105,7 +105,7 @@ It will be converted to a React application soon enough!
  * **x**: Mandatory. The current position in x axis. Coordinate x.
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning element looking direction.
-   > See more about element directions below - we may check element direction table when starting elements in the map (East)
+   > See more about element directions below - we may check element direction table when starting elements in the map
  * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** and the target has a **life property**
  * **playerAggroRange**: Optional (default 200). Range (in pixels) where player can get a map element aggro.
