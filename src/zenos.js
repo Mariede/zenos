@@ -706,7 +706,7 @@
 					}
 				} else {
 					if (validateAggroX) {
-						_mapElement.step.x = _mapElement.step._savedX;
+						_mapElement.step.x = _player.step.x;
 					}
 				}
 
@@ -724,11 +724,21 @@
 					}
 				} else {
 					if (validateAggroY) {
-						_mapElement.step.y = _mapElement.step._savedY;
+						_mapElement.step.y = _player.step.y;
 					}
 				}
 
 				playerHasAggro = true;
+			} else {
+				if (_mapElement.step._savedX && _mapElement.step.x !== _mapElement.step._savedX) {
+					_mapElement.step.x = _mapElement.step._savedX;
+					delete _mapElement.step._savedX;
+				}
+
+				if (_mapElement.step._savedY && _mapElement.step.y !== _mapElement.step._savedY) {
+					_mapElement.step.y = _mapElement.step._savedY;
+					delete _mapElement.step._savedY;
+				}
 			}
 		}
 
