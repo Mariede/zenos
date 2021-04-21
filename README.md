@@ -123,6 +123,8 @@ It will be converted to a React application soon enough!
  * **_isTakingDamage**: true when element is taking damage.
  * **_isTimeBetweenHits**: must be lower than next hit time for a melee hit to be cast (miliseconds).
  * **_savedBody**: for blinking style body color of element (when taking damage).
+ * **_savedX**: for map elements when getting aggro to save last step x value.
+ * **_savedY**: for map elements when getting aggro to save last step y value.
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11).

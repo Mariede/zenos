@@ -15,6 +15,8 @@
 			_isTimeBetweenHits - must be lower than next hit time for a melee hit to be cast
 			_savedBody - for blinking style body color of element (when taking damage)
 			_savedDetails - for blinking style details color of element (when shooting)
+			_savedX - for map elements when getting aggro to save last step x value
+			_savedY - for map elements when getting aggro to save last step y value
 	*/
 
 	// Default values
@@ -1286,30 +1288,36 @@
 		};
 
 		if (_playerAsTargetMapElement === null) {
+			const resultForCheck = [];
+
 			for (const mapElement of _map.elements) {
 				if (mapElement.id !== checkElement.id) {
 					const resultAtX = _checkAtX(checkElement, mapElement, _map.elements);
 					const resultAtY = _checkAtY(checkElement, mapElement, _map.elements);
 
 					if (resultAtX !== -1) {
-						return resultAtX;
+						resultForCheck.push(resultAtX);
 					}
 
 					if (resultAtY !== -1) {
-						return resultAtY;
+						resultForCheck.push(resultAtY);
 					}
 				}
+			}
+
+			if (resultForCheck.length) {
+				return resultForCheck;
 			}
 		} else { // Exception case: player object as a target map element
 			const resultAtX = _checkAtX(checkElement, _playerAsTargetMapElement, _map.elements);
 			const resultAtY = _checkAtY(checkElement, _playerAsTargetMapElement, _map.elements);
 
 			if (resultAtX !== -1) {
-				return resultAtX;
+				return [resultAtX];
 			}
 
 			if (resultAtY !== -1) {
-				return resultAtY;
+				return [resultAtY];
 			}
 		}
 
@@ -1384,22 +1392,30 @@
 			const collidedData = checkMapElementCollision(_mapElement, _map);
 
 			if (collidedPlayer !== -1) {
-				// Decrease/Increase current checkElement life
-				const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = collidedPlayer;
+				collidedPlayer.forEach(
+					_collidedPlayer => {
+					// Decrease/Increase current checkElement life
+						const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = _collidedPlayer;
 
-				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
-				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+						setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
+						setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
 
-				// Update menu screen
-				setMenuScreen(_player, _map);
+						// Update menu screen
+						setMenuScreen(_player, _map);
+					}
+				);
 			}
 
 			if (collidedData !== -1) {
-				// Decrease/Increase current checkElement life
-				const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = collidedData;
+				collidedData.forEach(
+					_collidedData => {
+						// Decrease/Increase current checkElement life
+						const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = _collidedData;
 
-				setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
-				setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+						setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
+						setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+					}
+				);
 			}
 		}
 	};
@@ -1411,14 +1427,18 @@
 		const collidedPlayer = checkMapElementCollision(_player, _map); // Origin player (player moves onto element)
 
 		if (collidedPlayer !== -1) {
-			// Decrease/Increase player life (the current checkElement)
-			const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = collidedPlayer;
+			collidedPlayer.forEach(
+				_collidedPlayer => {
+					// Decrease/Increase player life (the current checkElement)
+					const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = _collidedPlayer;
 
-			setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
-			setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+					setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
+					setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
 
-			// Update menu screen
-			setMenuScreen(_player, _map);
+					// Update menu screen
+					setMenuScreen(_player, _map);
+				}
+			);
 		}
 	};
 
