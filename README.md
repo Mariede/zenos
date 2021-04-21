@@ -93,6 +93,7 @@ It will be converted to a React application soon enough!
 
 ### Json element
  * **id**: Mandatory. A number that specifies a unique identifier for the element.
+ * **name**: Optional. The name of the element. Can appear at hit log.
  * **life**: Optional. If the element has a life property it can take hits and be destroyed.
    > If life property exists, when it reaches zero the element will disappear from the map
  * **damageTakenFactor**: Only applicable if element has a life property (default 50). It is like the armor, but the less the better.

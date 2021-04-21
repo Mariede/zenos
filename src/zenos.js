@@ -1497,11 +1497,14 @@
 		const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
 
 		const logToWrite = (
-			_hitBonus !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
-				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; hitted by <strong>${_lifeModifierFinal}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
-			) : (
-				`${_elementTakingHit.name ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${_elementTakingHit.id}</strong>`} &#10144; loses <strong>${_lifeModifierFinal}</strong> (time)`
-			)
+			`${!_elementTakingHit.id ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${(_elementTakingHit.name || _elementTakingHit.id)}</strong>`} &#10144;
+				${
+					_hitBonus !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
+						` hitted by <strong>${_lifeModifierFinal}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
+					) : (
+						` loses <strong>${_lifeModifierFinal}</strong> (time)`
+					)
+				}`
 		);
 
 		hitLogContent.innerHTML = `<div class="${_elementTakingHit.life > 0 ? (_lifeModifierFinal > 0 ? 'lose' : 'gain') : 'dead'}">${logToWrite}</div>${hitLogContent.innerHTML}`;
@@ -1892,6 +1895,7 @@
 					},
 					{
 						id: 11,
+						name: 'Gamon',
 						life: 750,
 						damageTakenFactor: 15, // Only applicable if element has a life property
 						type: 3,
@@ -1917,6 +1921,7 @@
 					},
 					{
 						id: 12,
+						name: 'Zok',
 						life: 950,
 						damageTakenFactor: 25, // Only applicable if element has a life property
 						type: 3,
@@ -1940,6 +1945,7 @@
 					},
 					{
 						id: 13,
+						name: 'Tundro',
 						life: 400,
 						damageTakenFactor: 45, // Only applicable if element has a life property
 						type: 101, // Type 100 and 101 defines the plataform mode (element can have a direction, but can not move)

@@ -16,7 +16,10 @@
 			const toggleHitLogContent = e => {
 				e.preventDefault();
 				const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content');
-				hitLogContent.classList.toggle('hide');
+
+				if (hitLogContent.hasChildNodes()) {
+					hitLogContent.classList.toggle('hide');
+				}
 			};
 		</script>
 	</head>
