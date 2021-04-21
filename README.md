@@ -88,6 +88,8 @@ It will be converted to a React application soon enough!
 
 ## Map elements entities
  * Array containing **all the elements** that exists inside the map (map elements).
+ * Can be structures, walls, doors, keys, food, ornaments, objects, monsters, ...
+ * If it has a life property, can use a moving "aggro" algoritm.
 
 ### Json element
  * **id**: Mandatory. A number that specifies a unique identifier for the element.
