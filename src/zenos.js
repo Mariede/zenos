@@ -752,6 +752,8 @@
 			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _player);
 
 			if (![100, 101].includes(_mapElement.type)) { // Types 100 and 101 defines the platform mode. Element map has a direction but can not move
+				moveMapElementRangeLimit(_mapElement, playerHasAggro);
+
 				if (_mapElement.step.x) {
 					if (_mapElement.step.x !== 0) {
 						_mapElement.x += _mapElement.step.x;
@@ -764,8 +766,6 @@
 					}
 				}
 			}
-
-			moveMapElementRangeLimit(_mapElement, playerHasAggro);
 		}
 	};
 
@@ -1665,9 +1665,16 @@
 
 		clearInterval($intervalTimer);
 
+		// Keyboard listeners
 		document.body.removeEventListener(
 			'keydown',
 			$keyDownHandlerBeginGame,
+			false
+		);
+
+		document.body.addEventListener(
+			'keypress',
+			listeners.keyPressHandlerRestartGame,
 			false
 		);
 
@@ -1710,7 +1717,13 @@
 			1000
 		);
 
-		// Game keyboard listener
+		// Keyboard listeners
+		document.body.removeEventListener(
+			'keypress',
+			listeners.keyPressHandlerRestartGame,
+			false
+		);
+
 		document.body.addEventListener(
 			'keydown',
 			$keyDownHandlerBeginGame,
@@ -2349,17 +2362,5 @@
 		}
 	};
 
-	// Load game
-	const loadGame = () => {
-		// Load listener
-		document.body.addEventListener(
-			'keypress',
-			listeners.keyPressHandlerRestartGame,
-			false
-		);
-
-		startGame();
-	};
-
-	loadGame();
+	startGame();
 })();
