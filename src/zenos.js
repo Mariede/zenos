@@ -792,7 +792,7 @@
 			const elementHasLife = Object.prototype.hasOwnProperty.call(mapElement, 'life');
 
 			if (elementHasLife && mapElement.life <= 0) {
-				const itemToRemove = mapElements.findIndex(item => item.id === mapElement.id);
+				const itemToRemove = mapElements.findIndex(item => mapElement.id && item.id === mapElement.id);
 
 				if (itemToRemove !== -1) {
 					mapElements.splice(itemToRemove, 1);
@@ -963,139 +963,180 @@
 	// -----------------------------------------------------------------------------------------------
 	// Collisions
 	// -----------------------------------------------------------------------------------------------
+	const collisionAvoidPenetration = (_checkElement, _mapElement, _phase) => {
+		const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement (target)
+			const aidValues = {};
 
-	const collisionActions = (_checkElement, _mapElement, _mapElements, phase) => {
-		if ([8, 9].includes(_checkElement.type) && _checkElement.id) { // Remove origin element
-			const itemToRemove = _mapElements.findIndex(item => item.id === _checkElement.id);
+			const mapRadius2CirclesDistanceX = (
+				_checkElement.radius && _mapElement.radius && (
+					Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.y - _mapElement.y) ** 2))
+				)
+			) || 0;
 
-			if (itemToRemove !== -1) {
-				_mapElements.splice(itemToRemove, 1);
+			const mapRadius2CirclesDistanceY = (
+				_checkElement.radius && _mapElement.radius && (
+					Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.x - _mapElement.x) ** 2))
+				)
+			) || 0;
+
+			const mapRadiusReflexionX = (
+				mapRadius2CirclesDistanceX ? ( // Only circle x circle
+					mapRadius2CirclesDistanceX - _checkElement.radius
+				) : (
+					_mapElement.radius
+				)
+			);
+
+			const mapRadiusReflexionY = (
+				mapRadius2CirclesDistanceY ? ( // Only circle x circle
+					mapRadius2CirclesDistanceY - _checkElement.radius
+				) : (
+					_mapElement.radius
+				)
+			);
+
+			aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
+			aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
+			aidValues.baseMapElementDistanceX = _mapElement.radius ? mapRadiusReflexionX : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
+			aidValues.baseMapElementDistanceY = _mapElement.radius ? mapRadiusReflexionY : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
+
+			return aidValues;
+		};
+
+		const aidValues = _getAidValues(_checkElement, _mapElement);
+
+		if (_checkElement.step.x !== 0) {
+			const adjustPenetrationX = (
+				Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
+			);
+
+			if (_phase === 1 && _checkElement.step.x < 0) {
+				if (adjustPenetrationX) {
+					_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
+					return _phase;
+				}
+			} else if (_phase === 2 && _checkElement.step.x > 0) {
+				if (adjustPenetrationX) {
+					_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
+					return _phase;
+				}
 			}
 		}
 
-		switch (_mapElement.type) {
-			case 2:
-			case 3: // Keep origin movement - no penetration in target element
-			case 100:
-			case 101: // Keep origin movement - no penetration in target element - platform mode (stacked in place)
-			case 4:
-			case 5: // Stop origin movement - no penetration in target element
-			case 6:
-			case 7: { // Revert origin movement - no penetration in target element
-				const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement (target)
-					const aidValues = {};
+		if (_checkElement.step.y !== 0) {
+			const adjustPenetrationY = (
+				Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
+			);
 
-					const mapRadius2CirclesDistanceX = (
-						_checkElement.radius && _mapElement.radius && (
-							Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.y - _mapElement.y) ** 2))
-						)
-					) || 0;
+			if (_phase === 3 && _checkElement.step.y < 0) {
+				if (adjustPenetrationY) {
+					_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
+					return _phase;
+				}
+			} else if (_phase === 4 && _checkElement.step.y > 0) {
+				if (adjustPenetrationY) {
+					_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
+					return _phase;
+				}
+			}
+		}
 
-					const mapRadius2CirclesDistanceY = (
-						_checkElement.radius && _mapElement.radius && (
-							Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.x - _mapElement.x) ** 2))
-						)
-					) || 0;
+		return -1;
+	};
 
-					const mapRadiusReflexionX = (
-						mapRadius2CirclesDistanceX ? ( // Only circle x circle
-							mapRadius2CirclesDistanceX - _checkElement.radius
-						) : (
-							_mapElement.radius
-						)
-					);
+	const collisionActions = (_checkElement, _mapElement, _mapElements, phase) => {
+		/*
+		Validation at origin element (type)
+		*/
+		switch (_checkElement.type) {
+			/*
+			Origin element disappear (destroyed)
+			*/
+			case 8:
+			case 9: { // Both elements removed from map - origin and target
+				const itemToRemove = _mapElements.findIndex(item => _checkElement.id && item.id === _checkElement.id);
 
-					const mapRadiusReflexionY = (
-						mapRadius2CirclesDistanceY ? ( // Only circle x circle
-							mapRadius2CirclesDistanceY - _checkElement.radius
-						) : (
-							_mapElement.radius
-						)
-					);
-
-					aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
-					aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
-					aidValues.baseMapElementDistanceX = _mapElement.radius ? mapRadiusReflexionX : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
-					aidValues.baseMapElementDistanceY = _mapElement.radius ? mapRadiusReflexionY : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
-
-					return aidValues;
-				};
-
-				const aidValues = _getAidValues(_checkElement, _mapElement);
-
-				if (_checkElement.step.x !== 0) {
-					const _executeActionX = (_checkElement, _mapElement) => {
-						switch (_mapElement.type) {
-							case 4:
-							case 5: {
-								_checkElement.step.x = 0;
-								break;
-							}
-							case 6:
-							case 7: {
-								_checkElement.step.x = -_checkElement.step.x;
-								break;
-							}
-						}
-					};
-
-					const adjustPenetrationX = (
-						Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
-					);
-
-					if (phase === 1 && _checkElement.step.x < 0) {
-						if (adjustPenetrationX) {
-							_checkElement.x = _mapElement.x + aidValues.baseCheckElementDistanceX + aidValues.baseMapElementDistanceX;
-							_executeActionX(_checkElement, _mapElement);
-						}
-					} else if (phase === 2 && _checkElement.step.x > 0) {
-						if (adjustPenetrationX) {
-							_checkElement.x = _mapElement.x - aidValues.baseCheckElementDistanceX - aidValues.baseMapElementDistanceX;
-							_executeActionX(_checkElement, _mapElement);
-						}
-					}
+				if (itemToRemove !== -1) {
+					_mapElements.splice(itemToRemove, 1);
 				}
 
-				if (_checkElement.step.y !== 0) {
-					const _executeActionY = (_checkElement, _mapElement) => {
-						switch (_mapElement.type) {
-							case 4:
-							case 5: {
-								_checkElement.step.y = 0;
-								break;
-							}
-							case 6:
-							case 7: {
-								_checkElement.step.y = -_checkElement.step.y;
-								break;
-							}
-						}
-					};
+				break;
+			}
+		}
 
-					const adjustPenetrationY = (
-						Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
-					);
+		/*
+		Validation at target element (type)
+		*/
+		switch (_mapElement.type) {
+			/*
+			No penetration in target element
+			*/
+			case 2:
+			case 3: // Keep origin movement
+			case 100:
+			case 101: // Keep origin movement - platform mode (stacked in place)
+			case 4:
+			case 5: // Stop origin movement
+			case 6:
+			case 7: { // Revert origin movement
+				// ------------------------------------------------------------
+				// Effect actions
+				const _executeActionX = (_checkElement, _mapElement) => {
+					switch (_mapElement.type) {
+						case 4:
+						case 5: {
+							_checkElement.step.x = 0;
+							break;
+						}
+						case 6:
+						case 7: {
+							_checkElement.step.x = -_checkElement.step.x;
+							break;
+						}
+					}
+				};
 
-					if (phase === 3 && _checkElement.step.y < 0) {
-						if (adjustPenetrationY) {
-							_checkElement.y = _mapElement.y + aidValues.baseCheckElementDistanceY + aidValues.baseMapElementDistanceY;
-							_executeActionY(_checkElement, _mapElement);
+				const _executeActionY = (_checkElement, _mapElement) => {
+					switch (_mapElement.type) {
+						case 4:
+						case 5: {
+							_checkElement.step.y = 0;
+							break;
 						}
-					} else if (phase === 4 && _checkElement.step.y > 0) {
-						if (adjustPenetrationY) {
-							_checkElement.y = _mapElement.y - aidValues.baseCheckElementDistanceY - aidValues.baseMapElementDistanceY;
-							_executeActionY(_checkElement, _mapElement);
+						case 6:
+						case 7: {
+							_checkElement.step.y = -_checkElement.step.y;
+							break;
 						}
+					}
+				};
+				// ------------------------------------------------------------
+
+				const executeActions = collisionAvoidPenetration(_checkElement, _mapElement, phase);
+
+				switch (executeActions) {
+					case 1:
+					case 2: { // Actions at x axis
+						_executeActionX(_checkElement, _mapElement);
+						break;
+					}
+					case 3:
+					case 4: { // Actions at y axis
+						_executeActionY(_checkElement, _mapElement);
+						break;
 					}
 				}
 
 				break;
 			}
+			/*
+			Target element disappear (destroyed)
+			*/
 			case 8:
-			case 9: // Target disappear (both elements removed from map - origin and target)
+			case 9: // Both elements removed from map - origin and target
 			case 10:
-			case 11: { // Target disappear (element removed from map)
-				const itemToRemove = _mapElements.findIndex(item => item.id === _mapElement.id);
+			case 11: { // Target element removed from map
+				const itemToRemove = _mapElements.findIndex(item => _mapElement.id && item.id === _mapElement.id);
 
 				if (itemToRemove !== -1) {
 					_mapElements.splice(itemToRemove, 1);
