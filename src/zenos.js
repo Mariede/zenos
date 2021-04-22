@@ -1980,7 +1980,7 @@
 						y: 50,
 						currentDirection: 11, // Must have for getting and drawning element direction
 						hitBonus: 30, // Only applicable if element type can hit
-						playerAggroRange: 280, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						playerAggroRange: 300, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						style: {
 							color: {
 								body: '%elements.12.style.color.body',
@@ -1995,16 +1995,16 @@
 					{
 						id: 13,
 						name: 'Tundro',
-						life: 400,
+						life: 450,
 						damageTakenFactor: 45, // Only applicable if element has a life property
-						type: 101, // Type 100 and 101 defines the plataform mode (element can have a direction, but can not move)
+						type: 3,
 						width: 35,
 						height: 35,
 						x: 700,
 						y: 150,
 						currentDirection: 10, // Must have for getting and drawning element direction
 						hitBonus: 200, // Only applicable if element type can hit
-						playerAggroRange: 400, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						playerAggroRange: 150, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						style: {
 							color: {
 								body: 'brown',
@@ -2013,7 +2013,31 @@
 						},
 						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
 							x: 0,
-							y: 1
+							y: 0
+						}
+					},
+					{
+						id: 14,
+						name: 'Shot tower',
+						life: 2000,
+						damageTakenFactor: 45, // Only applicable if element has a life property
+						type: 101, // Type 100 and 101 defines the plataform mode (element can have a direction, but can not move)
+						width: 60,
+						height: 60,
+						x: 21,
+						y: 21,
+						currentDirection: 10, // Must have for getting and drawning element direction
+						hitBonus: 100, // Only applicable if element type can hit
+						playerAggroRange: 600, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						style: {
+							color: {
+								body: 'blue',
+								details: 'green'
+							}
+						},
+						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
+							x: 0,
+							y: 0
 						}
 					}
 				]
