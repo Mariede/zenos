@@ -1207,6 +1207,14 @@
 			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
 		);
 
+		const _rectanglesCollisionBackward = (_checkCoord1, _mapCoord1, _checkCood2, _mapCood2) => (
+			_checkCoord1 <= _mapCoord1 && _checkCood2 > _mapCood2
+		);
+
+		const _rectanglesCollisionFoward = (_checkCoord1, _mapCoord1, _checkCood2, _mapCood2) => (
+			_checkCoord1 >= _mapCoord1 && _checkCood2 < _mapCood2
+		);
+
 		const _goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
 			const secureCollisionValue = Math.abs(checkStep) + 1;
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
@@ -1234,13 +1242,13 @@
 				_mapRadius ? (
 					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
 				) : (
-					_checkCoord - _checkRadius <= _mapCoord + _mapComplement && _checkCoord - _checkRadius > _mapCoord
+					_rectanglesCollisionBackward(_checkCoord - _checkRadius, _mapCoord + _mapComplement, _checkCoord - _checkRadius, _mapCoord)
 				)
 			) : (
 				_mapRadius ? (
-					_checkCoord <= _mapCoord + _mapRadius && _checkCoord > _mapCoord - _mapRadius
+					_rectanglesCollisionBackward(_checkCoord, _mapCoord + _mapRadius, _checkCoord, _mapCoord - _mapRadius)
 				) : (
-					_checkCoord <= _mapCoord + _mapComplement && _checkCoord > _mapCoord
+					_rectanglesCollisionBackward(_checkCoord, _mapCoord + _mapComplement, _checkCoord, _mapCoord)
 				)
 			)
 		);
@@ -1251,13 +1259,13 @@
 				_mapRadius ? (
 					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
 				) : (
-					_checkCoord + _checkRadius >= _mapCoord && _checkCoord + _checkRadius < _mapCoord + _mapComplement
+					_rectanglesCollisionFoward(_checkCoord + _checkRadius, _mapCoord, _checkCoord + _checkRadius, _mapCoord + _mapComplement)
 				)
 			) : (
 				_mapRadius ? (
-					_checkCoord + _checkComplement >= _mapCoord - _mapRadius && _checkCoord + _checkComplement < _mapCoord + _mapRadius
+					_rectanglesCollisionFoward(_checkCoord + _checkComplement, _mapCoord - _mapRadius, _checkCoord + _checkComplement, _mapCoord + _mapRadius)
 				) : (
-					_checkCoord + _checkComplement >= _mapCoord && _checkCoord + _checkComplement < _mapCoord + _mapComplement
+					_rectanglesCollisionFoward(_checkCoord + _checkComplement, _mapCoord, _checkCoord + _checkComplement, _mapCoord + _mapComplement)
 				)
 			)
 		);
