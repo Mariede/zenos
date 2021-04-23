@@ -13,6 +13,7 @@
 			_isTakingDamage - true when element is taking damage (if applicabble)
 			_isShieldUp - true when element shield is up (if applicabble)
 			_isTimeBetweenHits - must be lower than next hit time for a melee hit to be cast
+			_isTimeBetweenShootingHits - must be lower than next hit time for a ranged shooting hit to be cast (does not exists for players)
 			_savedBody - for blinking style body color of element (when taking damage)
 			_savedDetails - for blinking style details color of element (when shooting)
 			_savedX - for map elements when getting aggro to save last step x value
@@ -26,7 +27,7 @@
 		playerAggroRange: 200, // Range (in pixels) where player can get a map element aggro
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
-		hitPauseTimeCheck: [5, 5000], // Only for map elements that can shoot: [maxHitTrigger ,timeToWait] (timeToWait in miliseconds)
+		hitPauseTimeCheck: [5, 6000], // Only for map elements that can shoot: [maxHitTrigger ,timeToWait] (timeToWait in miliseconds)
 		isTakingDamageColor: 'red',
 		isShootingColor: 'lightcyan',
 		shootSpeed: 15,
@@ -656,7 +657,7 @@
 		if (newShootData) {
 			const currentHitTimeCheck = Date.now();
 
-			if (!_mapElement._isTimeBetweenHits || currentHitTimeCheck > _mapElement._isTimeBetweenHits) {
+			if (!_mapElement._isTimeBetweenShootingHits || currentHitTimeCheck > _mapElement._isTimeBetweenShootingHits) {
 				const chekInfiniteAmmo = newShootData.charges === -1;
 				const chargesLeft = !chekInfiniteAmmo && newShootData.charges;
 
@@ -684,7 +685,7 @@
 					)
 				);
 
-				_mapElement._isTimeBetweenHits = currentHitTimeCheck + (_mapElement.timeBetweenHits || defaults.timeBetweenHits) + hittingPause;
+				_mapElement._isTimeBetweenShootingHits = currentHitTimeCheck + (_mapElement.timeBetweenHits || defaults.timeBetweenHits) + hittingPause;
 			}
 		}
 	};
@@ -2075,7 +2076,7 @@
 						currentDirection: 11, // Must have for getting and drawning element direction
 						hitBonus: 30, // Only applicable if element type can hit
 						playerAggroRange: 300, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
-						hitPauseTimeCheck: [3, 4000], // Optional, only applicable if element can shoot ([maxHitTrigger ,timeToWait] (timeToWait in miliseconds))
+						hitPauseTimeCheck: [6, 5000], // Optional, only applicable if element can shoot ([maxHitTrigger ,timeToWait] (timeToWait in miliseconds))
 						style: {
 							color: {
 								body: '%elements.12.style.color.body',

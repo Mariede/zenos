@@ -21,7 +21,7 @@ It will be converted to a React application soon enough!
  * **damageTakenFactor**: Optional (default 50). It is like the armor, but the less the better.
    > Don't go above 50 or it will become less usefull
  * **timeBetweenHits**: Optional (default 450). It is the time between player hits.
-   > In miliseconds
+   > In miliseconds - not applicable for shooting hits, only melee
  * **type**: Mandatory. It is a number. Every element in the map has a type.
    > See more about element types below - we use type 3 for players (a type 3 can hit)
  * **radius** or **width**/**height**: Mandatory exclusive. Radius for circles, Width/Height for rectangles. It is the body hit box.
@@ -103,7 +103,7 @@ It will be converted to a React application soon enough!
  * **damageTakenFactor**: Only applicable if element has a life property (default 50). It is like the armor, but the less the better.
    > Don't go above 50 or it will become less usefull
  * **timeBetweenHits**: Only applicable if element type can hit (default 450). It is the time between element hits.
-   > In miliseconds
+   > In miliseconds -  melee or ranged (if applicable)
  * **type**: Mandatory. It is a number. Every element in the map has a type.
    > See more about element types below
  * **radius** or **width**/**height**: Mandatory exclusive. Radius for circles, Width/Height for rectangles. It is the body hit box.
@@ -132,6 +132,8 @@ It will be converted to a React application soon enough!
  * **_isShooting**: true when element is shooting (if applicable).
  * **_isTakingDamage**: true when element is taking damage.
  * **_isTimeBetweenHits**: must be lower than next hit time for a hit to be cast (miliseconds).
+ * **_isTimeBetweenShootingHits** must be lower than next hit time for a ranged shooting hit to be cast (miliseconds).
+   > Does not exists for players
  * **_savedBody**: for blinking style body color of element (when taking damage).
  * **_savedDetails**: for blinking style details color of element (when shooting - if applicable).
  * **_savedX**: for map elements when getting aggro to save last step x value.
