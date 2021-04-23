@@ -115,6 +115,8 @@ It will be converted to a React application soon enough!
    > Only applicable if the origin element type **can hit** and the target has a **life property**
  * **playerAggroRange**: Optional (default 200). Range (in pixels) where player can get a map element aggro.
    > A map element can be aggressive (aggro) only if it has a **life** property and **playerAggroRange** property **is not equal -1**
+ * **hitPauseTimeCheck**: Optional (default [5, 5000]). For hitting pause time checks, only for map elements that can shoot.
+   > [maxHitTrigger ,timeToWait] - **maxHitTrigger** is a positive integer, **timeToWait** in miliseconds
  * **style**: Defines the style of the element drawn - color of hitbox body.
    > Body receives the image when using images or sprites
  * **step**: Only applicable if element can move:
@@ -134,6 +136,7 @@ It will be converted to a React application soon enough!
  * **_savedDetails**: for blinking style details color of element (when shooting - if applicable).
  * **_savedX**: for map elements when getting aggro to save last step x value.
  * **_savedY**: for map elements when getting aggro to save last step y value.
+ * **_hitAmount**: for map elements only when shooting: counter for hit pause time checks.
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101).

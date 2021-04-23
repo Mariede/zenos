@@ -17,6 +17,7 @@
 			_savedDetails - for blinking style details color of element (when shooting)
 			_savedX - for map elements when getting aggro to save last step x value
 			_savedY - for map elements when getting aggro to save last step y value
+			_hitAmount - for map elements only when shooting: counter for hit pause time checks
 	*/
 
 	// Default values
@@ -25,6 +26,7 @@
 		playerAggroRange: 200, // Range (in pixels) where player can get a map element aggro
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
+		hitPauseTimeCheck: [5, 5000], // Only for map elements that can shoot: [maxHitTrigger ,timeToWait] (timeToWait in miliseconds)
 		isTakingDamageColor: 'red',
 		isShootingColor: 'lightcyan',
 		shootSpeed: 15,
@@ -663,10 +665,21 @@
 
 					if (!chekInfiniteAmmo) {
 						_mapElement.skills.weapon.shoot.charges -= 1;
+						_mapElement._hitAmount = (_mapElement._hitAmount || 0) + 1; // For hitting pause checks
 					}
 				}
 
-				_mapElement._isTimeBetweenHits = currentHitTimeCheck + (_mapElement.timeBetweenHits || defaults.timeBetweenHits);
+				const [maxHitTrigger, timeToWait] = (_mapElement.hitPauseTimeCheck || defaults.hitPauseTimeCheck); // For hitting pause checks
+
+				const hittingPause = (
+					_mapElement._hitAmount % maxHitTrigger === 0 ? (
+						timeToWait
+					) : (
+						0
+					)
+				);
+
+				_mapElement._isTimeBetweenHits = currentHitTimeCheck + (_mapElement.timeBetweenHits || defaults.timeBetweenHits) + hittingPause;
 			}
 		}
 	};
@@ -2057,6 +2070,7 @@
 						currentDirection: 11, // Must have for getting and drawning element direction
 						hitBonus: 30, // Only applicable if element type can hit
 						playerAggroRange: 300, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						hitPauseTimeCheck: [3, 4000], // Optional, only applicable if element can shoot ([maxHitTrigger ,timeToWait] (timeToWait in miliseconds))
 						style: {
 							color: {
 								body: '%elements.12.style.color.body',
