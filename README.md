@@ -15,6 +15,7 @@ It will be converted to a React application soon enough!
  * Blinks when shoot or loses life.
 
 ### Json element
+ * **idPlayer**: Mandatory. A number that specifies a unique identifier for the player.
  * **name**: Mandatory. The name of the player.
  * **life**: Mandatory. When it reaches zero game ends.
  * **damageTakenFactor**: Optional (default 50). It is like the armor, but the less the better.
@@ -70,6 +71,8 @@ It will be converted to a React application soon enough!
  * Personalized styles (backgrounds, borders, colors).
 
 ### Json element
+ * **idMap**: Mandatory. A number that specifies a unique identifier for the map.
+ * **name**: Mandatory. The name of the map.
  * **timer**: Mandatory. Map timer - when it reachs zero game ends.
  * **baseLineWidth**: Mandatory. Map border thickness.
  * **style**:

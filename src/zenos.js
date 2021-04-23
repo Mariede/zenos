@@ -1749,6 +1749,7 @@
 		*/
 		const mapsFillSpecial = [
 			{
+				idMap: 1,
 				fillers: [
 					{
 						id: '%style.fillStyle%',
@@ -1811,6 +1812,8 @@
 		*/
 		const maps = [
 			{
+				idMap: 1,
+				name: 'Unstable void',
 				timer: 900,
 				baseLineWidth: 20,
 				style: {
@@ -2017,7 +2020,6 @@
 						y: 150,
 						currentDirection: 10, // Must have for getting and drawning element direction
 						hitBonus: 200, // Only applicable if element type can hit
-						playerAggroRange: 150, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						style: {
 							color: {
 								body: 'brown',
@@ -2124,8 +2126,8 @@
 	const loadMapData = (_mapsFillSpecial, _maps, _mapId) => (
 		new Promise(
 			(resolve, reject) => {
-				const mapFillSpecial = _mapsFillSpecial[_mapId].fillers;
-				const map = _maps[_mapId];
+				const mapFillSpecial = _mapsFillSpecial.filter(map => _mapId && map.idMap === _mapId).pop().fillers;
+				const map = _maps.filter(map => _mapId && map.idMap === _mapId).pop();
 
 				const arrFillSpecial = [];
 
@@ -2217,7 +2219,7 @@
 	);
 
 	const setMap = (_action, _canvas, _cx, _player) => {
-		getMapData(_cx, 0)
+		getMapData(_cx, 1)
 		.then(
 			map => {
 				// Initial map player coordinates
@@ -2272,6 +2274,7 @@
 	const playersRepo = () => {
 		const playersRepo = [
 			{
+				idPlayer: 1,
 				name: 'Mike',
 				life: 500,
 				damageTakenFactor: 35, // Only applicable if element has a life property
@@ -2327,11 +2330,11 @@
 
 	const getPlayerData = playerId => {
 		const players = playersRepo();
-		return players[playerId];
+		return players.filter(player => playerId && player.idPlayer === playerId).pop();
 	};
 
 	const setPlayer = (_action, _canvas, _cx) => {
-		const player = getPlayerData(0);
+		const player = getPlayerData(1);
 		setMap(_action, _canvas, _cx, player);
 	};
 
