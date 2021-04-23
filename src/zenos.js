@@ -766,7 +766,7 @@
 					}
 				} else {
 					if (validateAggroX) {
-						_mapElement.step.x = Math.abs(_player.step.x);
+						_mapElement.step.x = -_player.step.x;
 					}
 				}
 
@@ -780,7 +780,7 @@
 					}
 				} else {
 					if (validateAggroY) {
-						_mapElement.step.y = Math.abs(_player.step.y);
+						_mapElement.step.y = -_player.step.y;
 					}
 				}
 
