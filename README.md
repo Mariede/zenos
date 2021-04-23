@@ -54,7 +54,7 @@ It will be converted to a React application soon enough!
  * **_isShooting**: true when element is shooting.
  * **_isTakingDamage**: true when element is taking damage.
  * **_isShieldUp**: true when element shield is up.
- * **_isTimeBetweenHits**: must be lower than next hit time for a melee hit to be cast (miliseconds).
+ * **_isTimeBetweenHits**: must be lower than next hit time for a hit to be cast (miliseconds).
  * **_savedBody**: for blinking style body color of element (when taking damage).
  * **_savedDetails**: for blinking style details color of element (when shooting).
 
@@ -93,6 +93,7 @@ It will be converted to a React application soon enough!
  * Array containing **all the elements** that exists inside the map (map elements).
  * Can be structures, walls, towers, doors, keys, food, ornaments, objects, monsters, ...
  * If it has a life property, can use a moving "aggro" algoritm.
+ * Can have actions like shoot or hit.
 
 ### Json element
  * **id**: Mandatory. A number that specifies a unique identifier for the element.
@@ -126,9 +127,11 @@ It will be converted to a React application soon enough!
         * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
 
 ### Temporary json bindings at execution time
+ * **_isShooting**: true when element is shooting (if applicable).
  * **_isTakingDamage**: true when element is taking damage.
- * **_isTimeBetweenHits**: must be lower than next hit time for a melee hit to be cast (miliseconds).
+ * **_isTimeBetweenHits**: must be lower than next hit time for a hit to be cast (miliseconds).
  * **_savedBody**: for blinking style body color of element (when taking damage).
+ * **_savedDetails**: for blinking style details color of element (when shooting - if applicable).
  * **_savedX**: for map elements when getting aggro to save last step x value.
  * **_savedY**: for map elements when getting aggro to save last step y value.
 

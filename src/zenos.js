@@ -638,6 +638,47 @@
 	// Map
 	// -----------------------------------------------------------------------------------------------
 
+	// Shooting action (if applicable)
+	const elementActionShot = (_mapElement, _map) => {
+		const newShootData = (_mapElement.skills && _mapElement.skills.weapon && _mapElement.skills.weapon.shoot) ? (
+			_mapElement.skills.weapon.shoot
+		) : (
+			undefined
+		);
+
+		if (newShootData) {
+			const currentHitTimeCheck = Date.now();
+
+			if (!_mapElement._isTimeBetweenHits || currentHitTimeCheck > _mapElement._isTimeBetweenHits) {
+				const chekInfiniteAmmo = newShootData.charges === -1;
+				const chargesLeft = !chekInfiniteAmmo && newShootData.charges;
+
+				if (chekInfiniteAmmo || chargesLeft > 0) {
+					const newShootDataBaseElement = { ...newShootData.baseElement };
+					const newShootDataSpeed = newShootData.shootSpeed;
+
+					_drawnElementShot(_mapElement, _map, newShootDataBaseElement, newShootDataSpeed);
+
+					_mapElement._isShooting = true;
+
+					if (!chekInfiniteAmmo) {
+						_mapElement.skills.weapon.shoot.charges -= 1;
+					}
+				}
+
+				_mapElement._isTimeBetweenHits = currentHitTimeCheck + (_mapElement.timeBetweenHits || defaults.timeBetweenHits);
+			}
+		}
+	};
+
+	// Execute element action (if applicable)
+	const _executeElementActions = (_mapElement, _map, _playerHasAggro) => {
+		if (_playerHasAggro) {
+			// Check shooting action
+			elementActionShot(_mapElement, _map);
+		}
+	};
+
 	// Check step range limits (if applicable)
 	const moveMapElementRangeLimit = (_mapElement, _playerHasAggro) => {
 		if (!_playerHasAggro && _mapElement.step.rangeLimit) {
@@ -766,7 +807,11 @@
 					}
 				}
 			}
+
+			return playerHasAggro;
 		}
+
+		return false;
 	};
 
 	const drawMapElements = (_cx, _player, _map) => {
@@ -781,6 +826,18 @@
 				}
 
 				_mapElement.style.color.body = _mapElement.style.color._savedBody;
+			}
+
+			// Weapon shoot
+			if (_mapElement._isShooting) {
+				_mapElement.style.color.details = (_mapElement.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
+				_mapElement._isShooting = false;
+			} else {
+				if (!_mapElement.style.color._savedDetails) {
+					_mapElement.style.color._savedDetails = _mapElement.style.color.details; // Temporary
+				}
+
+				_mapElement.style.color.details = _mapElement.style.color._savedDetails;
 			}
 		};
 
@@ -799,7 +856,7 @@
 				}
 			} else {
 				// Movement (if applicable)
-				moveMapElement(mapElement, _player);
+				const playerHasAggro = moveMapElement(mapElement, _player);
 
 				// Collisions
 				checkElementCollisions(mapElement, _player, _map);
@@ -812,6 +869,9 @@
 
 				// Drawn element details (damage, ...)
 				_drawnElementDetails(mapElement);
+
+				// Execute element actions (if applicable)
+				_executeElementActions(mapElement, _map, playerHasAggro);
 			}
 		}
 	};
@@ -1940,7 +2000,7 @@
 							}
 						},
 						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
-							x: 4,
+							x: 6,
 							y: 0
 						}
 					},
@@ -1976,7 +2036,7 @@
 							}
 						},
 						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
-							x: -1,
+							x: -2,
 							y: 2,
 							rangeLimit: { // Range limit for x or y movement (only for map elements)
 								maxX: 600,
@@ -2006,6 +2066,25 @@
 						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
 							x: 1,
 							y: 1
+						},
+						skills: {
+							weapon: {
+								shoot: {
+									isShootingColor: 'yellow',
+									shootSpeed: 15,
+									charges: 50, // -1 for infinite ammo
+									baseElement : { // New element guide (basic data)
+										type: 9, // Always use 9 for munition element (disappear on collision)
+										radius: 10, // Always use radius for munition element (centering)
+										hitBonus: 60, // Only applicable if element type can hit (ranged)
+										style: {
+											color: {
+												body: 'red'
+											}
+										}
+									}
+								}
+							}
 						}
 					},
 					{
@@ -2053,6 +2132,25 @@
 						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
 							x: 0,
 							y: 0
+						},
+						skills: {
+							weapon: {
+								shoot: {
+									isShootingColor: 'yellow',
+									shootSpeed: 5,
+									charges: 200, // -1 for infinite ammo
+									baseElement : { // New element guide (basic data)
+										type: 9, // Always use 9 for munition element (disappear on collision)
+										radius: 30, // Always use radius for munition element (centering)
+										hitBonus: 150, // Only applicable if element type can hit (ranged)
+										style: {
+											color: {
+												body: 'red'
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				]
