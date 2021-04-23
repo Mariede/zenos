@@ -59,6 +59,11 @@
 		);
 	};
 
+	// Generate stronger id (use it with max id from the array)
+	const _generateStrongId = lastFoundId => (
+		lastFoundId + 1 + Math.floor(Math.random() * 1000)
+	);
+
 	// Find object key by its value (id) and replace with new value (first one found)
 	const _objFindAndReplace = (_obj, _searchValue, _replaceValue) => {
 		Object.keys(_obj).some(
@@ -446,7 +451,7 @@
 		);
 
 		const newShootDataAttach = {
-			id: shootDataId + 1,
+			id: _generateStrongId(shootDataId),
 			x: shootDataX,
 			y: shootDataY,
 			step: {
