@@ -692,8 +692,8 @@
 		}
 	};
 
-	// Execute element action (if applicable)
-	const _executeElementActions = (_mapElement, _map, _playerHasAggro) => {
+	// Execute element actions (if applicable)
+	const elementActions = (_mapElement, _map, _playerHasAggro) => {
 		if (_playerHasAggro) {
 			// Check shooting action
 			elementActionShot(_mapElement, _map);
@@ -892,7 +892,7 @@
 				_drawnElementDetails(mapElement);
 
 				// Execute element actions (if applicable)
-				_executeElementActions(mapElement, _map, playerHasAggro);
+				elementActions(mapElement, _map, playerHasAggro);
 			}
 		}
 	};
@@ -1125,6 +1125,7 @@
 		return -1;
 	};
 
+	// Execute collision actions
 	const collisionActions = (_checkElement, _mapElement, _mapElements, phase) => {
 		/*
 		Validation at origin element (type)
@@ -1861,6 +1862,11 @@
 						type: 2
 					},
 					{
+						id: '%elements.6.style.color.body%',
+						content: './images/brick2.png',
+						type: 2
+					},
+					{
 						id: '%elements.11.style.color.body',
 						content: _cx => {
 							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
@@ -1926,14 +1932,14 @@
 				elements: [
 					{
 						id: 1,
-						type: 2,
-						width: 60,
+						type: 3,
+						width: 65,
 						height: 260,
-						x: 158,
+						x: 148,
 						y: 198,
 						style: {
 							color: {
-								body: 'black'
+								body: 'rgba(238, 238, 238, 0.6)'
 							}
 						}
 					},
@@ -1998,7 +2004,7 @@
 						y: 280,
 						style: {
 							color: {
-								body: 'pink'
+								body: '%elements.6.style.color.body%'
 							}
 						}
 					},
