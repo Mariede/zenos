@@ -62,7 +62,7 @@
 		);
 	};
 
-	// Generate stronger id (use it with max id from the array)
+	// Generate stronger id (use it with max id from the map elements array)
 	const _generateStrongId = lastFoundId => (
 		lastFoundId + 1 + Math.floor(Math.random() * 1000)
 	);
@@ -1534,6 +1534,13 @@
 
 					elementTakingHit.life = (elementResultedLife > 0 ? elementResultedLife : 0);
 
+					// Increase Aggro range (if applicable)
+					if (elementTakingHit.id && elementTakingHit.playerAggroRange !== -1 && elementTakingHit.life > 0) { // Only map elements can have an id
+						if ((elementHitting.idPlayer || elementHitting.ref === 'player')) {
+							elementTakingHit.playerAggroRange = (elementTakingHit.playerAggroRange || defaults.playerAggroRange) + defaults.playerAggroRange;
+						}
+					}
+
 					// Hit log
 					setHitLog(elementTakingHit, lifeModifierFinal, hitBonus, damageTakenFactor, lifeModifierReduceFactor);
 				}
@@ -2120,6 +2127,7 @@
 									shootSpeed: 8,
 									charges: 50, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
+										ref: 'env', // Mandatory for base elements (player for ref from player or env for ref from environment)
 										type: 9, // Always use 9 for munition element (disappear on collision)
 										radius: 10, // Always use radius for munition element (centering)
 										hitBonus: 60, // Only applicable if element type can hit (ranged)
@@ -2136,7 +2144,7 @@
 					{
 						id: 13,
 						name: 'Tundro',
-						life: 450,
+						life: 1250,
 						damageTakenFactor: 45, // Only applicable if element has a life property
 						type: 3,
 						width: 35,
@@ -2186,6 +2194,7 @@
 									shootSpeed: 5,
 									charges: 200, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
+										ref: 'env', // Mandatory for base elements (player for ref from player or env for ref from environment)
 										type: 9, // Always use 9 for munition element (disappear on collision)
 										radius: 30, // Always use radius for munition element (centering)
 										hitBonus: 150, // Only applicable if element type can hit (ranged)
@@ -2455,6 +2464,7 @@
 							shootSpeed: 12,
 							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
+								ref: 'player', // Mandatory for base elements (player for ref from player or env for ref from environment)
 								type: 9, // Always use 9 for munition element (disappear on collision)
 								radius: 10, // Always use radius for munition element (centering)
 								hitBonus: 50, // Only applicable if element type can hit (ranged)

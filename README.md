@@ -49,7 +49,9 @@ It will be converted to a React application soon enough!
         * **isShootingColor**: Optional (default lightcyan). The color of the skill when used.
         * **shootSpeed**: Optional (default 10). The shot speed in the map.
         * **charges**: Mandatory. How many charges the player have.
-        * **baseElement**: Mandatory. It is an element (object) with type 9 and a bonus hit.
+        * **baseElement**: Mandatory. It is a real time generated element (object) with type 9 and a bonus hit.
+          > Base elements must have an extra mandatory property called **ref**
+          > - This **ref** property can use two values: **player** (if it comes from players) or **env** (if it comes from environment)
 
 ### Temporary json bindings at execution time
  * **_isShooting**: true when element is shooting.
@@ -95,10 +97,12 @@ It will be converted to a React application soon enough!
  * Array containing **all the elements** that exists inside the map (map elements).
  * Can be structures, walls, towers, doors, keys, food, ornaments, objects, monsters, ...
  * If it has a life property, can use a moving "aggro" algoritm.
+ * Element aggro range increases when get hitted by a player.
  * Can have actions like shoot or hit.
 
 ### Json element
  * **id**: Mandatory. A number that specifies a unique identifier for the element.
+   > **Only map elements can have** a property called id - players and map objects must have an id, but not called this way
  * **name**: Optional. The name of the element. Can appear at hit log.
  * **life**: Optional. If the element has a life property it can take hits and be destroyed.
    > If life property exists, when it reaches zero the element will disappear from the map
@@ -116,7 +120,7 @@ It will be converted to a React application soon enough!
  * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** and the target has a **life property**
  * **playerAggroRange**: Optional (default 200). Range (in pixels) where player can get a map element aggro.
-   > A map element can be aggressive (aggro) only if it has a **life** property and **playerAggroRange** property **is not equal -1**
+   > A map element can be aggressive (aggro) only if it has a **life** property and **playerAggroRange** property value **is not equal -1**
  * **hitPauseTimeCheck**: Optional (default [5, 5000]). For hitting pause time checks, only for map elements that can shoot.
    > [maxHitTrigger ,timeToWait] - **maxHitTrigger** is a positive integer, **timeToWait** in miliseconds
  * **style**: Defines the style of the element drawn - color of hitbox body.
@@ -134,7 +138,9 @@ It will be converted to a React application soon enough!
         * **isShootingColor**: Optional (default lightcyan). The color of the skill when used.
         * **shootSpeed**: Optional (default 10). The shot speed in the map.
         * **charges**: Mandatory. How many charges the player have.
-        * **baseElement**: Mandatory. It is an element (object) with type 9 and a bonus hit.
+        * **baseElement**: Mandatory. It is a real time generated element (object) with type 9 and a bonus hit.
+          > Base elements must have an extra mandatory property called **ref**
+          > - This **ref** property can use two values: **player** (if it comes from players) or **env** (if it comes from environment)
 
 ### Temporary json bindings at execution time
  * **_isShooting**: true when element is shooting (if applicable).
