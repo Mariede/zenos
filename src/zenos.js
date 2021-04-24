@@ -31,7 +31,7 @@
 		hitPauseTimeCheck: [5, 6000], // Only for map elements that can shoot: [maxHitTrigger ,timeToWait] (timeToWait in miliseconds)
 		isTakingDamageColor: 'red',
 		isShootingColor: 'lightcyan',
-		shootSpeed: 15,
+		shootSpeed: 10,
 		isShieldUpColor: 'lightcyan',
 		shieldReduceFactor: 2,
 		shieldBreakAmount: 5 // Max counter for hits blocked before consuming a shield charge
@@ -2111,7 +2111,7 @@
 							weapon: {
 								shoot: {
 									isShootingColor: 'yellow',
-									shootSpeed: 15,
+									shootSpeed: 8,
 									charges: 50, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
 										type: 9, // Always use 9 for munition element (disappear on collision)
@@ -2433,8 +2433,8 @@
 					x: 0,
 					y: 0,
 					increment: 1,
-					xMax: 3,
-					yMax: 3
+					xMax: 5,
+					yMax: 5
 				},
 				skills: {
 					shield: {
@@ -2446,7 +2446,7 @@
 					weapon: {
 						shoot: {
 							isShootingColor: 'yellow',
-							shootSpeed: 15,
+							shootSpeed: 12,
 							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
 								type: 9, // Always use 9 for munition element (disappear on collision)

@@ -47,7 +47,7 @@ It will be converted to a React application soon enough!
         * **charges**: Mandatory. How many charges the player have.
     * **shoot**:
         * **isShootingColor**: Optional (default lightcyan). The color of the skill when used.
-        * **shootSpeed**: Optional (default 15). The shot speed in the map.
+        * **shootSpeed**: Optional (default 10). The shot speed in the map.
         * **charges**: Mandatory. How many charges the player have.
         * **baseElement**: Mandatory. It is an element (object) with type 9 and a bonus hit.
 
@@ -129,6 +129,12 @@ It will be converted to a React application soon enough!
         * **maxX**: Maximum x coordinate accepted for movement, in normal conditions.
         * **minY**: Minimum y coordinate accepted for movement, in normal conditions.
         * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
+ * **skills**: Are the map elements skills (optional):
+    * **shoot**:
+        * **isShootingColor**: Optional (default lightcyan). The color of the skill when used.
+        * **shootSpeed**: Optional (default 10). The shot speed in the map.
+        * **charges**: Mandatory. How many charges the player have.
+        * **baseElement**: Mandatory. It is an element (object) with type 9 and a bonus hit.
 
 ### Temporary json bindings at execution time
  * **_isShooting**: true when element is shooting (if applicable).
