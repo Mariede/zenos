@@ -34,7 +34,8 @@
 		shootSpeed: 10,
 		isShieldUpColor: 'lightcyan',
 		shieldReduceFactor: 2,
-		shieldBreakAmount: 5 // Max counter for hits blocked before consuming a shield charge
+		shieldBreakAmount: 5, // Max counter for hits blocked before consuming a shield charge
+		shieldCap: 'rgba(239, 239, 239, 0.15)' // Shield background color
 	};
 
 	// Get random integer number (min and max included)
@@ -362,6 +363,26 @@
 				}
 			}
 		}
+	};
+
+	const _drawnElementShield = (_cx, _elementShielded) => {
+		const elementShieldedX = _elementShielded.radius ? _elementShielded.x : _elementShielded.x + (_elementShielded.width / 2);
+		const elementShieldedY = _elementShielded.radius ? _elementShielded.y : _elementShielded.y + (_elementShielded.height / 2);
+		const shieldSize = (_elementShielded.radius || (_elementShielded.width / 2)) * 1.5;
+
+		_cx.save();
+
+		_cx.fillStyle = defaults.shieldCap;
+		_cx.lineWidth = 1;
+
+		_cx.beginPath();
+		_cx.arc(elementShieldedX, elementShieldedY, shieldSize, 0, 2 * Math.PI);
+		_cx.strokeStyle = (_elementShielded.skills.shield.isShieldUpColor || defaults.isShieldUpColor);
+		_cx.stroke();
+		_cx.fill();
+		_cx.closePath();
+
+		_cx.restore();
 	};
 
 	// Drawns element shots (works better with circle and square elements)
@@ -1015,21 +1036,7 @@
 
 			// Shield
 			if (_player._isShieldUp && _player.skills.shield.charges > 0) {
-				const playerX = _player.radius ? _player.x : _player.x + (_player.width / 2);
-				const playerY = _player.radius ? _player.y : _player.y + (_player.height / 2);
-				const shieldSize = (_player.radius || (_player.width / 2)) * 1.5;
-
-				_cx.save();
-
-				_cx.lineWidth = 1;
-
-				_cx.beginPath();
-				_cx.arc(playerX, playerY, shieldSize, 0, 2 * Math.PI);
-				_cx.strokeStyle = (_player.skills.shield.isShieldUpColor || defaults.isShieldUpColor);
-				_cx.stroke();
-				_cx.closePath();
-
-				_cx.restore();
+				_drawnElementShield(_cx, _player);
 			}
 		};
 
