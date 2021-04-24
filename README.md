@@ -43,6 +43,7 @@ It will be converted to a React application soon enough!
     * **shield**:
         * **isShieldUpColor**: Optional (default lightcyan). The color of the skill when up.
         * **shieldReduceFactor**: Optional (default 2). The received damage reduction factor.
+        * **shieldBreakAmount**: Optional (default 5). Max counter for hits blocked before consuming a shield charge.
         * **charges**: Mandatory. How many charges the player have.
     * **shoot**:
         * **isShootingColor**: Optional (default lightcyan). The color of the skill when used.
@@ -54,6 +55,7 @@ It will be converted to a React application soon enough!
  * **_isShooting**: true when element is shooting.
  * **_isTakingDamage**: true when element is taking damage.
  * **_isShieldUp**: true when element shield is up.
+ * **_shieldBreakAmount**: current counter for hits blocked until shield consumes one charge.
  * **_isTimeBetweenHits**: must be lower than next hit time for a hit to be cast (miliseconds).
  * **_savedBody**: for blinking style body color of element (when taking damage).
  * **_savedDetails**: for blinking style details color of element (when shooting).
@@ -138,7 +140,7 @@ It will be converted to a React application soon enough!
  * **_savedDetails**: for blinking style details color of element (when shooting - if applicable).
  * **_savedX**: for map elements when getting aggro to save last step x value.
  * **_savedY**: for map elements when getting aggro to save last step y value.
- * **_hitAmount**: for map elements only when shooting: counter for hit pause time checks.
+ * **_hitAmount**: for map elements only when shooting: current counter for hit pause time checks.
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101).

@@ -12,13 +12,14 @@
 			_isShooting - true when element is shooting (if applicabble)
 			_isTakingDamage - true when element is taking damage (if applicabble)
 			_isShieldUp - true when element shield is up (if applicabble)
+			_shieldBreakAmount - current counter for hits blocked until shield consumes one charge (if applicabble)
 			_isTimeBetweenHits - must be lower than next hit time for a melee hit to be cast
 			_isTimeBetweenShootingHits - must be lower than next hit time for a ranged shooting hit to be cast (does not exists for players)
 			_savedBody - for blinking style body color of element (when taking damage)
 			_savedDetails - for blinking style details color of element (when shooting)
 			_savedX - for map elements when getting aggro to save last step x value
 			_savedY - for map elements when getting aggro to save last step y value
-			_hitAmount - for map elements only when shooting: counter for hit pause time checks
+			_hitAmount - for map elements only when shooting: current counter for hit pause time checks
 	*/
 
 	// Default values
@@ -32,7 +33,8 @@
 		isShootingColor: 'lightcyan',
 		shootSpeed: 15,
 		isShieldUpColor: 'lightcyan',
-		shieldReduceFactor: 2
+		shieldReduceFactor: 2,
+		shieldBreakAmount: 5 // Max counter for hits blocked before consuming a shield charge
 	};
 
 	// Get random integer number (min and max included)
@@ -1503,8 +1505,14 @@
 							const elementTakingHitShield = elementTakingHit.skills.shield;
 
 							if (elementTakingHit._isShieldUp && elementTakingHitShield.charges > 0) {
-								elementTakingHitShield.charges -= 1;
-								elementTakingHit._isShieldUp = false;
+								elementTakingHit._shieldBreakAmount = (elementTakingHit._shieldBreakAmount || 0) + 1; // Counter for hits blocked
+
+								const maxHitBreak = (elementTakingHitShield.shieldBreakAmount || defaults.shieldBreakAmount); // Counter for hits blocked
+
+								if (elementTakingHit._shieldBreakAmount % maxHitBreak === 0) {
+									elementTakingHitShield.charges -= 1;
+									elementTakingHit._isShieldUp = false;
+								}
 
 								lifeModifierReduceFactor = (elementTakingHitShield.shieldReduceFactor || defaults.shieldReduceFactor);
 							}
@@ -1653,15 +1661,27 @@
 		// Bottom
 		const elMenuPlayerCounter = document.querySelector('#screen > div#general > div#menu > div#bottom span#timer');
 
+		/*
+		Data calculation
+		*/
+
 		// Check finite ammo
 		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.charges === -1;
+
+		// Shield
+		const maxHitBreak = (_player.skills.shield.shieldBreakAmount || defaults.shieldBreakAmount);
+		const currentShieldBreakAmount = (maxHitBreak - ((_player._shieldBreakAmount || 0) % maxHitBreak));
 
 		// Speed calc
 		const playerSpeedStepX = Math.abs(_player.step.x);
 		const playerSpeedStepY = Math.abs(_player.step.y);
 		const playerSpeedFinal = Math.sqrt((playerSpeedStepX ** 2) + (playerSpeedStepY ** 2));
 
-		const elMenuSpeedFinalShow = `${_numberFormatted(playerSpeedFinal, 1)} m/s`;
+		const speedFinalShow = `${_numberFormatted(playerSpeedFinal, 1)} m/s`;
+
+		/*
+		Data show
+		*/
 
 		// Player name
 		elMenuPlayerName.textContent = _player.name;
@@ -1673,10 +1693,10 @@
 		elMenuPlayerShoot.textContent = `🔫 ${!chekInfiniteAmmo ? _player.skills.weapon.shoot.charges : '♾️'}`;
 
 		// Shield
-		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges}`;
+		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges} / ${currentShieldBreakAmount}`;
 
 		// Speed
-		elMenuPlayerSpeed.textContent = `🏃💨 ${elMenuSpeedFinalShow}`;
+		elMenuPlayerSpeed.textContent = `🏃💨 ${speedFinalShow}`;
 
 		// Counter
 		elMenuPlayerCounter.textContent = _timerFormatted(_map.timer);
@@ -2420,6 +2440,7 @@
 					shield: {
 						isShieldUpColor: 'ghostwhite',
 						shieldReduceFactor: 4,
+						shieldBreakAmount: 8,
 						charges: 10
 					},
 					weapon: {
