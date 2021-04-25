@@ -518,21 +518,21 @@
 				switch (_event.key) {
 					case 'q':
 					case 'Q': {
-						if (!_player._isShieldUp && _player.skills.shield.charges > 0) {
-							_player._isShieldUp = true;
-						} else {
-							_player._isShieldUp = false;
+						const shieldData = (_player.skills && _player.skills.shield);
+
+						if (shieldData) {
+							if (!_player._isShieldUp && shieldData.charges > 0) {
+								_player._isShieldUp = true;
+							} else {
+								_player._isShieldUp = false;
+							}
 						}
 
 						break;
 					}
 					case 'w':
 					case 'W': {
-						const newShootData = (_player.skills && _player.skills.weapon && _player.skills.weapon.shoot) ? (
-							_player.skills.weapon.shoot
-						) : (
-							undefined
-						);
+						const newShootData = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot;
 
 						if (newShootData) {
 							const chekInfiniteAmmo = newShootData.charges === -1;
@@ -547,7 +547,7 @@
 								_player._isShooting = true;
 
 								if (!chekInfiniteAmmo) {
-									_player.skills.weapon.shoot.charges -= 1;
+									newShootData.charges -= 1;
 								}
 							}
 						}
@@ -689,17 +689,13 @@
 
 	// Shield action (if applicable)
 	const elementActionShield = _mapElement => {
-		const newShieldUp = (_mapElement.skills && _mapElement.skills.shield) ? (
-			_mapElement.skills.shield
-		) : (
-			undefined
-		);
+		const shieldData = _mapElement.skills && _mapElement.skills.shield;
 
-		if (newShieldUp) {
+		if (shieldData) {
 			if (_mapElement._isShieldUp === undefined) { // Start shield
 				_mapElement._isShieldUp = true;
 			} else {
-				if (newShieldUp.charges > 0) {
+				if (shieldData.charges > 0) {
 					const currentShieldUpTimeCheck = Date.now();
 
 					if (_mapElement._isShieldUp) {
@@ -716,11 +712,7 @@
 
 	// Shooting action (if applicable)
 	const elementActionShot = (_mapElement, _map) => {
-		const newShootData = (_mapElement.skills && _mapElement.skills.weapon && _mapElement.skills.weapon.shoot) ? (
-			_mapElement.skills.weapon.shoot
-		) : (
-			undefined
-		);
+		const newShootData = (_mapElement.skills && _mapElement.skills.weapon && _mapElement.skills.weapon.shoot);
 
 		if (newShootData) {
 			const currentHitTimeCheck = Date.now();
@@ -738,7 +730,7 @@
 					_mapElement._isShooting = true;
 
 					if (!chekInfiniteAmmo) {
-						_mapElement.skills.weapon.shoot.charges -= 1;
+						newShootData.charges -= 1;
 						_mapElement._hitAmount = (_mapElement._hitAmount || 0) + 1; // For hitting pause checks
 					}
 				}
@@ -914,28 +906,30 @@
 
 	const drawMapElements = (_cx, _player, _map) => {
 		const _drawnElementDetails = (_cx, _mapElement) => {
+			const mapElementStyleColor = _mapElement.style && _mapElement.style.color;
+
 			// Takes damage
 			if (_mapElement._isTakingDamage) {
-				_mapElement.style.color.body = defaults.isTakingDamageColor;
+				mapElementStyleColor.body = defaults.isTakingDamageColor;
 				_mapElement._isTakingDamage = false;
 			} else {
-				if (!_mapElement.style.color._savedBody) {
-					_mapElement.style.color._savedBody = _mapElement.style.color.body; // Temporary
+				if (!mapElementStyleColor._savedBody) {
+					mapElementStyleColor._savedBody = mapElementStyleColor.body; // Temporary
 				}
 
-				_mapElement.style.color.body = _mapElement.style.color._savedBody;
+				mapElementStyleColor.body = mapElementStyleColor._savedBody;
 			}
 
 			// Weapon shoot
 			if (_mapElement._isShooting) {
-				_mapElement.style.color.details = (_mapElement.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
+				mapElementStyleColor.details = (_mapElement.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
 				_mapElement._isShooting = false;
 			} else {
-				if (!_mapElement.style.color._savedDetails) {
-					_mapElement.style.color._savedDetails = _mapElement.style.color.details; // Temporary
+				if (!mapElementStyleColor._savedDetails) {
+					mapElementStyleColor._savedDetails = mapElementStyleColor.details; // Temporary
 				}
 
-				_mapElement.style.color.details = _mapElement.style.color._savedDetails;
+				mapElementStyleColor.details = mapElementStyleColor._savedDetails;
 			}
 
 			// Shield
@@ -1063,28 +1057,30 @@
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDetails = (_cx, _player) => {
+			const playerStyleColor = _player.style && _player.style.color;
+
 			// Takes damage
 			if (_player._isTakingDamage) {
-				_player.style.color.body = defaults.isTakingDamageColor;
+				playerStyleColor.body = defaults.isTakingDamageColor;
 				_player._isTakingDamage = false;
 			} else {
-				if (!_player.style.color._savedBody) {
-					_player.style.color._savedBody = _player.style.color.body; // Temporary
+				if (!playerStyleColor._savedBody) {
+					playerStyleColor._savedBody = playerStyleColor.body; // Temporary
 				}
 
-				_player.style.color.body = _player.style.color._savedBody;
+				playerStyleColor.body = playerStyleColor._savedBody;
 			}
 
 			// Weapon shoot
 			if (_player._isShooting) {
-				_player.style.color.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
+				playerStyleColor.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
 				_player._isShooting = false;
 			} else {
-				if (!_player.style.color._savedDetails) {
-					_player.style.color._savedDetails = _player.style.color.details; // Temporary
+				if (!playerStyleColor._savedDetails) {
+					playerStyleColor._savedDetails = playerStyleColor.details; // Temporary
 				}
 
-				_player.style.color.details = _player.style.color._savedDetails;
+				playerStyleColor.details = playerStyleColor._savedDetails;
 			}
 
 			// Shield
@@ -1570,20 +1566,20 @@
 
 					if (!elementHitting._isTimeBetweenHits || currentHitTimeCheck > elementHitting._isTimeBetweenHits) {
 						// Only if it has a shield option - damage reduced by reduceFactor shield
-						if (elementTakingHit.skills && elementTakingHit.skills.shield) {
-							const elementTakingHitShield = elementTakingHit.skills.shield;
+						const shieldData = (elementTakingHit.skills && elementTakingHit.skills.shield);
 
-							if (elementTakingHit._isShieldUp && elementTakingHitShield.charges > 0) {
+						if (shieldData) {
+							if (elementTakingHit._isShieldUp && shieldData.charges > 0) {
 								elementTakingHit._shieldBreakAmount = (elementTakingHit._shieldBreakAmount || 0) + 1; // Counter for hits blocked
 
-								const maxHitBreak = (elementTakingHitShield.shieldBreakAmount || defaults.shieldBreakAmount); // Counter for hits blocked
+								const maxHitBreak = (shieldData.shieldBreakAmount || defaults.shieldBreakAmount); // Counter for hits blocked
 
 								if (elementTakingHit._shieldBreakAmount % maxHitBreak === 0) {
-									elementTakingHitShield.charges -= 1;
+									shieldData.charges -= 1;
 									elementTakingHit._isShieldUp = false;
 								}
 
-								lifeModifierReduceFactor = (elementTakingHitShield.shieldReduceFactor || defaults.shieldReduceFactor);
+								lifeModifierReduceFactor = (shieldData.shieldReduceFactor || defaults.shieldReduceFactor);
 							}
 						}
 
@@ -1742,11 +1738,13 @@
 		*/
 
 		// Check finite ammo
-		const chekInfiniteAmmo = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.charges === -1;
+		const playerShotCharges = _player.skills && _player.skills.weapon && _player.skills.weapon.shoot && _player.skills.weapon.shoot.charges;
 
 		// Shield
-		const maxHitBreak = (_player.skills.shield.shieldBreakAmount || defaults.shieldBreakAmount);
-		const currentShieldBreakAmount = (maxHitBreak - ((_player._shieldBreakAmount || 0) % maxHitBreak));
+		const playerShield = (_player.skills && _player.skills.shield);
+		const playerShieldCharges = (playerShield && playerShield.charges);
+		const maxHitBreak = ((playerShield && playerShield.shieldBreakAmount) || defaults.shieldBreakAmount); // Counter for hits blocked
+		const currentShieldBreakAmount = (playerShieldCharges ? (maxHitBreak - ((_player._shieldBreakAmount || 0) % maxHitBreak)) : 0);
 
 		// Speed calc
 		const playerSpeedStepX = Math.abs(_player.step.x);
@@ -1766,10 +1764,10 @@
 		elMenuPlayerLife.textContent = `❤️ ${_player.life}`;
 
 		// Shoot
-		elMenuPlayerShoot.textContent = `🔫 ${!chekInfiniteAmmo ? _player.skills.weapon.shoot.charges : '♾️'}`;
+		elMenuPlayerShoot.textContent = `🔫 ${playerShotCharges !== -1 ? playerShotCharges : '♾️'}`;
 
 		// Shield
-		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges} / ${currentShieldBreakAmount}`;
+		elMenuPlayerShield.textContent = `🛡️ ${playerShieldCharges} / ${currentShieldBreakAmount}`;
 
 		// Speed
 		elMenuPlayerSpeed.textContent = `🏃 ${speedFinalShow}`;
