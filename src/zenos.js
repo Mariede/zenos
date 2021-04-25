@@ -1756,7 +1756,7 @@
 		elMenuPlayerShield.textContent = `🛡️ ${_player.skills.shield.charges} / ${currentShieldBreakAmount}`;
 
 		// Speed
-		elMenuPlayerSpeed.textContent = `🏃💨 ${speedFinalShow}`;
+		elMenuPlayerSpeed.textContent = `🏃 ${speedFinalShow}`;
 
 		// Counter
 		elMenuPlayerCounter.textContent = _timerFormatted(_map.timer);
@@ -2140,8 +2140,8 @@
 							}
 						},
 						step: { // Only applicable if element can move or it is in platform mode (stacked in place)
-							x: -2,
-							y: 2,
+							x: -3,
+							y: 3,
 							rangeLimit: { // Range limit for x or y movement (only for map elements)
 								maxX: 600,
 								minY: 400
