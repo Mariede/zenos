@@ -184,16 +184,26 @@
 
 		// Drawn element body
 		if (elementIsACircle) {
+			const elementStyle = _element.style;
+
 			_cx.save();
 
 			_cx.beginPath();
 			_cx.arc(_element.x, _element.y, _element.radius, 0, 2 * Math.PI);
-			_cx.fillStyle = _element.style.color.body;
+			_cx.fillStyle = elementStyle.color.body;
 			_cx.fill();
 			_cx.closePath();
 
+			if (elementStyle.border) {
+				_cx.lineWidth = elementStyle.border.width;
+				_cx.strokeStyle = elementStyle.border.color;
+				_cx.stroke();
+			}
+
 			_cx.restore();
 		} else {
+			const elementStyle = _element.style;
+
 			_cx.save();
 
 			if (_element.rotate) {
@@ -202,8 +212,14 @@
 				_cx.translate(-_element.x, -_element.y);
 			}
 
-			_cx.fillStyle = _element.style.color.body;
+			_cx.fillStyle = elementStyle.color.body;
 			_cx.fillRect(_element.x, _element.y, _element.width, _element.height);
+
+			if (elementStyle.border) {
+				_cx.lineWidth = elementStyle.border.width;
+				_cx.strokeStyle = elementStyle.border.color;
+				_cx.strokeRect(_element.x, _element.y, _element.width, _element.height);
+			}
 
 			_cx.restore();
 		}
@@ -1999,6 +2015,10 @@
 						style: {
 							color: {
 								body: 'rgba(238, 238, 238, 0.6)'
+							},
+							border: {
+								width: 1,
+								color: 'green'
 							}
 						}
 					},
@@ -2013,6 +2033,10 @@
 						style: {
 							color: {
 								body: '%elements.2.style.color.body%'
+							},
+							border: {
+								width: 1,
+								color: 'green'
 							}
 						}
 					},
@@ -2064,6 +2088,10 @@
 						style: {
 							color: {
 								body: '%elements.6.style.color.body%'
+							},
+							border: {
+								width: 2,
+								color: 'black'
 							}
 						}
 					},

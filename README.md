@@ -31,8 +31,17 @@ It will be converted to a React application soon enough!
    > See more about element directions below - we may use 1 for starting players in the map (East)
  * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** and the target has a **life property**
- * **style**: Defines the style of the player drawn - color of hitbox body and details.
-   > Body receives the image when using images or sprites
+ * **style**: Defines the style of the player drawn - hitbox body and details.
+    * **color**: This property is mandatory for the hitbox body.
+        * **body**: Mandatory. Body background filler. Can be:
+            1. Solid color
+            2. Background-image (repeat / no-repeat / repeat-x / repeat-y)
+            3. Canvas gradient fill style (linear or radial)
+          > Body receives the image when using images or sprites
+        * **details**: Optional. In current case, used to drawn player directions.
+    * **border**: Optional. Enables drawn colored borders around the player hit box.
+        * **width**: The border width (in pixels).
+        * **color**: The border color.
  * **step**: Mandatory. Applicable for player's movement:
     * **x**: Moving speed at x axis.
     * **y**: Moving speed at y axis.
@@ -130,8 +139,17 @@ It will be converted to a React application soon enough!
    > NOT READY. WILL BE IMPLEMENTED SOON...
  * **hitPauseTimeCheck**: Optional (default [5, 5000]). For hitting pause time checks, only for map elements that can shoot.
    > [maxHitTrigger ,timeToWait] - **maxHitTrigger** is a positive integer, **timeToWait** in miliseconds
- * **style**: Defines the style of the element drawn - color of hitbox body.
-   > Body receives the image when using images or sprites
+ * **style**: Defines the style of the map element drawn - hitbox body and details.
+    * **color**: This property is mandatory for the hitbox body.
+        * **body**: Mandatory. Body background filler. Can be:
+            1. Solid color
+            2. Background-image (repeat / no-repeat / repeat-x / repeat-y)
+            3. Canvas gradient fill style (linear or radial)
+          > Body receives the image when using images or sprites
+        * **details**: Optional. In current case, used to drawn map element directions (if applicable).
+    * **border**: Optional. Enables drawn colored borders around the map element hit box.
+        * **width**: The border width (in pixels).
+        * **color**: The border color.
  * **step**: Only applicable if element can move:
     * **x**: Moving speed at x axis.
     * **y**: Moving speed at y axis.
