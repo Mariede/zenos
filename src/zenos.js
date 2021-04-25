@@ -1150,7 +1150,7 @@
 
 		const aidValues = _getAidValues(_checkElement, _mapElement);
 
-		if (_checkElement.step.x !== 0) {
+		if (_checkElement.step.x !== 0 && [1, 2].includes(_phase)) {
 			const adjustPenetrationX = (
 				Math.abs(_checkElement.x - _mapElement.x + _checkElement.step.x) < Math.abs(_checkElement.x - _mapElement.x)
 			);
@@ -1166,9 +1166,7 @@
 					return _phase;
 				}
 			}
-		}
-
-		if (_checkElement.step.y !== 0) {
+		} else if (_checkElement.step.y !== 0 && [3, 4].includes(_phase)) {
 			const adjustPenetrationY = (
 				Math.abs(_checkElement.y - _mapElement.y + _checkElement.step.y) < Math.abs(_checkElement.y - _mapElement.y)
 			);
