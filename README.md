@@ -115,15 +115,19 @@ It will be converted to a React application soon enough!
  * **type**: Mandatory. It is a number. Every element in the map has a type.
    > See more about element types below
  * **radius** or **width**/**height**: Mandatory exclusive. Radius for circles, Width/Height for rectangles. It is the body hit box.
+ * **rotate**: Optional. Only valid for rectagles. Rotate the map element in degrees.
+   > The rotate property **does not work** with collisions!
  * **x**: Mandatory. The current position in x axis. Coordinate x.
  * **y**: Mandatory. The current position in y axis. Coordinate y.
  * **currentDirection**: Optional. Must have for getting and drawning element looking direction.
    > See more about element directions below - we may check element direction table when starting elements in the map
  * **hitBonus**: Optional - zero bonus if not present. It is the **bonus damage** or the life gained to the target (if negative).
    > Only applicable if the origin element type **can hit** and the target has a **life property**
- * **playerAggroRange**: Optional (default 200). Range (in pixels) where player can get a map element aggro.
-   > A map element can be aggressive (aggro) only if it has a **life** property and **playerAggroRange** property value **is not equal -1**
+ * **aggroRange**: Optional (default 200). Range (in pixels) where a player can get aggroed by a map element.
+   > A map element can be aggressive (aggro) only if it has a **life** property and **aggroRange** property value **is not equal -1**
    > - Player hits **increase aggro range**
+ * **aggroGroup**: Optional. A unique number. If any map element of the group get aggroed by a player, the whole group will.
+   > NOT READY. WILL BE IMPLEMENTED SOON...
  * **hitPauseTimeCheck**: Optional (default [5, 5000]). For hitting pause time checks, only for map elements that can shoot.
    > [maxHitTrigger ,timeToWait] - **maxHitTrigger** is a positive integer, **timeToWait** in miliseconds
  * **style**: Defines the style of the element drawn - color of hitbox body.

@@ -26,7 +26,7 @@
 	// Default values
 	const defaults = {
 		elementTypesCanHit: [3, 5, 7, 9, 11, 101], // Element types that may produce damage or gain (hit possible)
-		playerAggroRange: 200, // Range (in pixels) where player can get a map element aggro
+		aggroRange: 200, // Range (in pixels) where a player can get aggroed by a map element
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
 		hitPauseTimeCheck: [5, 6000], // Only for map elements that can shoot: [maxHitTrigger ,timeToWait] (timeToWait in miliseconds)
@@ -787,10 +787,10 @@
 	const moveMapElementPlayerAggro = (_mapElement, _player) => {
 		let playerHasAggro = false;
 
-		// If playerAggroRange equals -1 or element has no life: no aggro permitted for the element
-		if (_mapElement.playerAggroRange !== -1 && _mapElement.life && _mapElement.life > 0) {
+		// If aggroRange equals -1 or element has no life: no aggro permitted for the element
+		if (_mapElement.aggroRange !== -1 && _mapElement.life && _mapElement.life > 0) {
 			const aggroCheck = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
-			const aggroRange = (_mapElement.playerAggroRange || defaults.playerAggroRange) ** 2;
+			const aggroRange = (_mapElement.aggroRange || defaults.aggroRange) ** 2;
 
 			if (aggroCheck <= aggroRange) {
 				if (!_mapElement.step._savedX && _mapElement.step._savedX !== 0) {
@@ -1586,10 +1586,10 @@
 
 					elementTakingHit.life = (elementResultedLife > 0 ? elementResultedLife : 0);
 
-					// Increase Aggro range (if applicable)
-					if (elementTakingHit.id && elementTakingHit.playerAggroRange !== -1 && elementTakingHit.life > 0) { // Only map elements can have an id
+					// Increase aggro range (if applicable)
+					if (elementTakingHit.id && elementTakingHit.aggroRange !== -1 && elementTakingHit.life > 0) { // Only map elements can have an id
 						if ((elementHitting.idPlayer || elementHitting.ref === 'player')) {
-							elementTakingHit.playerAggroRange = (elementTakingHit.playerAggroRange || defaults.playerAggroRange) + defaults.playerAggroRange;
+							elementTakingHit.aggroRange = (elementTakingHit.aggroRange || defaults.aggroRange) + defaults.aggroRange;
 						}
 					}
 
@@ -2007,7 +2007,7 @@
 						type: 2,
 						width: 60,
 						height: 255,
-						// Em análise - rotate: 10,
+						// Experiment: rotate: 10, // Rotate (in degrees) is only valid with width/height and does not work with collisions!
 						x: 150,
 						y: 200,
 						style: {
@@ -2166,7 +2166,7 @@
 						y: 50,
 						currentDirection: 11, // Must have for getting and drawning element direction
 						hitBonus: 30, // Only applicable if element type can hit
-						playerAggroRange: 300, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						aggroRange: 300, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						hitPauseTimeCheck: [6, 5000], // Optional, only applicable if element can shoot ([maxHitTrigger ,timeToWait] (timeToWait in miliseconds))
 						style: {
 							color: {
@@ -2238,7 +2238,7 @@
 						y: 21,
 						currentDirection: 10, // Must have for getting and drawning element direction
 						hitBonus: 100, // Only applicable if element type can hit
-						playerAggroRange: 600, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
+						aggroRange: 600, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						style: {
 							color: {
 								body: 'blue',
