@@ -13,6 +13,7 @@
 			_isTakingDamage - true when element is taking damage (if applicabble)
 			_isShieldUp - true when element shield is up (if applicabble)
 			_shieldBreakAmount - current counter for hits blocked until shield consumes one charge (if applicabble)
+			_isTimeBetweenShieldUps - must be lower than next shield up delay for a new charge to be cast (does not exists for players)
 			_isTimeBetweenHits - must be lower than next hit time for a melee hit to be cast
 			_isTimeBetweenShootingHits - must be lower than next hit time for a ranged shooting hit to be cast (does not exists for players)
 			_savedBody - for blinking style body color of element (when taking damage)
@@ -35,7 +36,8 @@
 		isShieldUpColor: 'lightcyan',
 		shieldReduceFactor: 2,
 		shieldBreakAmount: 5, // Max counter for hits blocked before consuming a shield charge
-		shieldCap: 'rgba(239, 239, 239, 0.15)' // Shield background color
+		shieldCap: 'rgba(239, 239, 239, 0.15)', // Shield background color
+		timeBetweenShieldUps: 1500 // Only for map elements that can shield: delay time between charges for skill shield to be up again (miliseconds)
 	};
 
 	// Get random integer number (min and max included)
@@ -669,6 +671,33 @@
 	// Map
 	// -----------------------------------------------------------------------------------------------
 
+	// Shield action (if applicable)
+	const elementActionShield = _mapElement => {
+		const newShieldUp = (_mapElement.skills && _mapElement.skills.shield) ? (
+			_mapElement.skills.shield
+		) : (
+			undefined
+		);
+
+		if (newShieldUp) {
+			if (_mapElement._isShieldUp === undefined) { // Start shield
+				_mapElement._isShieldUp = true;
+			} else {
+				if (newShieldUp.charges > 0) {
+					const currentShieldUpTimeCheck = Date.now();
+
+					if (_mapElement._isShieldUp) {
+						_mapElement._isTimeBetweenShieldUps = currentShieldUpTimeCheck + defaults.timeBetweenShieldUps;
+					} else {
+						if (currentShieldUpTimeCheck > _mapElement._isTimeBetweenShieldUps) {
+							_mapElement._isShieldUp = true;
+						}
+					}
+				}
+			}
+		}
+	};
+
 	// Shooting action (if applicable)
 	const elementActionShot = (_mapElement, _map) => {
 		const newShootData = (_mapElement.skills && _mapElement.skills.weapon && _mapElement.skills.weapon.shoot) ? (
@@ -716,6 +745,9 @@
 	// Execute element actions (if applicable)
 	const elementActions = (_mapElement, _map, _playerHasAggro) => {
 		if (_playerHasAggro) {
+			// Check shield action
+			elementActionShield(_mapElement);
+
 			// Check shooting action
 			elementActionShot(_mapElement, _map);
 		}
@@ -865,7 +897,7 @@
 	};
 
 	const drawMapElements = (_cx, _player, _map) => {
-		const _drawnElementDetails = _mapElement => {
+		const _drawnElementDetails = (_cx, _mapElement) => {
 			// Takes damage
 			if (_mapElement._isTakingDamage) {
 				_mapElement.style.color.body = defaults.isTakingDamageColor;
@@ -888,6 +920,11 @@
 				}
 
 				_mapElement.style.color.details = _mapElement.style.color._savedDetails;
+			}
+
+			// Shield
+			if (_mapElement._isShieldUp && _mapElement.skills.shield.charges > 0) {
+				_drawnElementShield(_cx, _mapElement);
 			}
 		};
 
@@ -917,8 +954,8 @@
 				// Drawn element body (direction if applicable)
 				_drawnElement(_cx, mapElement, currentElementDirection);
 
-				// Drawn element details (damage, ...)
-				_drawnElementDetails(mapElement);
+				// Drawn element details (shield, damage, ...)
+				_drawnElementDetails(_cx, mapElement);
 
 				// Execute element actions (if applicable)
 				elementActions(mapElement, _map, playerHasAggro);
@@ -1052,7 +1089,7 @@
 		// Drawn player body and direction
 		_drawnElement(_cx, _player, currentPlayerDirection);
 
-		// Drawn player details (damage, ...)
+		// Drawn player details (shield, damage, ...)
 		_drawnPlayerDetails(_cx, _player);
 	};
 
@@ -2109,6 +2146,12 @@
 								maxX: 600,
 								minY: 400
 							}
+						},
+						skills: {
+							shield: {
+								shieldReduceFactor: 3,
+								charges: 5
+							}
 						}
 					},
 					{
@@ -2136,6 +2179,10 @@
 							y: 1
 						},
 						skills: {
+							shield: {
+								shieldBreakAmount: 10,
+								charges: 1
+							},
 							weapon: {
 								shoot: {
 									isShootingColor: 'yellow',

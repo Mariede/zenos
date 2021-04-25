@@ -135,29 +135,44 @@ It will be converted to a React application soon enough!
         * **minY**: Minimum y coordinate accepted for movement, in normal conditions.
         * **maxY**: Maximum y coordinate accepted for movement, in normal conditions.
  * **skills**: Are the map elements skills (optional):
+    * **shield**:
+        * **isShieldUpColor**: Optional (default lightcyan). The color of the skill when up.
+        * **shieldReduceFactor**: Optional (default 2). The received damage reduction factor.
+        * **shieldBreakAmount**: Optional (default 5). Max counter for hits blocked before consuming a shield charge.
+        * **charges**: Mandatory. How many charges the map element have.
     * **shoot**:
         * **isShootingColor**: Optional (default lightcyan). The color of the skill when used.
         * **shootSpeed**: Optional (default 10). The shot speed in the map.
-        * **charges**: Mandatory. How many charges the player have.
+        * **charges**: Mandatory. How many charges the map element have.
         * **baseElement**: Mandatory. It is a real time generated element (object) with type 9 and a bonus hit.
           > Base elements must have an extra mandatory property called **ref**
           > - This **ref** property can use two values: **player** (if it comes from players) or **env** (if it comes from environment)
 
 ### Temporary json bindings at execution time
- * **_isShooting**: true when element is shooting (if applicable).
+ * **_isShooting**: true when element is shooting.
  * **_isTakingDamage**: true when element is taking damage.
+ * **_isShieldUp**: true when element shield is up.
+ * **_shieldBreakAmount**: current counter for hits blocked until shield consumes one charge.
+ * **_isTimeBetweenShieldUps**: must be lower than next shield up delay for a new charge to be cast (miliseconds).
+   > Does not exists for players
  * **_isTimeBetweenHits**: must be lower than next hit time for a hit to be cast (miliseconds).
  * **_isTimeBetweenShootingHits** must be lower than next hit time for a ranged shooting hit to be cast (miliseconds).
    > Does not exists for players
  * **_savedBody**: for blinking style body color of element (when taking damage).
- * **_savedDetails**: for blinking style details color of element (when shooting - if applicable).
+ * **_savedDetails**: for blinking style details color of element (when shooting).
  * **_savedX**: for map elements when getting aggro to save last step x value.
+   > Does not exists for players
  * **_savedY**: for map elements when getting aggro to save last step y value.
+   > Does not exists for players
  * **_hitAmount**: for map elements only when shooting: current counter for hit pause time checks.
+   > Does not exists for players
 
 ### Defaults only values
  * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
+ * **shieldCap**: Shield background color.
+ * **timeBetweenShieldUps**: Delay time between charges for skill shield to be up again (miliseconds)
+   > Does not exists for players
 
 ## Element types
  * It is a number. Every element in the map has a type (including player).
