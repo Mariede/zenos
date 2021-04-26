@@ -836,7 +836,19 @@
 				} else {
 					if (validateAggroX) {
 						if (_player.step.x !== 0) {
-							_mapElement.step.x = -_player.step.x;
+							if (!_mapElement.radius || !_player.radius) {
+								_mapElement.step.x = -_player.step.x;
+							} else { // Circle x Circle
+								if (_player.step.x < 0) {
+									if (_mapElement.x - _mapElement.radius >= _player.x + _player.radius) {
+										_mapElement.step.x = -_player.step.x;
+									}
+								} else {
+									if (_mapElement.x + _mapElement.radius <= _player.x - _player.radius) {
+										_mapElement.step.x = -_player.step.x;
+									}
+								}
+							}
 						} else {
 							_mapElement.step.x = (_mapElement.x > _player.x ? -1 : 1);
 						}
@@ -854,7 +866,19 @@
 				} else {
 					if (validateAggroY) {
 						if (_player.step.y !== 0) {
-							_mapElement.step.y = -_player.step.y;
+							if (!_mapElement.radius || !_player.radius) {
+								_mapElement.step.y = -_player.step.y;
+							} else { // Circle x Circle
+								if (_player.step.y < 0) {
+									if (_mapElement.y - _mapElement.radius >= _player.y + _player.radius) {
+										_mapElement.step.y = -_player.step.y;
+									}
+								} else {
+									if (_mapElement.y + _mapElement.radius <= _player.y - _player.radius) {
+										_mapElement.step.y = -_player.step.y;
+									}
+								}
+							}
 						} else {
 							_mapElement.step.y = (_mapElement.y > _player.y ? -1 : 1);
 						}
