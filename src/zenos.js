@@ -26,7 +26,7 @@
 
 	// Default values
 	const defaults = {
-		elementTypesCanHit: [3, 5, 7, 9, 11, 101], // Element types that may produce damage or gain (hit possible)
+		elementTypesCanHit: [3, 5, 7, 9, 11, 101, 201], // Element types that may produce damage or gain (hit possible)
 		aggroRange: 200, // Range (in pixels) where a player can get aggroed by a map element
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
@@ -936,7 +936,7 @@
 		if (_mapElement.step) {
 			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _mapElements, _player);
 
-			if (![100, 101].includes(_mapElement.type)) { // Types 100 and 101 defines the platform mode. Element map has a direction but can not move
+			if (_mapElement.type !== 101) { // Type 101 defines the platform mode. Element map has a direction but can not move
 				moveMapElementRangeLimit(_mapElement, playerHasAggro);
 
 				if (_mapElement.step.x) {
@@ -1271,8 +1271,8 @@
 			*/
 			case 2:
 			case 3: // Keep origin movement
-			case 100:
-			case 101: // Keep origin movement - platform mode (stacked in place)
+			case 101: // Platform mode - keep origin movement (stacked in place)
+			case 201: // Mob type - keep origin movement (only for mobs)
 			case 4:
 			case 5: // Stop origin movement
 			case 6:
@@ -2034,8 +2034,8 @@
 				9 - Collision -> disappear on every collision - as origin or target (except borders) - hit may produce damage or gain
 				10 - Collision -> disappear only if receives the collision - as target (except borders) - no hit possible
 				11 - Collision -> disappear only if receives the collision - as target (except borders) - hit may produce damage or gain
-				100 - Collision -> persistent (origin keeps movement) - no hit possible (Platform mode)
 				101 - Collision -> persistent (origin keeps movement) - hit may produce damage or gain (Platform mode)
+				201 - collision -> persistent (origin keeps movement) - hit may produce damage or gain (only for mobs!)
 
 			** player starting point: 'mid' for middle screen ou number in pixels
 			** Hint: put all diable elements (with life property) in the end of the array for render performance
@@ -2205,7 +2205,7 @@
 						name: 'Gamon',
 						life: 750,
 						damageTakenFactor: 15, // Only applicable if element has a life property
-						type: 3,
+						type: 201, // Type 201 defines the mob type, used only for mobs
 						radius: 30,
 						x: 500,
 						y: 500,
@@ -2238,7 +2238,7 @@
 						name: 'Zok',
 						life: 950,
 						damageTakenFactor: 25, // Only applicable if element has a life property
-						type: 3,
+						type: 201, // Type 201 defines the mob type, used only for mobs
 						width: 50,
 						height: 50,
 						x: 900,
@@ -2287,7 +2287,7 @@
 						name: 'Tundro',
 						life: 1250,
 						damageTakenFactor: 45, // Only applicable if element has a life property
-						type: 3,
+						type: 201, // Type 201 defines the mob type, used only for mobs
 						width: 35,
 						height: 35,
 						x: 700,
@@ -2311,7 +2311,7 @@
 						name: 'Shot tower',
 						life: 2000,
 						damageTakenFactor: 45, // Only applicable if element has a life property
-						type: 101, // Type 100 and 101 defines the plataform mode (element can have a direction, but can not move)
+						type: 101, // Type 101 defines the plataform mode (element can have a direction, but can not move)
 						width: 60,
 						height: 60,
 						x: 21,
