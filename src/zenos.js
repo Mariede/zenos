@@ -21,6 +21,7 @@
 			_savedX - for map elements when getting aggro to save last step x value
 			_savedY - for map elements when getting aggro to save last step y value
 			_hitAmount - for map elements only when shooting: current counter for hit pause time checks
+			_isAggroed - for map elements only that can be aggroed: true when element get aggroed by a player
 	*/
 
 	// Default values
@@ -792,15 +793,30 @@
 	};
 
 	// Check if player got aggroed and move accordly (if applicable)
-	const moveMapElementPlayerAggro = (_mapElement, _player) => {
+	const moveMapElementPlayerAggro = (_mapElement, _mapElements, _player) => {
 		let playerHasAggro = false;
 
 		// If aggroRange equals -1 or element has no life: no aggro permitted for the element
 		if (_mapElement.aggroRange !== -1 && _mapElement.life && _mapElement.life > 0) {
-			const aggroCheck = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
-			const aggroRange = (_mapElement.aggroRange || defaults.aggroRange) ** 2;
+			const aggroGroupCheck = (
+				_mapElements
+				.filter(
+					element => _mapElement.aggroGroup && element.id !== _mapElement.id && element.aggroGroup === _mapElement.aggroGroup
+				)
+				.some(
+					element => element._isAggroed
+				)
+			);
 
-			if (aggroCheck <= aggroRange) {
+			const aggroPlayer = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
+			const aggroRange = (_mapElement.aggroRange || defaults.aggroRange) ** 2;
+			const aggroCheck = aggroPlayer <= aggroRange;
+
+			if (aggroGroupCheck || aggroCheck) {
+				if (!aggroGroupCheck) {
+					_mapElement._isAggroed = true;
+				}
+
 				if (!_mapElement.step._savedX && _mapElement.step._savedX !== 0) {
 					_mapElement.step._savedX = _mapElement.step.x; // Temporary
 				}
@@ -887,6 +903,8 @@
 
 				playerHasAggro = true;
 			} else {
+				_mapElement._isAggroed = false;
+
 				if (_mapElement.step._savedX || _mapElement.step._savedX === 0) {
 					_mapElement.step.x = _mapElement.step._savedX;
 					delete _mapElement.step._savedX;
@@ -902,9 +920,9 @@
 		return playerHasAggro;
 	};
 
-	const moveMapElement = (_mapElement, _player) => {
+	const moveMapElement = (_mapElement, _mapElements, _player) => {
 		if (_mapElement.step) {
-			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _player);
+			const playerHasAggro = moveMapElementPlayerAggro(_mapElement, _mapElements, _player);
 
 			if (![100, 101].includes(_mapElement.type)) { // Types 100 and 101 defines the platform mode. Element map has a direction but can not move
 				moveMapElementRangeLimit(_mapElement, playerHasAggro);
@@ -977,7 +995,7 @@
 				}
 			} else {
 				// Movement (if applicable)
-				const playerHasAggro = moveMapElement(mapElement, _player);
+				const playerHasAggro = moveMapElement(mapElement, mapElements, _player);
 
 				// Collisions
 				checkElementCollisions(mapElement, _player, _map);
@@ -2181,6 +2199,7 @@
 						y: 500,
 						currentDirection: 9, // Must have for getting and drawning element direction
 						hitBonus: 20, // Only applicable if element type can hit
+						aggroGroup: 1,
 						style: {
 							color: {
 								body: '%elements.11.style.color.body',
@@ -2263,6 +2282,7 @@
 						y: 150,
 						currentDirection: 10, // Must have for getting and drawning element direction
 						hitBonus: 200, // Only applicable if element type can hit
+						aggroGroup: 1,
 						style: {
 							color: {
 								body: 'brown',

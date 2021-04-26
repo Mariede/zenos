@@ -135,8 +135,7 @@ It will be converted to a React application soon enough!
  * **aggroRange**: Optional (default 200). Range (in pixels) where a player can get aggroed by a map element.
    > A map element can be aggressive (aggro) only if it has a **life** property and **aggroRange** property value **is not equal -1**
    > - Player hits **increase aggro range**
- * **aggroGroup**: Optional. A unique number. If any map element of the group get aggroed by a player, the whole group will.
-   > NOT READY. WILL BE IMPLEMENTED SOON...
+ * **aggroGroup**: Optional. A unique number. If any map element of the group get aggroed by a player, the **whole group** will.
  * **hitPauseTimeCheck**: Optional (default [5, 5000]). For hitting pause time checks, only for map elements that can shoot.
    > [maxHitTrigger ,timeToWait] - **maxHitTrigger** is a positive integer, **timeToWait** in miliseconds
  * **style**: Defines the style of the map element drawn - hitbox body and details.
@@ -190,6 +189,8 @@ It will be converted to a React application soon enough!
  * **_savedY**: for map elements when getting aggro to save last step y value.
    > Does not exists for players
  * **_hitAmount**: for map elements only when shooting: current counter for hit pause time checks.
+   > Does not exists for players
+ * _isAggroed - for map elements only that can be aggroed: true when element get aggroed by a player.
    > Does not exists for players
 
 ### Defaults only values
