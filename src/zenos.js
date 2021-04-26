@@ -751,6 +751,15 @@
 		}
 	};
 
+	// Shield action (if applicable)
+	const elementActionShieldRemove = _mapElement => {
+		const shieldData = _mapElement.skills && _mapElement.skills.shield;
+
+		if (shieldData && _mapElement._isShieldUp) {
+			_mapElement._isShieldUp = false;
+		}
+	};
+
 	// Execute element actions (if applicable)
 	const elementActions = (_mapElement, _map, _playerHasAggro) => {
 		if (_playerHasAggro) {
@@ -759,6 +768,9 @@
 
 			// Check shooting action
 			elementActionShot(_mapElement, _map);
+		} else {
+			// Check shield action
+			elementActionShieldRemove(_mapElement);
 		}
 	};
 
