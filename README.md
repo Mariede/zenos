@@ -220,7 +220,7 @@ It will be converted to a React application soon enough!
     + **101**. Collision &#8594; action: persistent, origin keeps movement - can hit: yes (Platform mode)
       > An element in **platform mode** can have a direction but can not move (keep stacked in place)
     + **201**. Collision &#8594; action: persistent, origin keeps movement - can hit: yes (Mob type)
-      > Type 201 is **only for mobs** (element maps that has life, can move and hit)
+      > Type 201 is **only for mobs** (easy way to identify a mobile agressive map element)
  * Every element that has a life property will disappear if life reachs zero.
 
 ## Element directions
@@ -253,3 +253,6 @@ It will be converted to a React application soon enough!
 ##  Hit log screen
  * It is an option in the game menu.
  * Shows hit logs in the game with some details, like: hit value, hit bonus, damage taken factor and reduce factor.
+
+## Tips
+ * Using circle (radius) for players and mobs hit boxes will improve aggro collisions when having multiple mobs over the player.

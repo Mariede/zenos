@@ -848,7 +848,7 @@
 					_mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2)
 				);
 
-				const secureNearAggroValue = (_player.radius || (_player.width / 2));
+				const secureNearAggroValue = Math.abs((_mapElement.radius || (_mapElement.width / 2)) - (_player.radius || (_player.width / 2))) + 1;
 
 				const validateAggroX = (_player.x > checkMapElementX + secureNearAggroValue) || (_player.x < checkMapElementX - secureNearAggroValue);
 				const validateAggroY = (_player.y > checkMapElementY + secureNearAggroValue) || (_player.y < checkMapElementY - secureNearAggroValue);
@@ -2035,7 +2035,7 @@
 				10 - Collision -> disappear only if receives the collision - as target (except borders) - no hit possible
 				11 - Collision -> disappear only if receives the collision - as target (except borders) - hit may produce damage or gain
 				101 - Collision -> persistent (origin keeps movement) - hit may produce damage or gain (Platform mode)
-				201 - collision -> persistent (origin keeps movement) - hit may produce damage or gain (only for mobs!)
+				201 - collision -> persistent (origin keeps movement) - hit may produce damage or gain (only for mobs! Easy way to identify a mobile agressive map element)
 
 			** player starting point: 'mid' for middle screen ou number in pixels
 			** Hint: put all diable elements (with life property) in the end of the array for render performance
@@ -2288,8 +2288,7 @@
 						life: 1250,
 						damageTakenFactor: 45, // Only applicable if element has a life property
 						type: 201, // Type 201 defines the mob type, used only for mobs
-						width: 35,
-						height: 35,
+						radius: 20,
 						x: 700,
 						y: 150,
 						currentDirection: 10, // Must have for getting and drawning element direction
