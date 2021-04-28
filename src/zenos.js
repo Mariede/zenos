@@ -1610,7 +1610,7 @@
 			);
 
 			if (lifeModifier !== 0) {
-				let lifeModifierReduceFactor = 1,
+				let damageReduceFactor = 1,
 					goModifyLife = false;
 
 				if (lifeModifier > 0) {
@@ -1631,7 +1631,7 @@
 									elementTakingHit._isShieldUp = false;
 								}
 
-								lifeModifierReduceFactor = (shieldData.shieldReduceFactor || defaults.shieldReduceFactor);
+								damageReduceFactor = (shieldData.shieldReduceFactor || defaults.shieldReduceFactor);
 							}
 						}
 
@@ -1645,7 +1645,7 @@
 				}
 
 				if (goModifyLife) {
-					const lifeModifierFinal = Math.round(lifeModifier / lifeModifierReduceFactor);
+					const lifeModifierFinal = Math.round(lifeModifier / damageReduceFactor);
 					const elementResultedLife = elementTakingHit.life - lifeModifierFinal;
 
 					elementTakingHit.life = (elementResultedLife > 0 ? elementResultedLife : 0);
@@ -1658,7 +1658,7 @@
 					}
 
 					// Hit log
-					setHitLog(elementTakingHit, lifeModifierFinal, hitBonus, damageTakenFactor, lifeModifierReduceFactor);
+					setHitLog(elementTakingHit, elementHitting, lifeModifierFinal, hitBonus, damageTakenFactor, damageReduceFactor);
 				}
 			}
 		}
@@ -1753,14 +1753,14 @@
 	// -----------------------------------------------------------------------------------------------
 	// Hit log screen
 	// -----------------------------------------------------------------------------------------------
-	const setHitLog = (_elementTakingHit, _lifeModifierFinal, _hitBonus, _damageTakenFactor, _lifeModifierReduceFactor) => {
+	const setHitLog = (_elementTakingHit, elementHitting, _lifeModifierFinal, _hitBonus, _damageTakenFactor, _damageReduceFactor) => {
 		const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
 
 		const logToWrite = (
 			`${!_elementTakingHit.id ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${(_elementTakingHit.name || _elementTakingHit.id)}</strong>`} &#10144;
 				${
-					_hitBonus !== undefined && _damageTakenFactor !== undefined && _lifeModifierReduceFactor !== undefined ? (
-						` hitted by <strong>${_lifeModifierFinal}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | reduce factor <strong>${_lifeModifierReduceFactor}</strong>`
+					_hitBonus !== undefined && _damageTakenFactor !== undefined && _damageReduceFactor !== undefined ? (
+						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(elementHitting.name || elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
 					) : (
 						` loses <strong>${_lifeModifierFinal}</strong> (time)`
 					)
@@ -1934,7 +1934,7 @@
 					_player.life = (playerResultedLife > 0 ? playerResultedLife : 0);
 
 					// Hit log
-					setHitLog(_player, lifeModifierFinal);
+					setHitLog(_player, {}, lifeModifierFinal);
 				}
 
 				setMenuScreen(_player, _map);
