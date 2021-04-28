@@ -26,7 +26,7 @@
 
 	// Default values
 	const defaults = {
-		elementTypesCanHit: [3, 5, 7, 9, 11, 101, 201], // Element types that may produce damage or gain (hit possible)
+		elementTypesCanHit: [3, 5, 7, 9, 11, 101, 201, 301], // Element types that may produce damage or gain (hit possible)
 		aggroRange: 200, // Range (in pixels) where a player can get aggroed by a map element
 		damageTakenFactor: 50, // Only applicable if element has a life property - Lesser is more defense (default max 50)
 		timeBetweenHits: 450, // In miliseconds, only applicable if element can hit
@@ -1273,6 +1273,7 @@
 			case 3: // Keep origin movement
 			case 101: // Platform mode - keep origin movement (stacked in place)
 			case 201: // Mob type - keep origin movement (only for mobs)
+			case 301: // Player type - keep origin movement (only for players)
 			case 4:
 			case 5: // Stop origin movement
 			case 6:
@@ -2037,7 +2038,8 @@
 				10 - Collision -> disappear only if receives the collision - as target (except borders) - no hit possible
 				11 - Collision -> disappear only if receives the collision - as target (except borders) - hit may produce damage or gain
 				101 - Collision -> persistent (origin keeps movement) - hit may produce damage or gain (Platform mode)
-				201 - collision -> persistent (origin keeps movement) - hit may produce damage or gain (only for mobs! Easy way to identify a mobile agressive map element)
+				201 - collision -> persistent (origin keeps movement) - hit may produce damage or gain (only for mobile agressive map elements)
+				301 - collision -> persistent (origin keeps movement) - hit may produce damage or gain (only for players)
 
 			** player starting point: 'mid' for middle screen ou number in pixels
 			** Hint: put all diable elements (with life property) in the end of the array for render performance
@@ -2580,7 +2582,7 @@
 				life: 500,
 				damageTakenFactor: 35, // Only applicable if element has a life property
 				timeBetweenHits: 250, // Time between element hits, only applicable if element can hit (in this case considered melee hits)
-				type: 3, // Type of the player object (based on the maps element types)
+				type: 301, // Type of the player object (based on the maps element types)
 				radius: 20,
 				x: 0, // Initially added to mapStartPointX
 				y: 0, // Initially added to mapStartPointY

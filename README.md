@@ -73,7 +73,7 @@ It will be converted to a React application soon enough!
  * **_savedDetails**: for blinking style details color of element (when shooting).
 
 ### Defaults only values
- * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101, 201).
+ * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101, 201, 301).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
  * **shieldCap**: Shield background color.
 
@@ -195,7 +195,7 @@ It will be converted to a React application soon enough!
    > Does not exists for players
 
 ### Defaults only values
- * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101, 201).
+ * **elementTypesCanHit**: Array indicating which element types can hit (3, 5, 7, 9, 11, 101, 201, 301).
  * **isTakingDamageColor**: The color of the element when taking damage (red).
  * **shieldCap**: Shield background color.
  * **timeBetweenShieldUps**: Delay time between charges for skill shield to be up again (miliseconds)
@@ -222,6 +222,8 @@ It will be converted to a React application soon enough!
       > An element in **platform mode** can have a direction but can not move (keep stacked in place)
     + **201**. Collision &#8594; action: persistent, origin keeps movement - can hit: yes (Mob type)
       > Type 201 is **only for mobs** (easy way to identify a mobile agressive map element)
+    + **301**. Collision &#8594; action: persistent, origin keeps movement - can hit: yes (Player type)
+      > Type 301 is **only for players** (easy way to identify a player map element)
  * Every element that has a life property will disappear if life reachs zero.
 
 ## Element directions
