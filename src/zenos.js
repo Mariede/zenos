@@ -407,6 +407,18 @@
 	// Drawns element shots (works better with circle and square elements)
 	// Shot drawning is always in circle format (for performance)
 	const _drawnElementShot = (elementShooting, _map, _newShootDataBaseElement, _newShootDataSpeed) => {
+		const shootSoundEffect = (_map, _newShootDataBaseElement) => {
+			// Sound effect
+			const playSound = _map.sounds.filter(sound => sound.id === (_newShootDataBaseElement.ref === 301 ? 'player-shoot' : 'mob-shoot')).pop();
+
+			if (playSound) {
+				playSound.audio.cloneNode().play()
+				.catch(
+					err => console.error(err) // eslint-disable-line no-console
+				);
+			}
+		};
+
 		const currentElementDirection = _getElementDirection(elementShooting);
 
 		const checkDirectionXpositive = ['NE', 'E', 'SE'].includes(currentElementDirection);
@@ -504,6 +516,7 @@
 		};
 
 		_map.elements.push({ ..._newShootDataBaseElement, ...newShootDataAttach });
+		shootSoundEffect(_map, _newShootDataBaseElement);
 	};
 
 	// -----------------------------------------------------------------------------------------------
@@ -523,7 +536,20 @@
 
 						if (shieldData) {
 							if (!_player._isShieldUp && shieldData.charges > 0) {
+								const shieldSoundEffect = _map => {
+									// Sound effect
+									const playSound = _map.sounds.filter(sound => sound.id === 'shield-up').pop();
+
+									if (playSound) {
+										playSound.audio.cloneNode().play()
+										.catch(
+											err => console.error(err) // eslint-disable-line no-console
+										);
+									}
+								};
+
 								_player._isShieldUp = true;
+								shieldSoundEffect(_map);
 							} else {
 								_player._isShieldUp = false;
 							}
@@ -689,12 +715,25 @@
 	// -----------------------------------------------------------------------------------------------
 
 	// Shield action (if applicable)
-	const elementActionShield = _mapElement => {
+	const elementActionShield = (_mapElement, _map) => {
+		const shieldSoundEffect = _map => {
+			// Sound effect
+			const playSound = _map.sounds.filter(sound => sound.id === 'shield-up').pop();
+
+			if (playSound) {
+				playSound.audio.cloneNode().play()
+				.catch(
+					err => console.error(err) // eslint-disable-line no-console
+				);
+			}
+		};
+
 		const shieldData = _mapElement.skills && _mapElement.skills.shield;
 
 		if (shieldData) {
 			if (_mapElement._isShieldUp === undefined) { // Start shield
 				_mapElement._isShieldUp = true;
+				shieldSoundEffect(_map);
 			} else {
 				if (shieldData.charges > 0) {
 					const currentShieldUpTimeCheck = Date.now();
@@ -704,6 +743,7 @@
 					} else {
 						if (currentShieldUpTimeCheck > _mapElement._isTimeBetweenShieldUps) {
 							_mapElement._isShieldUp = true;
+							shieldSoundEffect(_map);
 						}
 					}
 				}
@@ -764,7 +804,7 @@
 	const elementActions = (_mapElement, _map, _playerHasAggro) => {
 		if (_playerHasAggro) {
 			// Check shield action
-			elementActionShield(_mapElement);
+			elementActionShield(_mapElement, _map);
 
 			// Check shooting action
 			elementActionShot(_mapElement, _map);
@@ -1594,7 +1634,7 @@
 	};
 
 	// Calculate element new modified life (if applicable)
-	const setElementLifeModifier = (elementHitting, elementTakingHit, hitBonus) => {
+	const setElementLifeModifier = (elementHitting, elementTakingHit, hitBonus, _map) => {
 		if (defaults.elementTypesCanHit.includes(elementHitting.type) && elementTakingHit && elementTakingHit.life && elementTakingHit.life > 0) {
 			const damageTakenFactor = (elementTakingHit.damageTakenFactor || defaults.damageTakenFactor);
 			const damageReducer = (damageTakenFactor >= defaults.damageTakenFactor ? 1 : damageTakenFactor / defaults.damageTakenFactor);
@@ -1648,6 +1688,18 @@
 				}
 
 				if (goModifyLife) {
+					const hittedSoundEffect = _map => {
+						// Sound effect
+						const playSound = _map.sounds.filter(sound => sound.id === 'hitted').pop();
+
+						if (playSound) {
+							playSound.audio.cloneNode().play()
+							.catch(
+								err => console.error(err) // eslint-disable-line no-console
+							);
+						}
+					};
+
 					const lifeModifierFinal = Math.round(lifeModifier / damageReduceFactor);
 					const elementResultedLife = elementTakingHit.life - lifeModifierFinal;
 
@@ -1659,6 +1711,9 @@
 							elementTakingHit.aggroRange = (elementTakingHit.aggroRange || defaults.aggroRange) + defaults.aggroRange;
 						}
 					}
+
+					// Sound effect
+					hittedSoundEffect(_map);
 
 					// Hit log
 					setHitLog(elementTakingHit, elementHitting, lifeModifierFinal, hitBonus, damageTakenFactor, damageReduceFactor);
@@ -1681,8 +1736,8 @@
 					// Decrease/Increase current checkElement life
 						const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = _collidedPlayer;
 
-						setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
-						setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+						setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus, _map);
+						setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus, _map);
 
 						// Update menu screen
 						setMenuScreen(_player, _map);
@@ -1696,8 +1751,8 @@
 						// Decrease/Increase current checkElement life
 						const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = _collidedData;
 
-						setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
-						setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+						setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus, _map);
+						setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus, _map);
 					}
 				);
 			}
@@ -1716,8 +1771,8 @@
 					// Decrease/Increase player life (the current checkElement)
 					const { elementOrigin, elementOriginHitBonus, elementTarget, elementTargetHitBonus } = _collidedPlayer;
 
-					setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus);
-					setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus);
+					setElementLifeModifier(elementTarget, elementOrigin, elementTargetHitBonus, _map);
+					setElementLifeModifier(elementOrigin, elementTarget, elementOriginHitBonus, _map);
 
 					// Update menu screen
 					setMenuScreen(_player, _map);
@@ -1746,7 +1801,7 @@
 
 			if (_player.life <= 0) {
 				cancelAnimationFrame($animationFrameId);
-				endGame(_action, _cx, _player);
+				endGame(_action, _cx, _player, _map);
 			}
 		} catch (err) {
 			console.error(err); // eslint-disable-line no-console
@@ -1888,7 +1943,34 @@
 	};
 
 	// Actually ends
-	const endGame = (_action, _cx, _player) => {
+	const endGame = (_action, _cx, _player, _map) => {
+		const gameOverFinalActions = (_action, _cx, _player, _map) => {
+			// Sound effect
+			const playGameOverSound = _map.sounds.filter(sound => sound.id === 'fail').pop();
+
+			if (playGameOverSound) {
+				const resetGameSounds = new Event('resetGameSounds'); // Custom event
+
+				document.dispatchEvent(resetGameSounds);
+
+				playGameOverSound.audio.onended = () => {
+					gameOverMessage(_action, _cx, _player);
+
+					// Keyboard listeners
+					document.body.addEventListener(
+						'keypress',
+						listeners.keyPressHandlerRestartGame,
+						false
+					);
+				};
+
+				playGameOverSound.audio.play()
+				.catch(
+					err => console.error(err) // eslint-disable-line no-console
+				);
+			}
+		};
+
 		$isOver = true;
 
 		clearInterval($intervalTimer);
@@ -1900,13 +1982,7 @@
 			false
 		);
 
-		document.body.addEventListener(
-			'keypress',
-			listeners.keyPressHandlerRestartGame,
-			false
-		);
-
-		gameOverMessage(_action, _cx, _player);
+		gameOverFinalActions(_action, _cx, _player, _map);
 	};
 
 	// Actually starts
@@ -1962,6 +2038,37 @@
 	// -----------------------------------------------------------------------------------------------
 	// Load map
 	const mapsRepo = () => {
+		/*
+			Maps sounds and effects
+		*/
+		const mapsSounds = [
+			{
+				idMap: 1,
+				effects: [
+					{
+						id: 'mob-shoot',
+						content: './sounds/effects/mob-shoot.mp3'
+					},
+					{
+						id: 'player-shoot',
+						content: './sounds/effects/player-shoot.mp3'
+					},
+					{
+						id: 'shield-up',
+						content: './sounds/effects/shield-up.mp3'
+					},
+					{
+						id: 'hitted',
+						content: './sounds/effects/hitted.mp3'
+					},
+					{
+						id: 'fail',
+						content: './sounds/effects/fail.mp3'
+					}
+				]
+			}
+		];
+
 		/*
 			Maps images and elements colors
 				-> each item in the outer array (first) defines a image map set (same order as maps)
@@ -2364,6 +2471,7 @@
 
 		return (
 			{
+				mapsSounds,
 				mapsFillSpecial,
 				maps
 			}
@@ -2426,11 +2534,41 @@
 		)
 	);
 
-	const loadMapData = (_mapsFillSpecial, _maps, _mapId) => (
+	const loadMapData = (_mapsSounds, _mapsFillSpecial, _maps, _mapId) => (
 		new Promise(
 			(resolve, reject) => {
+				const mapSounds = _mapsSounds.filter(map => _mapId && map.idMap === _mapId).pop();
 				const mapFillSpecial = _mapsFillSpecial.filter(map => _mapId && map.idMap === _mapId).pop().fillers;
 				const map = _maps.filter(map => _mapId && map.idMap === _mapId).pop();
+
+				const mapSoundEffects = mapSounds.effects.map(
+					({ id, content, ...options }) => {
+						const audio = new Audio();
+
+						audio.src = content;
+
+						audio.preload = 'auto';
+						audio.autoplay = false;
+						audio.controls = false;
+						audio.loop = false;
+
+						if (options.volume) {
+							audio.volume = options.volume;
+						}
+
+						// Events actions
+						const _onEndGame = e => {
+							audio.pause();
+							audio.remove();
+							e.target.removeEventListener(e.type, _onEndGame);
+						};
+
+						// Custom event listener
+						document.addEventListener('resetGameSounds', _onEndGame);
+
+						return { id, audio };
+					}
+				);
 
 				const arrFillSpecial = [];
 
@@ -2444,7 +2582,8 @@
 						resolve(
 							{
 								map: map,
-								arrFillSpecial: result
+								arrFillSpecial: result,
+								soundEffects: mapSoundEffects
 							}
 						);
 					}
@@ -2459,13 +2598,14 @@
 	const getMapData = (_cx, mapId) => (
 		new Promise(
 			(resolve, reject) => {
-				const { mapsFillSpecial, maps } = mapsRepo();
+				const { mapsSounds, mapsFillSpecial, maps } = mapsRepo();
 
-				loadMapData(mapsFillSpecial, maps, mapId)
+				loadMapData(mapsSounds, mapsFillSpecial, maps, mapId)
 				.then(
 					result => {
 						const map = result.map;
 						const arrFillSpecial = result.arrFillSpecial;
+						const soundEffects = result.soundEffects;
 
 						arrFillSpecial.forEach(
 							item => {
@@ -2510,6 +2650,9 @@
 								_objFindAndReplace(map, mapId, mapFillStyle);
 							}
 						);
+
+						// Map sounds attached
+						map.sounds = soundEffects;
 
 						resolve(map);
 					}
