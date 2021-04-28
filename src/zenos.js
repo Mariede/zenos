@@ -1753,14 +1753,14 @@
 	// -----------------------------------------------------------------------------------------------
 	// Hit log screen
 	// -----------------------------------------------------------------------------------------------
-	const setHitLog = (_elementTakingHit, elementHitting, _lifeModifierFinal, _hitBonus, _damageTakenFactor, _damageReduceFactor) => {
+	const setHitLog = (_elementTakingHit, _elementHitting, _lifeModifierFinal, _hitBonus, _damageTakenFactor, _damageReduceFactor) => {
 		const hitLogContent = document.querySelector('#screen > div#general > div#menu > div#bottom > span#hit-log > div#content'); // Logs
 
 		const logToWrite = (
 			`${!_elementTakingHit.id ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${(_elementTakingHit.name || _elementTakingHit.id)}</strong>`} &#10144;
 				${
 					_hitBonus !== undefined && _damageTakenFactor !== undefined && _damageReduceFactor !== undefined ? (
-						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(elementHitting.name || (elementHitting.ref && (elementHitting.ref === 'player' ? 'Player skill' : 'Environment skill')) || elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
+						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(_elementHitting.name || (_elementHitting.ref && (_elementHitting.ref === 'player' ? 'Player skill' : 'Environment skill')) || _elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
 					) : (
 						` loses <strong>${_lifeModifierFinal}</strong> (time)`
 					)
