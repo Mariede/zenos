@@ -191,7 +191,7 @@
 
 			_cx.beginPath();
 			_cx.arc(_element.x, _element.y, _element.radius, 0, 2 * Math.PI);
-			_cx.fillStyle = elementStyle.color.body;
+			_cx.fillStyle = elementStyle.main.body;
 			_cx.fill();
 			_cx.closePath();
 
@@ -213,7 +213,7 @@
 				_cx.translate(-_element.x, -_element.y);
 			}
 
-			_cx.fillStyle = elementStyle.color.body;
+			_cx.fillStyle = elementStyle.main.body;
 			_cx.fillRect(_element.x, _element.y, _element.width, _element.height);
 
 			if (elementStyle.border) {
@@ -250,7 +250,7 @@
 				}
 
 				_cx.lineTo(_getX, _getY);
-				_cx.strokeStyle = _element.style.color.details;
+				_cx.strokeStyle = _element.style.main.details;
 				_cx.stroke();
 				_cx.closePath();
 
@@ -960,30 +960,30 @@
 
 	const drawMapElements = (_cx, _player, _map) => {
 		const _drawnElementDetails = (_cx, _mapElement) => {
-			const mapElementStyleColor = _mapElement.style && _mapElement.style.color;
+			const mapElementStyleMain = _mapElement.style && _mapElement.style.main;
 
 			// Takes damage
 			if (_mapElement._isTakingDamage) {
-				mapElementStyleColor.body = defaults.isTakingDamageColor;
+				mapElementStyleMain.body = defaults.isTakingDamageColor;
 				_mapElement._isTakingDamage = false;
 			} else {
-				if (!mapElementStyleColor._savedBody) {
-					mapElementStyleColor._savedBody = mapElementStyleColor.body; // Temporary
+				if (!mapElementStyleMain._savedBody) {
+					mapElementStyleMain._savedBody = mapElementStyleMain.body; // Temporary
 				}
 
-				mapElementStyleColor.body = mapElementStyleColor._savedBody;
+				mapElementStyleMain.body = mapElementStyleMain._savedBody;
 			}
 
 			// Weapon shoot
 			if (_mapElement._isShooting) {
-				mapElementStyleColor.details = (_mapElement.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
+				mapElementStyleMain.details = (_mapElement.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
 				_mapElement._isShooting = false;
 			} else {
-				if (!mapElementStyleColor._savedDetails) {
-					mapElementStyleColor._savedDetails = mapElementStyleColor.details; // Temporary
+				if (!mapElementStyleMain._savedDetails) {
+					mapElementStyleMain._savedDetails = mapElementStyleMain.details; // Temporary
 				}
 
-				mapElementStyleColor.details = mapElementStyleColor._savedDetails;
+				mapElementStyleMain.details = mapElementStyleMain._savedDetails;
 			}
 
 			// Shield
@@ -1111,30 +1111,30 @@
 
 	const renderPlayer = (_action, _cx, _player, _map) => {
 		const _drawnPlayerDetails = (_cx, _player) => {
-			const playerStyleColor = _player.style && _player.style.color;
+			const playerStyleMain = _player.style && _player.style.main;
 
 			// Takes damage
 			if (_player._isTakingDamage) {
-				playerStyleColor.body = defaults.isTakingDamageColor;
+				playerStyleMain.body = defaults.isTakingDamageColor;
 				_player._isTakingDamage = false;
 			} else {
-				if (!playerStyleColor._savedBody) {
-					playerStyleColor._savedBody = playerStyleColor.body; // Temporary
+				if (!playerStyleMain._savedBody) {
+					playerStyleMain._savedBody = playerStyleMain.body; // Temporary
 				}
 
-				playerStyleColor.body = playerStyleColor._savedBody;
+				playerStyleMain.body = playerStyleMain._savedBody;
 			}
 
 			// Weapon shoot
 			if (_player._isShooting) {
-				playerStyleColor.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
+				playerStyleMain.details = (_player.skills.weapon.shoot.isShootingColor || defaults.isShootingColor);
 				_player._isShooting = false;
 			} else {
-				if (!playerStyleColor._savedDetails) {
-					playerStyleColor._savedDetails = playerStyleColor.details; // Temporary
+				if (!playerStyleMain._savedDetails) {
+					playerStyleMain._savedDetails = playerStyleMain.details; // Temporary
 				}
 
-				playerStyleColor.details = playerStyleColor._savedDetails;
+				playerStyleMain.details = playerStyleMain._savedDetails;
 			}
 
 			// Shield
@@ -1965,7 +1965,7 @@
 		/*
 			Maps images and elements colors
 				-> each item in the outer array (first) defines a image map set (same order as maps)
-				-> uses ids to replace properties in maps (style.fillStyle or style.color.body)
+				-> uses ids to replace properties in maps (style.fillStyle or style.main.body)
 
 			type:
 				1 - solid color
@@ -1985,17 +1985,17 @@
 						type: 2
 					},
 					{
-						id: '%elements.2.style.color.body%',
+						id: '%elements.2.style.main.body%',
 						content: './images/brick1.png',
 						type: 2
 					},
 					{
-						id: '%elements.6.style.color.body%',
+						id: '%elements.6.style.main.body%',
 						content: './images/brick2.png',
 						type: 2
 					},
 					{
-						id: '%elements.11.style.color.body',
+						id: '%elements.11.style.main.body',
 						content: _cx => {
 							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
 							gradient.addColorStop(0.5, 'green');
@@ -2006,7 +2006,7 @@
 						type: 6
 					},
 					{
-						id: '%elements.12.style.color.body',
+						id: '%elements.12.style.main.body',
 						content: _cx => {
 							const gradient = _cx.createLinearGradient(0, 0, 800, 800);
 							gradient.addColorStop(0.5, 'gold');
@@ -2068,7 +2068,7 @@
 						x: 148,
 						y: 198,
 						style: {
-							color: {
+							main: {
 								body: 'rgba(238, 238, 238, 0.6)'
 							},
 							border: {
@@ -2086,8 +2086,8 @@
 						x: 150,
 						y: 200,
 						style: {
-							color: {
-								body: '%elements.2.style.color.body%'
+							main: {
+								body: '%elements.2.style.main.body%'
 							},
 							border: {
 								width: 1,
@@ -2103,7 +2103,7 @@
 						x: 290,
 						y: 110,
 						style: {
-							color: {
+							main: {
 								body: 'orangered'
 							}
 						}
@@ -2116,7 +2116,7 @@
 						x: 290,
 						y: 550,
 						style: {
-							color: {
+							main: {
 								body: 'olive'
 							}
 						}
@@ -2129,7 +2129,7 @@
 						x: 800,
 						y: 150,
 						style: {
-							color: {
+							main: {
 								body: 'silver'
 							}
 						}
@@ -2141,8 +2141,8 @@
 						x: 600,
 						y: 280,
 						style: {
-							color: {
-								body: '%elements.6.style.color.body%'
+							main: {
+								body: '%elements.6.style.main.body%'
 							},
 							border: {
 								width: 2,
@@ -2157,7 +2157,7 @@
 						x: 950,
 						y: 550,
 						style: {
-							color: {
+							main: {
 								body: 'deepskyblue'
 							}
 						}
@@ -2169,7 +2169,7 @@
 						x: 1300,
 						y: 350,
 						style: {
-							color: {
+							main: {
 								body: 'yellow'
 							}
 						}
@@ -2183,7 +2183,7 @@
 						x: 20,
 						y: 90,
 						style: {
-							color: {
+							main: {
 								body: 'darkgreen'
 							}
 						},
@@ -2202,7 +2202,7 @@
 						y: 260,
 						hitBonus: -500, // Only applicable if element type can hit (if negative, element gains life)
 						style: {
-							color: {
+							main: {
 								body: 'red'
 							}
 						}
@@ -2220,8 +2220,8 @@
 						hitBonus: 20, // Only applicable if element type can hit
 						aggroGroup: 1,
 						style: {
-							color: {
-								body: '%elements.11.style.color.body',
+							main: {
+								body: '%elements.11.style.main.body',
 								details: 'aquamarine'
 							}
 						},
@@ -2255,8 +2255,8 @@
 						aggroRange: 300, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						hitPauseTimeCheck: [6, 5000], // Optional, only applicable if element can shoot ([maxHitTrigger ,timeToWait] (timeToWait in miliseconds))
 						style: {
-							color: {
-								body: '%elements.12.style.color.body',
+							main: {
+								body: '%elements.12.style.main.body',
 								details: 'darkorange'
 							}
 						},
@@ -2281,7 +2281,7 @@
 										radius: 10, // Always use radius for munition element (centering)
 										hitBonus: 60, // Only applicable if element type can hit (ranged)
 										style: {
-											color: {
+											main: {
 												body: 'red'
 											}
 										}
@@ -2303,7 +2303,7 @@
 						hitBonus: 200, // Only applicable if element type can hit
 						aggroGroup: 1,
 						style: {
-							color: {
+							main: {
 								body: 'brown',
 								details: 'cyan'
 							}
@@ -2327,7 +2327,7 @@
 						hitBonus: 100, // Only applicable if element type can hit
 						aggroRange: 600, // Optional, only applicable if element has a life property... use -1 for no aggro permitted
 						style: {
-							color: {
+							main: {
 								body: 'blue',
 								details: 'green'
 							}
@@ -2349,7 +2349,7 @@
 										radius: 30, // Always use radius for munition element (centering)
 										hitBonus: 150, // Only applicable if element type can hit (ranged)
 										style: {
-											color: {
+											main: {
 												body: 'red'
 											}
 										}
@@ -2589,7 +2589,7 @@
 				currentDirection: 1, // Must have for getting and drawning element direction
 				hitBonus: 10, // Only applicable if element type can hit
 				style: {
-					color: {
+					main: {
 						body: 'black',
 						details: 'red'
 					}
@@ -2620,7 +2620,7 @@
 								radius: 10, // Always use radius for munition element (centering)
 								hitBonus: 50, // Only applicable if element type can hit (ranged)
 								style: {
-									color: {
+									main: {
 										body: 'red'
 									}
 								}
