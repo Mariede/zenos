@@ -256,3 +256,4 @@ It will be converted to a React application soon enough!
 
 ## Tips
  * Using circle (radius) for players and mobs hit boxes will improve aggro collisions when having multiple mobs over the player.
+ * Base elements must have a **ref** named property with one of two values: **player** (if it comes from players) or **env** (if it comes from environment)

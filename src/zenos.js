@@ -1760,7 +1760,7 @@
 			`${!_elementTakingHit.id ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${(_elementTakingHit.name || _elementTakingHit.id)}</strong>`} &#10144;
 				${
 					_hitBonus !== undefined && _damageTakenFactor !== undefined && _damageReduceFactor !== undefined ? (
-						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(elementHitting.name || elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
+						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(elementHitting.name || (elementHitting.ref && (elementHitting.ref === 'player' ? 'Player skill' : 'Environment skill')) || elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
 					) : (
 						` loses <strong>${_lifeModifierFinal}</strong> (time)`
 					)
@@ -2057,6 +2057,7 @@
 				elements: [
 					{
 						id: 1,
+						name: 'Fire wall',
 						type: 3,
 						width: 65,
 						height: 260,
@@ -2171,6 +2172,7 @@
 					},
 					{
 						id: 9,
+						name: 'Swing',
 						type: 7,
 						width: 80,
 						height: 20,
@@ -2188,6 +2190,7 @@
 					},
 					{
 						id: 10,
+						name: 'Food',
 						type: 11,
 						width: 20,
 						height: 20,
@@ -2268,6 +2271,7 @@
 									shootSpeed: 8,
 									charges: 50, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
+										name: 'Zok spit',
 										ref: 'env', // Mandatory for base elements (player for ref from player or env for ref from environment)
 										type: 9, // Always use 9 for munition element (disappear on collision)
 										radius: 10, // Always use radius for munition element (centering)
@@ -2335,6 +2339,7 @@
 									shootSpeed: 5,
 									charges: 200, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
+										name: 'Cannon ball',
 										ref: 'env', // Mandatory for base elements (player for ref from player or env for ref from environment)
 										type: 9, // Always use 9 for munition element (disappear on collision)
 										radius: 30, // Always use radius for munition element (centering)
@@ -2605,6 +2610,7 @@
 							shootSpeed: 12,
 							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
+								name: 'Mike blaster',
 								ref: 'player', // Mandatory for base elements (player for ref from player or env for ref from environment)
 								type: 9, // Always use 9 for munition element (disappear on collision)
 								radius: 10, // Always use radius for munition element (centering)
