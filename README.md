@@ -2,8 +2,10 @@
 
 Building a 2D game engine from scratch using canvas and js for testing purposes.
 
+This project is a remembrance and a tribute to the awesome and wonderful **16-bit Gauntlet** (nintendinho :heart:)!
+
 ```
-It will be converted to a React application soon enough!
+It will be converted to a React application soon!
 ```
 
 ## Player entity

@@ -1987,6 +1987,27 @@
 
 	// Actually starts
 	const beginGame = (_action, _canvas, _cx, _player, _map) => {
+		const gameStartFinalActions = _map => {
+			// Sound effect
+			const playGameStartSound = _map.sounds.filter(sound => sound.id === 'background-music').pop();
+
+			if (playGameStartSound) {
+				playGameStartSound.audio.oncanplay = () => {
+					// Keyboard listeners
+					document.body.addEventListener(
+						'keydown',
+						$keyDownHandlerBeginGame,
+						false
+					);
+				};
+
+				playGameStartSound.audio.play()
+				.catch(
+					err => console.error(err) // eslint-disable-line no-console
+				);
+			}
+		};
+
 		$isOver = false;
 
 		$boxWidth = _canvas.width;
@@ -2028,11 +2049,7 @@
 			false
 		);
 
-		document.body.addEventListener(
-			'keydown',
-			$keyDownHandlerBeginGame,
-			false
-		);
+		gameStartFinalActions(_map);
 	};
 
 	// -----------------------------------------------------------------------------------------------
@@ -2045,6 +2062,11 @@
 			{
 				idMap: 1,
 				effects: [
+					{
+						id: 'background-music',
+						content: './sounds/music/gauntlet.mp3',
+						loop: true
+					},
 					{
 						id: 'mob-shoot',
 						content: './sounds/effects/mob-shoot.mp3'
@@ -2550,7 +2572,11 @@
 						audio.preload = 'auto';
 						audio.autoplay = false;
 						audio.controls = false;
-						audio.loop = false;
+						audio.muted = false;
+
+						if (options.loop) {
+							audio.loop = options.loop;
+						}
 
 						if (options.volume) {
 							audio.volume = options.volume;
