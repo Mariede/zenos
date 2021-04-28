@@ -61,7 +61,7 @@ It will be converted to a React application soon enough!
           > Use -1 for infinite ammo
         * **baseElement**: Mandatory. It is a real time generated element (object) with type 9 and a bonus hit.
           > Base elements must have an extra mandatory property called **ref**
-          > - This **ref** property can use two values: **player** (if it comes from players) or **env** (if it comes from environment)
+          > - This **ref** property can use following values: **301** (if it comes from players) or **101**/**201** (if it comes from environment)
 
 ### Temporary json bindings at execution time
  * **_isShooting**: true when element is shooting.
@@ -171,7 +171,7 @@ It will be converted to a React application soon enough!
           > Use -1 for infinite ammo
         * **baseElement**: Mandatory. It is a real time generated element (object) with type 9 and a bonus hit.
           > Base elements must have an extra mandatory property called **ref**
-          > - This **ref** property can use two values: **player** (if it comes from players) or **env** (if it comes from environment)
+          > - This **ref** property can use following values: **301** (if it comes from players) or **101**/**201** (if it comes from environment)
 
 ### Temporary json bindings at execution time
  * **_isShooting**: true when element is shooting.
@@ -202,7 +202,7 @@ It will be converted to a React application soon enough!
    > Does not exists for players
 
 ## Element types
- * It is a number. Every element in the map has a type (including player).
+ * It is a number. Every element in the map has a type.
  * Each type defines an action associated when collision happens in the game.
  * Odd type numbers means the element can hit and do damage or rise life.
  * The act of collision have an **origin element** and a **target element**.
@@ -259,8 +259,8 @@ It will be converted to a React application soon enough!
 
 ## Tips
  * Using circle (radius) for players and mobs hit boxes will improve aggro collisions when having multiple mobs over the player.
- * Base elements must have a **ref** named property with one of two values:
-    * **player**: if it comes from players.
-    * **env**: if it comes from environment.
+ * Base elements must have a **ref** named property with one of following values:
+    * **301**: if it comes from players.
+    * **101**/**201**: if it comes from environment.
  * Map elements of the **same aggro group** can not hit or be hitted between themselves.
  * Player hits increase aggro range.

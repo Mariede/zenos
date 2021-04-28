@@ -1655,7 +1655,7 @@
 
 					// Increase aggro range (if applicable)
 					if (elementTakingHit.id && elementTakingHit.aggroRange !== -1 && elementTakingHit.life > 0) { // Only map elements can have an id
-						if ((elementHitting.idPlayer || elementHitting.ref === 'player')) {
+						if ((elementHitting.idPlayer || elementHitting.ref === 301)) {
 							elementTakingHit.aggroRange = (elementTakingHit.aggroRange || defaults.aggroRange) + defaults.aggroRange;
 						}
 					}
@@ -1763,7 +1763,7 @@
 			`${!_elementTakingHit.id ? `Player <strong>${_elementTakingHit.name}</strong>` : `Mob <strong>${(_elementTakingHit.name || _elementTakingHit.id)}</strong>`} &#10144;
 				${
 					_hitBonus !== undefined && _damageTakenFactor !== undefined && _damageReduceFactor !== undefined ? (
-						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(_elementHitting.name || (_elementHitting.ref && (_elementHitting.ref === 'player' ? 'Player skill' : 'Environment skill')) || _elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
+						` hitted <strong>${_lifeModifierFinal}</strong> by <strong>${(_elementHitting.name || (_elementHitting.ref && (_elementHitting.ref === 301 ? 'Player skill' : 'Environment skill')) || _elementHitting.id)}</strong>, hit bonus <strong>${_hitBonus}</strong> | damage taken factor <strong>${_damageTakenFactor}</strong> | damage reduce factor <strong>${_damageReduceFactor}</strong>`
 					) : (
 						` loses <strong>${_lifeModifierFinal}</strong> (time)`
 					)
@@ -2276,7 +2276,7 @@
 									charges: 50, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
 										name: 'Zok spit',
-										ref: 'env', // Mandatory for base elements (player for ref from player or env for ref from environment)
+										ref: 201, // Mandatory for base elements (301: ref from player / 101 or 201: ref from environment)
 										type: 9, // Always use 9 for munition element (disappear on collision)
 										radius: 10, // Always use radius for munition element (centering)
 										hitBonus: 60, // Only applicable if element type can hit (ranged)
@@ -2344,7 +2344,7 @@
 									charges: 200, // -1 for infinite ammo
 									baseElement : { // New element guide (basic data)
 										name: 'Cannon ball',
-										ref: 'env', // Mandatory for base elements (player for ref from player or env for ref from environment)
+										ref: 101, // Mandatory for base elements (301: ref from player / 101 or 201: ref from environment)
 										type: 9, // Always use 9 for munition element (disappear on collision)
 										radius: 30, // Always use radius for munition element (centering)
 										hitBonus: 150, // Only applicable if element type can hit (ranged)
@@ -2615,7 +2615,7 @@
 							charges: 200, // -1 for infinite ammo
 							baseElement : { // New element guide (basic data)
 								name: 'Mike blaster',
-								ref: 'player', // Mandatory for base elements (player for ref from player or env for ref from environment)
+								ref: 301, // Mandatory for base elements (301: ref from player / 101 or 201: ref from environment)
 								type: 9, // Always use 9 for munition element (disappear on collision)
 								radius: 10, // Always use radius for munition element (centering)
 								hitBonus: 50, // Only applicable if element type can hit (ranged)
