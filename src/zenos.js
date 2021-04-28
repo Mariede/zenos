@@ -1614,31 +1614,33 @@
 					goModifyLife = false;
 
 				if (lifeModifier > 0) {
-					const currentHitTimeCheck = Date.now();
+					if (!elementHitting.aggroGroup || (elementHitting.aggroGroup !== elementTakingHit.aggroGroup)) { // A group can not hit between them
+						const currentHitTimeCheck = Date.now();
 
-					if (!elementHitting._isTimeBetweenHits || currentHitTimeCheck > elementHitting._isTimeBetweenHits) {
-						// Only if it has a shield option - damage reduced by reduceFactor shield
-						const shieldData = (elementTakingHit.skills && elementTakingHit.skills.shield);
+						if (!elementHitting._isTimeBetweenHits || currentHitTimeCheck > elementHitting._isTimeBetweenHits) {
+							// Only if it has a shield option - damage reduced by reduceFactor shield
+							const shieldData = (elementTakingHit.skills && elementTakingHit.skills.shield);
 
-						if (shieldData) {
-							if (elementTakingHit._isShieldUp && shieldData.charges > 0) {
-								elementTakingHit._shieldBreakAmount = (elementTakingHit._shieldBreakAmount || 0) + 1; // Counter for hits blocked
+							if (shieldData) {
+								if (elementTakingHit._isShieldUp && shieldData.charges > 0) {
+									elementTakingHit._shieldBreakAmount = (elementTakingHit._shieldBreakAmount || 0) + 1; // Counter for hits blocked
 
-								const maxHitBreak = (shieldData.shieldBreakAmount || defaults.shieldBreakAmount); // Counter for hits blocked
+									const maxHitBreak = (shieldData.shieldBreakAmount || defaults.shieldBreakAmount); // Counter for hits blocked
 
-								if (elementTakingHit._shieldBreakAmount % maxHitBreak === 0) {
-									shieldData.charges -= 1;
-									elementTakingHit._isShieldUp = false;
+									if (elementTakingHit._shieldBreakAmount % maxHitBreak === 0) {
+										shieldData.charges -= 1;
+										elementTakingHit._isShieldUp = false;
+									}
+
+									damageReduceFactor = (shieldData.shieldReduceFactor || defaults.shieldReduceFactor);
 								}
-
-								damageReduceFactor = (shieldData.shieldReduceFactor || defaults.shieldReduceFactor);
 							}
+
+							elementTakingHit._isTakingDamage = true;
+							elementHitting._isTimeBetweenHits = currentHitTimeCheck + (elementHitting.timeBetweenHits || defaults.timeBetweenHits);
+
+							goModifyLife = true;
 						}
-
-						elementTakingHit._isTakingDamage = true;
-						elementHitting._isTimeBetweenHits = currentHitTimeCheck + (elementHitting.timeBetweenHits || defaults.timeBetweenHits);
-
-						goModifyLife = true;
 					}
 				} else {
 					goModifyLife = true;

@@ -136,6 +136,7 @@ It will be converted to a React application soon enough!
    > A map element can be aggressive (aggro) only if it has a **life** property and **aggroRange** property value **is not equal -1**
    > - Player hits **increase aggro range**
  * **aggroGroup**: Optional. A unique number. If any map element of the group get aggroed by a player, the **whole group** will.
+   > Map elements of the **same aggro group** can not hit or be hitted between themselves
  * **hitPauseTimeCheck**: Optional (default [5, 5000]). For hitting pause time checks, only for map elements that can shoot.
    > [maxHitTrigger ,timeToWait] - **maxHitTrigger** is a positive integer, **timeToWait** in miliseconds
  * **style**: Defines the style of the map element drawn - hitbox body and details.
@@ -256,4 +257,8 @@ It will be converted to a React application soon enough!
 
 ## Tips
  * Using circle (radius) for players and mobs hit boxes will improve aggro collisions when having multiple mobs over the player.
- * Base elements must have a **ref** named property with one of two values: **player** (if it comes from players) or **env** (if it comes from environment)
+ * Base elements must have a **ref** named property with one of two values:
+    * **player**: if it comes from players.
+    * **env**: if it comes from environment.
+ * Map elements of the **same aggro group** can not hit or be hitted between themselves.
+ * Player hits increase aggro range.
