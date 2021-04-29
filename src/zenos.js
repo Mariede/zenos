@@ -697,16 +697,6 @@
 			if (!_event.repeat) {
 				_beginGame();
 			}
-		},
-		keyPressHandlerRestartGame: _event => {
-			_event.preventDefault();
-
-			// Restart game
-			switch (_event.key) {
-				case 'Enter': {
-					restartGame();
-				}
-			}
 		}
 	};
 
@@ -1894,7 +1884,6 @@
 	let $keyDownHandlerBeginGame,
 		$intervalTimer,
 		$animationFrameId,
-		$isOver,
 		$boxWidth,
 		$boxHeight;
 
@@ -1956,10 +1945,22 @@
 				playGameOverSound.audio.onended = () => {
 					gameOverMessage(_action, _cx, _player);
 
-					// Keyboard listeners
+					// Keyboard listener
+					const _onRestartGame = _event => {
+						_event.preventDefault();
+
+						// Restart game
+						switch (_event.key) {
+							case 'Enter': {
+								_event.target.removeEventListener(_event.type, _onRestartGame, false);
+								startGame();
+							}
+						}
+					};
+
 					document.body.addEventListener(
 						'keypress',
-						listeners.keyPressHandlerRestartGame,
+						_onRestartGame,
 						false
 					);
 				};
@@ -1971,11 +1972,9 @@
 			}
 		};
 
-		$isOver = true;
-
 		clearInterval($intervalTimer);
 
-		// Keyboard listeners
+		// Keyboard listener
 		document.body.removeEventListener(
 			'keydown',
 			$keyDownHandlerBeginGame,
@@ -1993,7 +1992,7 @@
 
 			if (playGameStartSound) {
 				playGameStartSound.audio.oncanplay = () => {
-					// Keyboard listeners
+					// Keyboard listener
 					document.body.addEventListener(
 						'keydown',
 						$keyDownHandlerBeginGame,
@@ -2007,8 +2006,6 @@
 				);
 			}
 		};
-
-		$isOver = false;
 
 		$boxWidth = _canvas.width;
 		$boxHeight = _canvas.height;
@@ -2040,13 +2037,6 @@
 				setMenuScreen(_player, _map);
 			},
 			1000
-		);
-
-		// Keyboard listeners
-		document.body.removeEventListener(
-			'keypress',
-			listeners.keyPressHandlerRestartGame,
-			false
 		);
 
 		gameStartFinalActions(_map);
@@ -2574,23 +2564,24 @@
 						audio.controls = false;
 						audio.muted = false;
 
-						if (options.loop) {
+						if (options.loop === true) {
 							audio.loop = options.loop;
+						} else {
+							audio.loop = false;
 						}
 
 						if (options.volume) {
 							audio.volume = options.volume;
 						}
 
-						// Events actions
+						// Custom event listener
 						const _onEndGame = _event => {
 							audio.pause();
 							audio.remove();
-							_event.target.removeEventListener(_event.type, _onEndGame);
+							_event.target.removeEventListener(_event.type, _onEndGame, false);
 						};
 
-						// Custom event listener
-						document.addEventListener('resetGameSounds', _onEndGame);
+						document.addEventListener('resetGameSounds', _onEndGame, false);
 
 						return { id, audio };
 					}
@@ -2833,14 +2824,7 @@
 		}
 	};
 
-	// Restart game
-	const restartGame = () => {
-		if ($isOver === true) {
-			startGame();
-		}
-	};
-
-	// First time access
+	// Load page
 	const loadGame = () => {
 		const divScreen = document.querySelector('#screen');
 		const divScreenAction = document.querySelector('#screen > div#action');
@@ -2874,7 +2858,10 @@
 		divScreen.appendChild(_divLoadPage);
 		_divLoadPage.appendChild(_divLoadPageText);
 
+		// Keyboard listener
 		const _onLoadGame = _event => {
+			_event.preventDefault();
+
 			// Load game
 			switch (_event.key) {
 				case 'Enter': {
@@ -2886,14 +2873,13 @@
 					divScreenAction.removeAttribute('class');
 					divScreenGeneral.removeAttribute('class');
 
-					_event.target.removeEventListener(_event.type, _onLoadGame);
+					_event.target.removeEventListener(_event.type, _onLoadGame, false);
 
 					startGame();
 				}
 			}
 		};
 
-		// Keyboard listeners
 		document.body.addEventListener(
 			'keypress',
 			_onLoadGame,
