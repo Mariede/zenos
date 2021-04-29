@@ -2843,44 +2843,48 @@
 	// First time access
 	const loadGame = () => {
 		const divScreen = document.querySelector('#screen');
+		const divScreenAction = document.querySelector('#screen > div#action');
+		const divScreenGeneral = document.querySelector('#screen > div#general');
 
-		const divLoadGame = document.createElement('div');
-		const divLoadGameText = document.createElement('div');
+		const _divLoadPage = document.createElement('div');
+		const _divLoadPageText = document.createElement('div');
 
-		// First access page (Home)
+		// Load page (Home)
+		divScreenAction.setAttribute('class', 'is-hidden'); // Set the initial class is-hidden
+		divScreenGeneral.setAttribute('class', 'is-hidden'); // Set the initial class is-hidden
+
 		divScreen.style.backgroundColor = 'darkred';
 
-		divLoadGame.innerHTML = '<img src="./images/home-screen.png" /><br />Zenos';
+		_divLoadPage.innerHTML = '<img src="./images/home-screen.png" alt="home-screen" /><br />Zenos';
 
-		divLoadGame.style.position = 'fixed';
-		divLoadGame.style.top = '50%';
-		divLoadGame.style.left = '50%';
-		divLoadGame.style.fontSize = '2rem';
-		divLoadGame.style.fontStyle = 'italic';
-		divLoadGame.style.textAlign = 'center';
-		divLoadGame.style.letterSpacing = '2px';
-		divLoadGame.style.transform = 'translate(-50%, -50%)';
+		_divLoadPage.style.position = 'absolute';
+		_divLoadPage.style.top = '50%';
+		_divLoadPage.style.left = '50%';
+		_divLoadPage.style.fontSize = '2rem';
+		_divLoadPage.style.fontStyle = 'italic';
+		_divLoadPage.style.textAlign = 'center';
+		_divLoadPage.style.letterSpacing = '2px';
+		_divLoadPage.style.transform = 'translate(-50%, -50%)';
 
-		divLoadGameText.innerHTML = 'Pressione ENTER para iniciar';
+		_divLoadPageText.innerHTML = 'Press ENTER to start';
 
-		divLoadGameText.style.fontSize = '1rem';
+		_divLoadPageText.style.fontSize = '1rem';
+		_divLoadPageText.setAttribute('class', 'blink-me');
 
-		divScreen.appendChild(divLoadGame);
-		divLoadGame.appendChild(divLoadGameText);
+		divScreen.appendChild(_divLoadPage);
+		_divLoadPage.appendChild(_divLoadPageText);
 
 		const _onLoadGame = _event => {
 			// Load game
 			switch (_event.key) {
 				case 'Enter': {
-					const divScreenAction = document.querySelector('#screen > div#action');
-					const divScreenGeneral = document.querySelector('#screen > div#general');
-
-					divLoadGame.removeChild(divLoadGameText);
-					divScreen.removeChild(divLoadGame);
+					_divLoadPage.removeChild(_divLoadPageText);
+					divScreen.removeChild(_divLoadPage);
 
 					divScreen.removeAttribute('style');
-					divScreenAction.removeAttribute('class'); // Remove the initial class is-hidden
-					divScreenGeneral.removeAttribute('class'); // Remove the initial class is-hidden
+
+					divScreenAction.removeAttribute('class');
+					divScreenGeneral.removeAttribute('class');
 
 					_event.target.removeEventListener(_event.type, _onLoadGame);
 

@@ -21,6 +21,17 @@ img {
 	border: 0;
 }
 
+/* blinker home-screen text */
+.blink-me {
+	animation: blinker 3s linear infinite;
+}
+
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
 #screen {
 	position: relative;
 	max-width: 1920px;
