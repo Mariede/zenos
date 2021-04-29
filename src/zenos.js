@@ -1666,9 +1666,9 @@
 				}
 
 				if (goModifyLife) {
-					const hittedSoundEffect = _map => {
+					const hittedSoundEffect = (_map, _lifeModifierFinal) => {
 						// Sound effect
-						const playSound = _map.sounds.filter(sound => sound.id === 'hitted').pop();
+						const playSound = _map.sounds.filter(sound => sound.id === (_lifeModifierFinal > 0 ? 'hitted' : 'food')).pop();
 
 						if (playSound) {
 							playSound.audio.cloneNode().play()
@@ -1691,7 +1691,7 @@
 					}
 
 					// Sound effect
-					hittedSoundEffect(_map);
+					hittedSoundEffect(_map, lifeModifierFinal);
 
 					// Hit log
 					setHitLog(elementTakingHit, elementHitting, lifeModifierFinal, hitBonus, damageTakenFactor, damageReduceFactor);
@@ -2063,6 +2063,10 @@
 					{
 						id: 'fail',
 						content: './sounds/effects/fail.mp3'
+					},
+					{
+						id: 'food',
+						content: './sounds/effects/food.mp3'
 					}
 				]
 			}
