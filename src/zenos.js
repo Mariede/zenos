@@ -520,15 +520,15 @@
 	};
 
 	// -----------------------------------------------------------------------------------------------
-	// Listeners (load / start)
+	// Global listeners
 	// -----------------------------------------------------------------------------------------------
 
-	const listeners = {
+	const globalListeners = {
 		keyDownHandlerBeginGame: (_event, _player, _map) => {
 			_event.preventDefault();
 
 			// Movements / actions -> shield (q) / space / arrow up / arrow down/ arrow left / arrow right
-			const _beginGame = () => {
+			const _playingGameKeys = () => {
 				switch (_event.key) {
 					case 'q':
 					case 'Q': {
@@ -695,7 +695,7 @@
 			};
 
 			if (!_event.repeat) {
-				_beginGame();
+				_playingGameKeys();
 			}
 		}
 	};
@@ -1787,10 +1787,10 @@
 			renderPlayer(_action, _cx, _player, _map);
 
 			// Animation frames
-			$animationFrameId = requestAnimationFrame(() => setActionScreen(_action, _cx, _player, _map));
+			const animationFrameId = requestAnimationFrame(() => setActionScreen(_action, _cx, _player, _map));
 
 			if (_player.life <= 0) {
-				cancelAnimationFrame($animationFrameId);
+				cancelAnimationFrame(animationFrameId);
 				endGame(_action, _cx, _player, _map);
 			}
 		} catch (err) {
@@ -1883,7 +1883,6 @@
 	// Globals
 	let $keyDownHandlerBeginGame,
 		$intervalTimer,
-		$animationFrameId,
 		$boxWidth,
 		$boxHeight;
 
@@ -2010,7 +2009,7 @@
 		$boxWidth = _canvas.width;
 		$boxHeight = _canvas.height;
 
-		$keyDownHandlerBeginGame = event => listeners.keyDownHandlerBeginGame(event, _player, _map);
+		$keyDownHandlerBeginGame = event => globalListeners.keyDownHandlerBeginGame(event, _player, _map);
 
 		// Action screen
 		setActionScreen(_action, _cx, _player, _map);
