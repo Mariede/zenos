@@ -2,7 +2,7 @@
 
 Building a 2D game engine from scratch using canvas and js for testing purposes.
 
-This project is a remembrance and a tribute to the awesome and wonderful **16-bit Gauntlet** (nintendinho :heart:)!
+This project is a remembrance and a tribute to the awesome and wonderful **8-bit Gauntlet** (nintendinho :heart:)!
 
 ```
 It will be converted to a React application soon!
@@ -84,10 +84,19 @@ It will be converted to a React application soon!
 ### Base features
  * Its is the basic rectangle area where all elements of the game will exists.
  * Auto scrolling if the size of the map is bigger than screen.
- * Automatic async load all background images based on json data.
- * Personalized styles (backgrounds, borders, colors).
+ * Automatic async preload all background images based on json data.
+ * Automatic preload all sound effects from the map.
+ * Personalized styles (backgrounds, borders, colors, sounds).
 
-### Json element
+### Secondary Jsons - attached to the Json element (primary)
+ * **mapsSounds**
+    * **idMap**: Mandatory. A number that specifies a unique identifier for the map.
+    * **effects**: Mandatory. Array containing **all the sounds** to be played inside the map.
+ * **mapsFillSpecial**
+    * **idMap**: Mandatory. A number that specifies a unique identifier for the map.
+    * **fillers**: Mandatory. Array containing **all the fill styles** that are personalized for map elements.
+
+### Json element (primary)
  * **idMap**: Mandatory. A number that specifies a unique identifier for the map.
  * **name**: Mandatory. The name of the map.
  * **timer**: Mandatory. Map timer - when it reachs zero game ends.
@@ -254,6 +263,9 @@ It will be converted to a React application soon!
 ## Element actions and collision actions in the code
  * They are two very important parts in the engine structure.
  * We can create intelligent actions for the game, like new skills, keys, doors, move things, ... based on these areas.
+
+## Games sounds
+ * Music and effects.
 
 ##  Hit log screen
  * It is an option in the game menu.
