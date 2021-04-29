@@ -897,14 +897,8 @@
 							if (!_mapElement.radius || !_player.radius) {
 								_mapElement.step.x = -_player.step.x;
 							} else { // Circle x Circle
-								if (_player.step.x < 0) {
-									if (_mapElement.x - _mapElement.radius >= _player.x + _player.radius) {
-										_mapElement.step.x = -_player.step.x;
-									}
-								} else {
-									if (_mapElement.x + _mapElement.radius <= _player.x - _player.radius) {
-										_mapElement.step.x = -_player.step.x;
-									}
+								if (Math.abs(_mapElement.x - _player.x) >= _mapElement.radius + _player.radius) {
+									_mapElement.step.x = -_player.step.x;
 								}
 							}
 						} else {
@@ -927,14 +921,8 @@
 							if (!_mapElement.radius || !_player.radius) {
 								_mapElement.step.y = -_player.step.y;
 							} else { // Circle x Circle
-								if (_player.step.y < 0) {
-									if (_mapElement.y - _mapElement.radius >= _player.y + _player.radius) {
-										_mapElement.step.y = -_player.step.y;
-									}
-								} else {
-									if (_mapElement.y + _mapElement.radius <= _player.y - _player.radius) {
-										_mapElement.step.y = -_player.step.y;
-									}
+								if (Math.abs(_mapElement.y - _player.y) >= _mapElement.radius + _player.radius) {
+									_mapElement.step.y = -_player.step.y;
 								}
 							}
 						} else {
