@@ -524,7 +524,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	const globalListeners = {
-		keyDownHandlerBeginGame: (_event, _player, _map) => {
+		keyDownHandlerPlayingGame: (_event, _player, _map) => {
 			_event.preventDefault();
 
 			// Movements / actions -> shield (q) / space / arrow up / arrow down/ arrow left / arrow right
@@ -1881,7 +1881,7 @@
 	// -----------------------------------------------------------------------------------------------
 
 	// Globals
-	let $keyDownHandlerBeginGame,
+	let $keyDownHandlerPlayingGame,
 		$intervalTimer,
 		$boxWidth,
 		$boxHeight;
@@ -1976,7 +1976,7 @@
 		// Keyboard listener
 		document.body.removeEventListener(
 			'keydown',
-			$keyDownHandlerBeginGame,
+			$keyDownHandlerPlayingGame,
 			false
 		);
 
@@ -1985,16 +1985,18 @@
 
 	// Actually starts
 	const beginGame = (_action, _canvas, _cx, _player, _map) => {
-		const gameStartFinalActions = _map => {
+		const gameStartFinalActions = (_player, _map) => {
 			// Sound effect
 			const playGameStartSound = _map.sounds.filter(sound => sound.id === 'background-music').pop();
 
 			if (playGameStartSound) {
 				playGameStartSound.audio.oncanplay = () => {
 					// Keyboard listener
+					$keyDownHandlerPlayingGame = _event => globalListeners.keyDownHandlerPlayingGame(_event, _player, _map);
+
 					document.body.addEventListener(
 						'keydown',
-						$keyDownHandlerBeginGame,
+						$keyDownHandlerPlayingGame,
 						false
 					);
 				};
@@ -2008,8 +2010,6 @@
 
 		$boxWidth = _canvas.width;
 		$boxHeight = _canvas.height;
-
-		$keyDownHandlerBeginGame = event => globalListeners.keyDownHandlerBeginGame(event, _player, _map);
 
 		// Action screen
 		setActionScreen(_action, _cx, _player, _map);
@@ -2038,7 +2038,7 @@
 			1000
 		);
 
-		gameStartFinalActions(_map);
+		gameStartFinalActions(_player, _map);
 	};
 
 	// -----------------------------------------------------------------------------------------------
