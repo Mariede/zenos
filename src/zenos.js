@@ -1882,7 +1882,7 @@
 
 	// Globals
 	let $keyDownHandlerPlayingGame,
-		$intervalTimer,
+		$intervalMapTimer,
 		$boxWidth,
 		$boxHeight;
 
@@ -1971,7 +1971,7 @@
 			}
 		};
 
-		clearInterval($intervalTimer);
+		clearInterval($intervalMapTimer);
 
 		// Keyboard listener
 		document.body.removeEventListener(
@@ -2017,7 +2017,7 @@
 		// Menu screen
 		setMenuScreen(_player, _map);
 
-		$intervalTimer = setInterval(
+		$intervalMapTimer = setInterval(
 			() => {
 				_map.timer--;
 
