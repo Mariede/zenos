@@ -35,6 +35,10 @@ img {
 	overflow: hidden;
 }
 
+#screen > div#action.is-hidden {
+	display: none;
+}
+
 /* Keep it fixed in pixels, based on map size */
 #screen > div#action > canvas {
 	width: 100%;
@@ -44,6 +48,10 @@ img {
 #screen > div#general {
 	margin-top: 10px;
 	height: 115px;
+}
+
+#screen > div#general.is-hidden {
+	display: none;
 }
 
 #screen > div#general > div#menu {

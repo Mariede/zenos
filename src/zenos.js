@@ -2583,10 +2583,10 @@
 						}
 
 						// Events actions
-						const _onEndGame = e => {
+						const _onEndGame = _event => {
 							audio.pause();
 							audio.remove();
-							e.target.removeEventListener(e.type, _onEndGame);
+							_event.target.removeEventListener(_event.type, _onEndGame);
 						};
 
 						// Custom event listener
@@ -2840,5 +2840,62 @@
 		}
 	};
 
-	startGame();
+	// First time access
+	const loadGame = () => {
+		const divScreen = document.querySelector('#screen');
+
+		const divLoadGame = document.createElement('div');
+		const divLoadGameText = document.createElement('div');
+
+		// First access page (Home)
+		divScreen.style.backgroundColor = 'darkred';
+
+		divLoadGame.innerHTML = '<img src="./images/home-screen.png" /><br />Zenos';
+
+		divLoadGame.style.position = 'fixed';
+		divLoadGame.style.top = '50%';
+		divLoadGame.style.left = '50%';
+		divLoadGame.style.fontSize = '2rem';
+		divLoadGame.style.fontStyle = 'italic';
+		divLoadGame.style.textAlign = 'center';
+		divLoadGame.style.letterSpacing = '2px';
+		divLoadGame.style.transform = 'translate(-50%, -50%)';
+
+		divLoadGameText.innerHTML = 'Pressione ENTER para iniciar';
+
+		divLoadGameText.style.fontSize = '1rem';
+
+		divScreen.appendChild(divLoadGame);
+		divLoadGame.appendChild(divLoadGameText);
+
+		const _onLoadGame = _event => {
+			// Load game
+			switch (_event.key) {
+				case 'Enter': {
+					const divScreenAction = document.querySelector('#screen > div#action');
+					const divScreenGeneral = document.querySelector('#screen > div#general');
+
+					divLoadGame.removeChild(divLoadGameText);
+					divScreen.removeChild(divLoadGame);
+
+					divScreen.removeAttribute('style');
+					divScreenAction.removeAttribute('class'); // Remove the initial class is-hidden
+					divScreenGeneral.removeAttribute('class'); // Remove the initial class is-hidden
+
+					_event.target.removeEventListener(_event.type, _onLoadGame);
+
+					startGame();
+				}
+			}
+		};
+
+		// Keyboard listeners
+		document.body.addEventListener(
+			'keypress',
+			_onLoadGame,
+			false
+		);
+	};
+
+	loadGame();
 })();
