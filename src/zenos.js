@@ -894,13 +894,7 @@
 				} else {
 					if (validateAggroX) {
 						if (_player.step.x !== 0) {
-							if (!_mapElement.radius || !_player.radius) {
-								_mapElement.step.x = -_player.step.x;
-							} else { // Circle x Circle
-								if (Math.abs(_mapElement.x - _player.x) >= _mapElement.radius + _player.radius) {
-									_mapElement.step.x = -_player.step.x;
-								}
-							}
+							_mapElement.step.x = -_player.step.x;
 						} else {
 							_mapElement.step.x = (_mapElement.x > _player.x ? -1 : 1);
 						}
@@ -918,13 +912,7 @@
 				} else {
 					if (validateAggroY) {
 						if (_player.step.y !== 0) {
-							if (!_mapElement.radius || !_player.radius) {
-								_mapElement.step.y = -_player.step.y;
-							} else { // Circle x Circle
-								if (Math.abs(_mapElement.y - _player.y) >= _mapElement.radius + _player.radius) {
-									_mapElement.step.y = -_player.step.y;
-								}
-							}
+							_mapElement.step.y = -_player.step.y;
 						} else {
 							_mapElement.step.y = (_mapElement.y > _player.y ? -1 : 1);
 						}
@@ -1433,7 +1421,7 @@
 		);
 
 		const _goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
-			const secureCollisionValue = Math.abs(checkStep) + 1;
+			const secureCollisionValue = Math.abs(checkStep) + 5;
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
 			return (
