@@ -94,6 +94,36 @@
 
 	// Especific game helpers
 
+	// Play soud effect
+	const _playSoundEffect = (_sound, overlap = true, _onEndCallback) => {
+		if (_sound) {
+			const playSound = (
+				_sound.tagName ? ( // Should be already an AUDIO node element
+					_sound
+				) : ( // Should be a map sound element (json)
+					overlap ? (
+						_sound.audio.cloneNode()
+					) : (
+						_sound.audio
+					)
+				)
+			);
+
+			playSound.onended = () => {
+				if (_onEndCallback) {
+					_onEndCallback();
+				}
+
+				playSound.remove();
+			};
+
+			playSound.play()
+			.catch(
+				err => console.error(err) // eslint-disable-line no-console
+			);
+		}
+	};
+
 	// Check if map border is close enough
 	const _checkScreenBorders = _side => (
 		_side / 2
@@ -409,14 +439,8 @@
 	const _drawnElementShot = (elementShooting, _map, _newShootDataBaseElement, _newShootDataSpeed) => {
 		const shootSoundEffect = (_map, _newShootDataBaseElement) => {
 			// Sound effect
-			const playSound = _map.sounds.filter(sound => sound.id === (_newShootDataBaseElement.ref === 301 ? 'player-shoot' : 'mob-shoot')).pop();
-
-			if (playSound) {
-				playSound.audio.cloneNode().play()
-				.catch(
-					err => console.error(err) // eslint-disable-line no-console
-				);
-			}
+			const sound = _map.sounds.filter(mapSound => mapSound.id === (_newShootDataBaseElement.ref === 301 ? 'player-shoot' : 'mob-shoot')).pop();
+			_playSoundEffect(sound);
 		};
 
 		const currentElementDirection = _getElementDirection(elementShooting);
@@ -538,14 +562,8 @@
 							if (!_player._isShieldUp && shieldData.charges > 0) {
 								const shieldSoundEffect = _map => {
 									// Sound effect
-									const playSound = _map.sounds.filter(sound => sound.id === 'shield-up').pop();
-
-									if (playSound) {
-										playSound.audio.cloneNode().play()
-										.catch(
-											err => console.error(err) // eslint-disable-line no-console
-										);
-									}
+									const sound = _map.sounds.filter(mapSound => mapSound.id === 'shield-up').pop();
+									_playSoundEffect(sound);
 								};
 
 								_player._isShieldUp = true;
@@ -708,14 +726,8 @@
 	const elementActionShield = (_mapElement, _map) => {
 		const shieldSoundEffect = _map => {
 			// Sound effect
-			const playSound = _map.sounds.filter(sound => sound.id === 'shield-up').pop();
-
-			if (playSound) {
-				playSound.audio.cloneNode().play()
-				.catch(
-					err => console.error(err) // eslint-disable-line no-console
-				);
-			}
+			const sound = _map.sounds.filter(mapSound => mapSound.id === 'shield-up').pop();
+			_playSoundEffect(sound);
 		};
 
 		const shieldData = _mapElement.skills && _mapElement.skills.shield;
@@ -1656,14 +1668,8 @@
 				if (goModifyLife) {
 					const hittedSoundEffect = (_map, _lifeModifierFinal) => {
 						// Sound effect
-						const playSound = _map.sounds.filter(sound => sound.id === (_lifeModifierFinal > 0 ? 'hitted' : 'food')).pop();
-
-						if (playSound) {
-							playSound.audio.cloneNode().play()
-							.catch(
-								err => console.error(err) // eslint-disable-line no-console
-							);
-						}
+						const sound = _map.sounds.filter(mapSound => mapSound.id === (_lifeModifierFinal > 0 ? 'hitted' : 'food')).pop();
+						_playSoundEffect(sound);
 					};
 
 					const lifeModifierFinal = Math.round(lifeModifier / damageReduceFactor);
@@ -1908,65 +1914,61 @@
 
 	// Actually ends
 	const endGame = (_action, _cx, _player, _map) => {
-		const gameOverFinalActions = (_action, _cx, _player, _map) => {
-			// Sound effect
-			const playGameOverSound = _map.sounds.filter(sound => sound.id === 'fail').pop();
+		const gameOverSoundAndKeys = (_action, _cx, _player, _map) => {
+			const gameOverSoundCallback = () => {
+				gameOverMessage(_action, _cx, _player);
 
-			if (playGameOverSound) {
-				const resetGameSounds = new Event('resetGameSounds'); // Custom event
+				// Keyboard listener
+				const _onRestartGame = _event => {
+					_event.preventDefault();
 
-				document.dispatchEvent(resetGameSounds);
-
-				playGameOverSound.audio.onended = () => {
-					gameOverMessage(_action, _cx, _player);
-
-					// Keyboard listener
-					const _onRestartGame = _event => {
-						_event.preventDefault();
-
-						// Restart game
-						switch (_event.key) {
-							case 'Enter': {
-								_event.target.removeEventListener(_event.type, _onRestartGame, false);
-								startGame();
-							}
+					// Restart game
+					switch (_event.key) {
+						case 'Enter': {
+							_event.target.removeEventListener(_event.type, _onRestartGame, false);
+							startGame();
 						}
-					};
-
-					document.body.addEventListener(
-						'keypress',
-						_onRestartGame,
-						false
-					);
+					}
 				};
 
-				playGameOverSound.audio.play()
-				.catch(
-					err => console.error(err) // eslint-disable-line no-console
+				document.body.addEventListener(
+					'keypress',
+					_onRestartGame,
+					false
 				);
-			}
+			};
+
+			// Keyboard listener
+			document.body.removeEventListener(
+				'keydown',
+				$keyDownHandlerPlayingGame,
+				false
+			);
+
+			// Custom event
+			const resetGameSounds = new Event('resetGameSounds');
+			document.dispatchEvent(resetGameSounds);
+
+			// Sound effect
+			const sound = _map.sounds.filter(mapSound => mapSound.id === 'fail').pop();
+			_playSoundEffect(sound, false, gameOverSoundCallback);
 		};
 
 		clearInterval($intervalMapTimer);
 
-		// Keyboard listener
-		document.body.removeEventListener(
-			'keydown',
-			$keyDownHandlerPlayingGame,
-			false
-		);
-
-		gameOverFinalActions(_action, _cx, _player, _map);
+		gameOverSoundAndKeys(_action, _cx, _player, _map);
 	};
 
 	// Actually starts
 	const beginGame = (_action, _canvas, _cx, _player, _map) => {
-		const gameStartFinalActions = (_player, _map) => {
+		const gameStartSoundAndKeys = (_player, _map) => {
 			// Sound effect
-			const playGameStartSound = _map.sounds.filter(sound => sound.id === 'background-music').pop();
+			const playGameStartSound = _map.sounds.filter(mapSound => mapSound.id === 'background-music').pop();
 
 			if (playGameStartSound) {
-				playGameStartSound.audio.oncanplay = () => {
+				const sound = playGameStartSound.audio;
+
+				sound.oncanplay = () => {
 					// Keyboard listener
 					$keyDownHandlerPlayingGame = _event => globalListeners.keyDownHandlerPlayingGame(_event, _player, _map);
 
@@ -1977,10 +1979,7 @@
 					);
 				};
 
-				playGameStartSound.audio.play()
-				.catch(
-					err => console.error(err) // eslint-disable-line no-console
-				);
+				_playSoundEffect(sound, false);
 			}
 		};
 
@@ -2014,7 +2013,7 @@
 			1000
 		);
 
-		gameStartFinalActions(_player, _map);
+		gameStartSoundAndKeys(_player, _map);
 	};
 
 	// -----------------------------------------------------------------------------------------------
