@@ -1329,9 +1329,9 @@
 				};
 				// ------------------------------------------------------------
 
-				const executeActions = collisionAvoidPenetration(_checkElement, _mapElement, phase);
+				const executeCollisionActions = collisionAvoidPenetration(_checkElement, _mapElement, phase);
 
-				switch (executeActions) {
+				switch (executeCollisionActions) {
 					case 1:
 					case 2: { // Actions at x axis
 						_executeActionX(_checkElement, _mapElement);
@@ -1433,7 +1433,7 @@
 		);
 
 		const _goCheckBroadRange = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, checkStep) => {
-			const secureCollisionValue = Math.abs(checkStep) + 5;
+			const secureCollisionValue = Math.abs(checkStep) + 1;
 			const secureBorder = secureCollisionValue < (_mapComplement || _mapRadius) ? secureCollisionValue : (_mapComplement || _mapRadius);
 
 			return (
