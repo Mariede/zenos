@@ -1184,38 +1184,10 @@
 		const _getAidValues = (_checkElement, _mapElement) => { // Values to avoid penetration inside the _mapElement (target)
 			const aidValues = {};
 
-			const mapRadius2CirclesDistanceX = (
-				_checkElement.radius && _mapElement.radius && (
-					Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.y - _mapElement.y) ** 2))
-				)
-			) || 0;
-
-			const mapRadius2CirclesDistanceY = (
-				_checkElement.radius && _mapElement.radius && (
-					Math.sqrt(((_checkElement.radius + _mapElement.radius) ** 2) - ((_checkElement.x - _mapElement.x) ** 2))
-				)
-			) || 0;
-
-			const mapRadiusReflexionX = (
-				mapRadius2CirclesDistanceX ? ( // Only circle x circle
-					mapRadius2CirclesDistanceX - _checkElement.radius
-				) : (
-					_mapElement.radius
-				)
-			);
-
-			const mapRadiusReflexionY = (
-				mapRadius2CirclesDistanceY ? ( // Only circle x circle
-					mapRadius2CirclesDistanceY - _checkElement.radius
-				) : (
-					_mapElement.radius
-				)
-			);
-
 			aidValues.baseCheckElementDistanceX = _checkElement.radius ? _checkElement.radius : (_checkElement.step.x > 0 ? _checkElement.width : 0);
 			aidValues.baseCheckElementDistanceY = _checkElement.radius ? _checkElement.radius : (_checkElement.step.y > 0 ? _checkElement.height : 0);
-			aidValues.baseMapElementDistanceX = _mapElement.radius ? mapRadiusReflexionX : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
-			aidValues.baseMapElementDistanceY = _mapElement.radius ? mapRadiusReflexionY : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
+			aidValues.baseMapElementDistanceX = _mapElement.radius ? _mapElement.radius : (_checkElement.step.x > 0 ? 0 : _mapElement.width);
+			aidValues.baseMapElementDistanceY = _mapElement.radius ? _mapElement.radius : (_checkElement.step.y > 0 ? 0 : _mapElement.height);
 
 			return aidValues;
 		};
@@ -1419,10 +1391,17 @@
 	};
 
 	const checkMapElementCollision = (checkElement, _map, _playerAsTargetMapElement = null) => {
+		/*
+		** Disabled for now... needs algoritm improvements in collision avoid penetrations **
+			_checkCoordOther and _mapCoordOther are the opposite axis coordenates or:
+				-> _checkCoord and _mapCoord in X -> _checkCoordOther and _mapCoordOther in Y
+				-> _checkCoord and _mapCoord in Y -> _checkCoordOther and _mapCoordOther in X
+
 		// Two circles collision formula
 		const _circlesCollision = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther) => (
 			((_checkCoord - _mapCoord) ** 2) + ((_checkCoordOther - _mapCoordOther) ** 2) <= ((_checkRadius + _mapRadius) ** 2)
 		);
+		*/
 
 		const _rectanglesCollisionBackward = (_checkCoord1, _mapCoord1, _checkCood2, _mapCood2) => (
 			_checkCoord1 <= _mapCoord1 && _checkCood2 > _mapCood2
@@ -1454,10 +1433,11 @@
 		};
 
 		// Two rectangles Collision axis backward (-X / -Y)
-		const _goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement, _checkCoordOther, _mapCoordOther) => (
+		const _goCheckCollisionBackward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _mapComplement) => (
 			_checkRadius ? (
 				_mapRadius ? (
-					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
+					// ** Disabled for now... _circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
+					_rectanglesCollisionBackward(_checkCoord - _checkRadius, _mapCoord + _mapRadius, _checkCoord - _checkRadius, _mapCoord - _mapRadius)
 				) : (
 					_rectanglesCollisionBackward(_checkCoord - _checkRadius, _mapCoord + _mapComplement, _checkCoord - _checkRadius, _mapCoord)
 				)
@@ -1471,10 +1451,11 @@
 		);
 
 		// Two rectangles Collision axis foward (+X / +Y)
-		const _goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement, _checkCoordOther, _mapCoordOther) => (
+		const _goCheckCollisionFoward = (_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkComplement, _mapComplement) => (
 			_checkRadius ? (
 				_mapRadius ? (
-					_circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
+					// ** Disabled for now... _circlesCollision(_checkRadius, _mapRadius, _checkCoord, _mapCoord, _checkCoordOther, _mapCoordOther)
+					_rectanglesCollisionFoward(_checkCoord + _checkRadius, _mapCoord - _mapRadius, _checkCoord + _checkRadius, _mapCoord + _mapRadius)
 				) : (
 					_rectanglesCollisionFoward(_checkCoord + _checkRadius, _mapCoord, _checkCoord + _checkRadius, _mapCoord + _mapComplement)
 				)
@@ -1515,7 +1496,7 @@
 
 			if (goCheckBroadRangeY) {
 				if (_checkElement.step.x < 0 || (_checkElement.step.x === 0 && (_mapElement.step && (_mapElement.step.x || 0) > 0))) {
-					const goCheckCollisionBackwardX = _goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width, _checkElement.y, _mapElement.y);
+					const goCheckCollisionBackwardX = _goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _mapElement.width);
 
 					if (goCheckCollisionBackwardX) {
 						// Collided
@@ -1526,7 +1507,7 @@
 						}
 					}
 				} else {
-					const goCheckCollisionFowardX = _goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width, _checkElement.y, _mapElement.y);
+					const goCheckCollisionFowardX = _goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.x, _mapElement.x, _checkElement.width, _mapElement.width);
 
 					if (goCheckCollisionFowardX) {
 						// Collided
@@ -1547,7 +1528,7 @@
 
 			if (goCheckBroadRangeX) {
 				if (_checkElement.step.y < 0 || (_checkElement.step.y === 0 && (_mapElement.step && (_mapElement.step.y || 0) > 0))) {
-					const goCheckCollisionBackwardY = _goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height, _checkElement.x, _mapElement.x);
+					const goCheckCollisionBackwardY = _goCheckCollisionBackward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _mapElement.height);
 
 					if (goCheckCollisionBackwardY) {
 						// Collided
@@ -1558,7 +1539,7 @@
 						}
 					}
 				} else {
-					const goCheckCollisionFowardY = _goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height, _checkElement.x, _mapElement.x);
+					const goCheckCollisionFowardY = _goCheckCollisionFoward(_checkElement.radius, _mapElement.radius, _checkElement.y, _mapElement.y, _checkElement.height, _mapElement.height);
 
 					if (goCheckCollisionFowardY) {
 						// Collided

@@ -252,8 +252,9 @@ It will be converted to a React application soon!
 
 ## Elements collisions
  * "Circle x Circle".
+   > **Disabled for now**, it needs a better collision penetration algoritm (in future)
  * "Rectangle x Rectangle".
-   > Right now, "Circle x Rectangle" or "Rectangle x Circle" acts as "Rectangle x Rectangle" collision
+   > Right now, every shape (rectangles, squares, circles, ...) acts as "Rectangle x Rectangle" collision
  * Configurable collisions actions.
 
 ## Elements physics
