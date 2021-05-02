@@ -209,9 +209,168 @@
 		}
 	};
 
-	// Drawn element body and direction (if applicable)
-	const _drawnElement = (_cx, _element, _currentElementDirection) => {
+	// Drawn element direction (if applicable) - for a body shape style (no sprites)
+	const _drawnElementDirectionShape = (_cx, _element, _elementIsACircle, _currentElementDirection) => {
+		const _drawnElementDirection = (_cx, _element, _elementIsACircle, _getX, _getY) => {
+			_cx.save();
+
+			_cx.lineWidth = 5;
+
+			const baseInnerRectStart = _cx.lineWidth / 2;
+
+			_cx.beginPath();
+
+			if (_elementIsACircle) {
+				_cx.rect(_element.x - baseInnerRectStart, _element.y - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
+				_cx.moveTo(_element.x, _element.y);
+			} else {
+				const midInnerRectWidth = _element.x + (_element.width / 2);
+				const midInnerRectHeight = _element.y + (_element.height / 2);
+
+				_cx.rect(midInnerRectWidth - baseInnerRectStart, midInnerRectHeight - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
+				_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
+			}
+
+			_cx.lineTo(_getX, _getY);
+			_cx.strokeStyle = _element.style.main.details;
+			_cx.stroke();
+			_cx.closePath();
+
+			_cx.restore();
+		};
+
+		const baseAngle = Math.PI / 180;
+
+		switch (_currentElementDirection) {
+			case 'NW': {
+				if (_elementIsACircle) {
+					const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x;
+					const getY = _element.y;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'N': {
+				if (_elementIsACircle) {
+					const getX = _element.x;
+					const getY = _element.y - _element.radius;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x + (_element.width / 2);
+					const getY = _element.y;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'NE': {
+				if (_elementIsACircle) {
+					const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x + _element.width;
+					const getY = _element.y;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'W': {
+				if (_elementIsACircle) {
+					const getX = _element.x - _element.radius;
+					const getY = _element.y;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x;
+					const getY = _element.y + (_element.height / 2);
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'E': {
+				if (_elementIsACircle) {
+					const getX = _element.x + _element.radius;
+					const getY = _element.y;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x + _element.width;
+					const getY = _element.y + (_element.height / 2);
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'SW': {
+				if (_elementIsACircle) {
+					const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x;
+					const getY = _element.y + _element.height;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'S': {
+				if (_elementIsACircle) {
+					const getX = _element.x;
+					const getY = _element.y + _element.radius;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x + (_element.width / 2);
+					const getY = _element.y + _element.height;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+			case 'SE': {
+				if (_elementIsACircle) {
+					const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
+					const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				} else {
+					const getX = _element.x + _element.width;
+					const getY = _element.y + _element.height;
+
+					_drawnElementDirection(_cx, _element, _elementIsACircle, getX, getY);
+				}
+
+				break;
+			}
+		}
+	};
+
+	// Drawn element body
+	const _drawnElement = (_cx, _element) => {
 		const elementIsACircle = _element.radius || false;
+
+		// Element direction (if applicable)
+		const currentElementDirection = _getElementDirection(_element);
 
 		// Drawn element body
 		if (elementIsACircle) {
@@ -255,162 +414,8 @@
 			_cx.restore();
 		}
 
-		// Drawn element direction
-		const elementHasDirection = Object.prototype.hasOwnProperty.call(_element, 'currentDirection');
-
-		if (elementHasDirection) { // Only makes sense if element has a side direction
-			const _drawnElementDirection = (_cx, _element, _elementIsACircle, _getX, _getY) => {
-				_cx.save();
-
-				_cx.lineWidth = 5;
-
-				const baseInnerRectStart = _cx.lineWidth / 2;
-
-				_cx.beginPath();
-
-				if (_elementIsACircle) {
-					_cx.rect(_element.x - baseInnerRectStart, _element.y - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
-					_cx.moveTo(_element.x, _element.y);
-				} else {
-					const midInnerRectWidth = _element.x + (_element.width / 2);
-					const midInnerRectHeight = _element.y + (_element.height / 2);
-
-					_cx.rect(midInnerRectWidth - baseInnerRectStart, midInnerRectHeight - baseInnerRectStart, _cx.lineWidth, _cx.lineWidth);
-					_cx.moveTo(midInnerRectWidth, midInnerRectHeight);
-				}
-
-				_cx.lineTo(_getX, _getY);
-				_cx.strokeStyle = _element.style.main.details;
-				_cx.stroke();
-				_cx.closePath();
-
-				_cx.restore();
-			};
-
-			const baseAngle = Math.PI / 180;
-
-			switch (_currentElementDirection) {
-				case 'NW': {
-					if (elementIsACircle) {
-						const getX = _element.x + (_element.radius * Math.sin(-45 * baseAngle));
-						const getY = _element.y - (_element.radius * Math.cos(-45 * baseAngle));
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x;
-						const getY = _element.y;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'N': {
-					if (elementIsACircle) {
-						const getX = _element.x;
-						const getY = _element.y - _element.radius;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x + (_element.width / 2);
-						const getY = _element.y;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'NE': {
-					if (elementIsACircle) {
-						const getX = _element.x + (_element.radius * Math.sin(45 * baseAngle));
-						const getY = _element.y - (_element.radius * Math.cos(45 * baseAngle));
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x + _element.width;
-						const getY = _element.y;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'W': {
-					if (elementIsACircle) {
-						const getX = _element.x - _element.radius;
-						const getY = _element.y;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x;
-						const getY = _element.y + (_element.height / 2);
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'E': {
-					if (elementIsACircle) {
-						const getX = _element.x + _element.radius;
-						const getY = _element.y;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x + _element.width;
-						const getY = _element.y + (_element.height / 2);
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'SW': {
-					if (elementIsACircle) {
-						const getX = _element.x + (_element.radius * Math.sin(225 * baseAngle));
-						const getY = _element.y - (_element.radius * Math.cos(225 * baseAngle));
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x;
-						const getY = _element.y + _element.height;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'S': {
-					if (elementIsACircle) {
-						const getX = _element.x;
-						const getY = _element.y + _element.radius;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x + (_element.width / 2);
-						const getY = _element.y + _element.height;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-				case 'SE': {
-					if (elementIsACircle) {
-						const getX = _element.x + (_element.radius * Math.sin(-225 * baseAngle));
-						const getY = _element.y - (_element.radius * Math.cos(-225 * baseAngle));
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					} else {
-						const getX = _element.x + _element.width;
-						const getY = _element.y + _element.height;
-
-						_drawnElementDirection(_cx, _element, elementIsACircle, getX, getY);
-					}
-
-					break;
-				}
-			}
+		if (currentElementDirection) { // Only makes sense if element has a side direction
+			_drawnElementDirectionShape(_cx, _element, elementIsACircle, currentElementDirection); // For a body shape style (no sprites)
 		}
 	};
 
@@ -1030,11 +1035,8 @@
 				// Collisions
 				checkElementCollisions(mapElement, _player, _map);
 
-				// Element direction (if applicable)
-				const currentElementDirection = _getElementDirection(mapElement);
-
 				// Drawn element body (direction if applicable)
-				_drawnElement(_cx, mapElement, currentElementDirection);
+				_drawnElement(_cx, mapElement);
 
 				// Drawn element details (shield, damage, ...)
 				_drawnElementDetails(_cx, mapElement);
@@ -1167,11 +1169,8 @@
 		// Collisions
 		checkPlayerCollisions(_player, _map);
 
-		// Player direction
-		const currentPlayerDirection = _getElementDirection(_player);
-
 		// Drawn player body and direction
-		_drawnElement(_cx, _player, currentPlayerDirection);
+		_drawnElement(_cx, _player);
 
 		// Drawn player details (shield, damage, ...)
 		_drawnPlayerDetails(_cx, _player);
