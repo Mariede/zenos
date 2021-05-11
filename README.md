@@ -120,6 +120,7 @@ It will be converted to a React application soon!
  * Can be structures, walls, towers, doors, keys, food, ornaments, objects, monsters, ...
  * If it has a life property, can use a moving "aggro" algoritm.
  * Element aggro range increases when get hitted by a player.
+ * Line of sight (los) algoritm may help avoid aggro.
  * Can have action skills like hit, shield or shooting.
 
 ### Json element
@@ -274,8 +275,10 @@ It will be converted to a React application soon!
 
 ## Tips
  * Using circle (radius) for players and mobs hit boxes will improve aggro collisions when having multiple mobs over the player.
+   > Circle collisions disabled for now
  * Base elements must have a **ref** named property with one of following values:
     * **301**: if it comes from players.
     * **101**/**201**: if it comes from environment.
  * Map elements of the **same aggro group** can not hit or be hitted between themselves.
  * Player hits increase aggro range.
+ * There is a line of sight algoritm that helps avoid aggro.

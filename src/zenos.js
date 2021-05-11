@@ -857,6 +857,55 @@
 
 		// If aggroRange equals -1 or element has no life: no aggro permitted for the element
 		if (_mapElement.aggroRange !== -1 && _mapElement.life && _mapElement.life > 0) {
+			// Validate LOS (Line Of sight of the current map element)
+			const _hasLineOfSight = (_mapElement, _mapElements, _player) => {
+				const playerX = _player.radius ? _player.x : _player.x + (_player.width / 2);
+				const playerY = _player.radius ? _player.y : _player.y + (_player.height / 2);
+
+				const mapElementX = _mapElement.radius ? _mapElement.x : _mapElement.x + (_mapElement.width / 2);
+				const mapElementY = _mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2);
+
+				return (
+					_mapElements
+					.filter(
+						element => _mapElement.id && element.id !== _mapElement.id
+					)
+					.every(
+						element => {
+							const _axisLineOfSight = (a1, a2, b1, b2) => (
+								a1 < a2 || b1 > b2
+							);
+
+							const elementX = element.radius ? element.x : element.x + (element.width / 2);
+							const elementY = element.radius ? element.y : element.y + (element.height / 2);
+
+							const elementSideX = element.radius ? element.radius : (element.width / 2);
+							const elementSideY = element.radius ? element.radius : (element.height / 2);
+
+							const losX = (
+								mapElementX > playerX ? (
+									_axisLineOfSight(elementX + elementSideX, playerX, elementX - elementSideX, mapElementX)
+								) : (
+									_axisLineOfSight(elementX + elementSideX, mapElementX, elementX - elementSideX, playerX)
+								)
+							);
+
+							const losY = (
+								mapElementY > playerY ? (
+									_axisLineOfSight(elementY + elementSideY, playerY, elementY - elementSideY, mapElementY)
+								) : (
+									_axisLineOfSight(elementY + elementSideY, mapElementY, elementY - elementSideY, playerY)
+								)
+							);
+
+							return (
+								losX || losY
+							);
+						}
+					)
+				);
+			};
+
 			const aggroGroupCheck = (
 				_mapElements
 				.filter(
@@ -869,7 +918,18 @@
 
 			const aggroPlayer = ((_player.x - _mapElement.x) ** 2) + ((_player.y - _mapElement.y) ** 2);
 			const aggroRange = (_mapElement.aggroRange || defaults.aggroRange) ** 2;
-			const aggroCheck = aggroPlayer <= aggroRange;
+
+			const aggroCheck = (
+				_mapElement._isAggroed ? (
+					aggroPlayer <= aggroRange
+				) : (
+					_hasLineOfSight(_mapElement, _mapElements, _player) ? (
+						aggroPlayer <= aggroRange
+					) : (
+						false
+					)
+				)
+			);
 
 			if (aggroGroupCheck || aggroCheck) {
 				if (!aggroGroupCheck) {
