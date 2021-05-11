@@ -862,8 +862,14 @@
 				const playerX = _player.radius ? _player.x : _player.x + (_player.width / 2);
 				const playerY = _player.radius ? _player.y : _player.y + (_player.height / 2);
 
+				const playerSideX = _player.radius ? _player.radius : (_player.width / 2);
+				const playerSideY = _player.radius ? _player.radius : (_player.height / 2);
+
 				const mapElementX = _mapElement.radius ? _mapElement.x : _mapElement.x + (_mapElement.width / 2);
 				const mapElementY = _mapElement.radius ? _mapElement.y : _mapElement.y + (_mapElement.height / 2);
+
+				const mapElementSideX = _mapElement.radius ? _mapElement.radius : (_mapElement.width / 2);
+				const mapElementSideY = _mapElement.radius ? _mapElement.radius : (_mapElement.height / 2);
 
 				return (
 					_mapElements
@@ -884,17 +890,17 @@
 
 							const losX = (
 								mapElementX > playerX ? (
-									_axisLineOfSight(elementX + elementSideX, playerX, elementX - elementSideX, mapElementX)
+									_axisLineOfSight(elementX + elementSideX, playerX + playerSideX, elementX - elementSideX, mapElementX - mapElementSideX)
 								) : (
-									_axisLineOfSight(elementX + elementSideX, mapElementX, elementX - elementSideX, playerX)
+									_axisLineOfSight(elementX + elementSideX, mapElementX + mapElementSideX, elementX - elementSideX, playerX - playerSideX)
 								)
 							);
 
 							const losY = (
 								mapElementY > playerY ? (
-									_axisLineOfSight(elementY + elementSideY, playerY, elementY - elementSideY, mapElementY)
+									_axisLineOfSight(elementY + elementSideY, playerY + playerSideY, elementY - elementSideY, mapElementY - mapElementSideY)
 								) : (
-									_axisLineOfSight(elementY + elementSideY, mapElementY, elementY - elementSideY, playerY)
+									_axisLineOfSight(elementY + elementSideY, mapElementY + mapElementSideY, elementY - elementSideY, playerY - playerSideY)
 								)
 							);
 
