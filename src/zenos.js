@@ -871,6 +871,9 @@
 				const mapElementSideX = _mapElement.radius ? _mapElement.radius : (_mapElement.width / 2);
 				const mapElementSideY = _mapElement.radius ? _mapElement.radius : (_mapElement.height / 2);
 
+				const quadrantMidX = (playerX + mapElementX) / 2;
+				const quadrantMidY = (playerY + mapElementY) / 2;
+
 				return (
 					_mapElements
 					.filter(
@@ -879,7 +882,29 @@
 					.every(
 						element => {
 							const _axisLineOfSight = (a1, a2, b1, b2) => (
-								a1 < a2 || b1 > b2
+								(a1 < a2) || (b1 > b2)
+							);
+
+							const _quadrantsLineOfSight = (a1, a2, b1, b2) => (
+								(a1 && a2) || (b1 && b2)
+							);
+
+							const _quadrants1122 = () => (
+								_quadrantsLineOfSight(
+									elementX + elementSideX < quadrantMidX,
+									elementY + elementSideY < quadrantMidY,
+									elementX - elementSideX > quadrantMidX,
+									elementY - elementSideY > quadrantMidY
+								)
+							);
+
+							const _quadrants1221 = () => (
+								_quadrantsLineOfSight(
+									elementX - elementSideX > quadrantMidX,
+									elementY + elementSideY < quadrantMidY,
+									elementX + elementSideX < quadrantMidX,
+									elementY - elementSideY > quadrantMidY
+								)
 							);
 
 							const elementX = element.radius ? element.x : element.x + (element.width / 2);
@@ -904,8 +929,24 @@
 								)
 							);
 
+							const losQuadrants = (
+								mapElementX > playerX ? (
+									mapElementY > playerY ? (
+										_quadrants1221()
+									) : (
+										_quadrants1122()
+									)
+								) : (
+									mapElementY > playerY ? (
+										_quadrants1122()
+									) : (
+										_quadrants1221()
+									)
+								)
+							);
+
 							return (
-								losX || losY
+								losX || losY || losQuadrants
 							);
 						}
 					)
