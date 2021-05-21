@@ -921,7 +921,7 @@
 								)
 							);
 
-							const losY = (
+							const losY = !losX && (
 								mapElementY > playerY ? (
 									_axisLineOfSight(elementY + elementSideY, playerY + playerSideY, elementY - elementSideY, mapElementY - mapElementSideY)
 								) : (
@@ -929,7 +929,7 @@
 								)
 							);
 
-							const losQuadrants = (
+							const losQuadrants = !losX && !losY && (
 								mapElementX > playerX ? (
 									mapElementY > playerY ? (
 										_quadrants1221()
