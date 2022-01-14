@@ -5,8 +5,12 @@
   "main": "./src/zenos.html",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": ">=12.22.0"
+  },
   "dependencies": {
-    "eslint": "^7.32.0"
+    "eslint": "^8.6.0",
+    "eslint-plugin-import": "^2.25.4"
   },
   "keywords": [
     "zenos",

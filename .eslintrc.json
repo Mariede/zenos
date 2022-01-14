@@ -15,7 +15,8 @@
 		"sourceType": "script"
 	},
 	"extends": [
-		"eslint:recommended"
+		"eslint:recommended",
+		"plugin:import/errors"
 	],
 	"settings": {
 		"import/resolver": {
@@ -122,6 +123,10 @@
 			2,
 			"beside"
 		],
+
+		"import/no-unresolved": 2,
+		"import/no-extraneous-dependencies": 2,
+
 		"indent": [
 			2,
 			"tab",
