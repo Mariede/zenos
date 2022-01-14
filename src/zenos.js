@@ -512,20 +512,20 @@
 		const shootStepX = (shootCheckingStepX > 0 || checkDirectionXpositive) ? (
 			shootSpeed
 		) : (
-			(shootCheckingStepX < 0 || checkDirectionXnegative) ? (
-				shootSpeed * -1
-			) : (
+			(shootCheckingStepX > 0 && !checkDirectionXnegative) ? (
 				0
+			) : (
+				shootSpeed * -1
 			)
 		);
 
 		const shootStepY = (shootCheckingStepY > 0 || checkDirectionYpositive) ? (
 			shootSpeed
 		) : (
-			(shootCheckingStepY < 0 || checkDirectionYnegative) ? (
-				shootSpeed * -1
-			) : (
+			(shootCheckingStepY > 0 && !checkDirectionYnegative) ? (
 				0
+			) : (
+				shootSpeed * -1
 			)
 		);
 
@@ -968,10 +968,10 @@
 
 			const aggroCheck = (
 				_mapElement._isAggroed ? (
-					aggroPlayer <= aggroRange
+					aggroRange >= aggroPlayer
 				) : (
 					_hasLineOfSight(_mapElement, _mapElements, _player) ? (
-						aggroPlayer <= aggroRange
+						aggroRange >= aggroPlayer
 					) : (
 						false
 					)
@@ -1524,15 +1524,15 @@
 			return (
 				_checkRadius ? (
 					_mapRadius ? (
-						!(_checkCoord - _checkRadius > _mapCoord + _mapRadius - secureBorder || _checkCoord + _checkRadius < _mapCoord - _mapRadius + secureBorder)
+						!(_checkCoord - _checkRadius > _mapCoord + _mapRadius - secureBorder || _mapCoord - _mapRadius + secureBorder > _checkCoord + _checkRadius)
 					) : (
-						!(_checkCoord - _checkRadius > _mapCoord + _mapComplement - secureBorder || _checkCoord + _checkRadius < _mapCoord + secureBorder)
+						!(_checkCoord - _checkRadius > _mapCoord + _mapComplement - secureBorder || _mapCoord + secureBorder > _checkCoord + _checkRadius)
 					)
 				) : (
 					_mapRadius ? (
-						!(_checkCoord > _mapCoord + _mapRadius - secureBorder || _checkCoord + _checkComplement < _mapCoord - _mapRadius + secureBorder)
+						!(_checkCoord > _mapCoord + _mapRadius - secureBorder || _mapCoord - _mapRadius + secureBorder > _checkCoord + _checkComplement)
 					) : (
-						!(_checkCoord > _mapCoord + _mapComplement - secureBorder || _checkCoord + _checkComplement < _mapCoord + secureBorder)
+						!(_checkCoord > _mapCoord + _mapComplement - secureBorder || _mapCoord + secureBorder > _checkCoord + _checkComplement)
 					)
 				)
 			);
@@ -1964,7 +1964,7 @@
 			$boxWidth < _action.offsetWidth ? (
 				$boxWidth / 2
 			) : (
-				_player.x < screenCheckW ? (
+				screenCheckW > _player.x ? (
 					_action.offsetWidth / 2
 				) : (
 					_player.x > $boxWidth - screenCheckW ? (
@@ -1980,7 +1980,7 @@
 			$boxHeight < _action.offsetHeight ? (
 				$boxHeight / 2
 			) : (
-				_player.y < screenCheckY ? (
+				screenCheckY > _player.y ? (
 					_action.offsetHeight / 2
 				) : (
 					_player.y > $boxHeight - screenCheckY ? (
