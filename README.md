@@ -5,8 +5,8 @@ Building a 2D game engine from scratch using canvas and js for testing purposes.
 This project is a remembrance and a tribute to the awesome and wonderful **8-bit Gauntlet** (nintendinho :heart:)!
 
 ```
-It will be converted to a React application one day (lol)! A real playable map is easier to be done and may be there sooner =)) Thank's
-Better collision/actions code should be done too, especially to have circle iterations
+It will be converted to a React application one day (lol)! A real playable map is easier to be done and may be there sooner
+Better collision/actions code should be done too, especially to have circle iterations =))
 ```
 
 ## Player entity
